@@ -2,7 +2,15 @@
 title: "Automatic differentation rules for linear algebra"
 author: "Jutho Haegeman"
 date: "10/27/2023"
-format: html
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 4
+    toc-title: Contents
+    toc-location: left
+    number-sections: true    
+    html-math-method: mathjax
 ---
 
 ::: {.hidden}

@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -102,14 +102,70 @@ window.Quarto = {
 
 </head>
 
-<body class="fullcontent quarto-light">
+<body class="floating quarto-light">
 
 <div id="quarto-search-results"></div>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#preliminaries" id="toc-preliminaries" class="nav-link active" data-scroll-target="#preliminaries"><span class="header-section-number">1</span> Preliminaries</a>
+  <ul>
+  <li><a href="#complex-variables-and-chain-rules" id="toc-complex-variables-and-chain-rules" class="nav-link" data-scroll-target="#complex-variables-and-chain-rules"><span class="header-section-number">1.1</span> Complex variables and chain rules</a></li>
+  <li><a href="#matrices-and-their-tangents-and-cotangents" id="toc-matrices-and-their-tangents-and-cotangents" class="nav-link" data-scroll-target="#matrices-and-their-tangents-and-cotangents"><span class="header-section-number">1.2</span> Matrices and their tangents and cotangents</a>
+  <ul class="collapse">
+  <li><a href="#diagonal-and-triangular-matrices" id="toc-diagonal-and-triangular-matrices" class="nav-link" data-scroll-target="#diagonal-and-triangular-matrices"><span class="header-section-number">1.2.1</span> Diagonal and triangular matrices</a></li>
+  <li><a href="#unitary-matrices" id="toc-unitary-matrices" class="nav-link" data-scroll-target="#unitary-matrices"><span class="header-section-number">1.2.2</span> Unitary matrices</a></li>
+  <li><a href="#isometric-matrices" id="toc-isometric-matrices" class="nav-link" data-scroll-target="#isometric-matrices"><span class="header-section-number">1.2.3</span> Isometric matrices</a></li>
+  </ul></li>
+  <li><a href="#linear-problems-with-matrices" id="toc-linear-problems-with-matrices" class="nav-link" data-scroll-target="#linear-problems-with-matrices"><span class="header-section-number">1.3</span> Linear problems with matrices</a>
+  <ul class="collapse">
+  <li><a href="#sylvester-equation-and-hadamard-product" id="toc-sylvester-equation-and-hadamard-product" class="nav-link" data-scroll-target="#sylvester-equation-and-hadamard-product"><span class="header-section-number">1.3.1</span> Sylvester equation and Hadamard product</a></li>
+  </ul></li>
+  <li><a href="#gauge-freedom" id="toc-gauge-freedom" class="nav-link" data-scroll-target="#gauge-freedom"><span class="header-section-number">1.4</span> Gauge freedom</a></li>
+  </ul></li>
+  <li><a href="#qr-decomposition" id="toc-qr-decomposition" class="nav-link" data-scroll-target="#qr-decomposition"><span class="header-section-number">2</span> QR decomposition</a>
+  <ul>
+  <li><a href="#full-rank-case" id="toc-full-rank-case" class="nav-link" data-scroll-target="#full-rank-case"><span class="header-section-number">2.1</span> Full rank case</a></li>
+  <li><a href="#general-result" id="toc-general-result" class="nav-link" data-scroll-target="#general-result"><span class="header-section-number">2.2</span> General result</a></li>
+  </ul></li>
+  <li><a href="#eigenvalue-decomposition" id="toc-eigenvalue-decomposition" class="nav-link" data-scroll-target="#eigenvalue-decomposition"><span class="header-section-number">3</span> Eigenvalue decomposition</a>
+  <ul>
+  <li><a href="#hermitian-eigenvalue-decomposition" id="toc-hermitian-eigenvalue-decomposition" class="nav-link" data-scroll-target="#hermitian-eigenvalue-decomposition"><span class="header-section-number">3.1</span> Hermitian eigenvalue decomposition</a></li>
+  <li><a href="#nonhermitian-eigenvalue-decomposition" id="toc-nonhermitian-eigenvalue-decomposition" class="nav-link" data-scroll-target="#nonhermitian-eigenvalue-decomposition"><span class="header-section-number">3.2</span> Nonhermitian eigenvalue decomposition</a></li>
+  <li><a href="#schur-decomposition" id="toc-schur-decomposition" class="nav-link" data-scroll-target="#schur-decomposition"><span class="header-section-number">3.3</span> Schur decomposition</a></li>
+  </ul></li>
+  <li><a href="#partial-eigenvalue-and-schur-factorisation" id="toc-partial-eigenvalue-and-schur-factorisation" class="nav-link" data-scroll-target="#partial-eigenvalue-and-schur-factorisation"><span class="header-section-number">4</span> Partial eigenvalue and Schur factorisation</a>
+  <ul>
+  <li><a href="#invariant-subspaces" id="toc-invariant-subspaces" class="nav-link" data-scroll-target="#invariant-subspaces"><span class="header-section-number">4.1</span> Invariant subspaces</a></li>
+  <li><a href="#single-eigenvector" id="toc-single-eigenvector" class="nav-link" data-scroll-target="#single-eigenvector"><span class="header-section-number">4.2</span> Single eigenvector</a></li>
+  <li><a href="#single-eigenvector-alternative" id="toc-single-eigenvector-alternative" class="nav-link" data-scroll-target="#single-eigenvector-alternative"><span class="header-section-number">4.3</span> Single eigenvector (alternative)</a></li>
+  <li><a href="#higher-dimensional-invariant-subspace" id="toc-higher-dimensional-invariant-subspace" class="nav-link" data-scroll-target="#higher-dimensional-invariant-subspace"><span class="header-section-number">4.4</span> Higher-dimensional invariant subspace</a>
+  <ul class="collapse">
+  <li><a href="#hermitian-case" id="toc-hermitian-case" class="nav-link" data-scroll-target="#hermitian-case"><span class="header-section-number">4.4.1</span> Hermitian case</a></li>
+  <li><a href="#non-hermitian-case" id="toc-non-hermitian-case" class="nav-link" data-scroll-target="#non-hermitian-case"><span class="header-section-number">4.4.2</span> Non-hermitian case</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#singular-value-decomposition" id="toc-singular-value-decomposition" class="nav-link" data-scroll-target="#singular-value-decomposition"><span class="header-section-number">5</span> Singular value decomposition</a>
+  <ul>
+  <li><a href="#full-rank-decomposition" id="toc-full-rank-decomposition" class="nav-link" data-scroll-target="#full-rank-decomposition"><span class="header-section-number">5.1</span> Full rank decomposition</a></li>
+  <li><a href="#general-result-1" id="toc-general-result-1" class="nav-link" data-scroll-target="#general-result-1"><span class="header-section-number">5.2</span> General result</a></li>
+  </ul></li>
+  <li><a href="#polar-decomposition" id="toc-polar-decomposition" class="nav-link" data-scroll-target="#polar-decomposition"><span class="header-section-number">6</span> Polar decomposition</a>
+  <ul>
+  <li><a href="#alternative-from-svd" id="toc-alternative-from-svd" class="nav-link" data-scroll-target="#alternative-from-svd"><span class="header-section-number">6.1</span> Alternative from SVD</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -158,10 +214,10 @@ window.Quarto = {
 <p>$$</p>
 </div>
 <p>In this document we derive the forward and reverse chain rule for a number of common matrix factorisations. In particular, we also focus partial or incomplete factorisations, as appear in Krylov algorithms, as well as on truncated (low-rank) factorisations. We first introduce some important concepts that will be used in several of those rules.</p>
-<section id="preliminaries" class="level1">
-<h1>Preliminaries</h1>
-<section id="complex-variables-and-chain-rules" class="level2">
-<h2 class="anchored" data-anchor-id="complex-variables-and-chain-rules">Complex variables and chain rules</h2>
+<section id="preliminaries" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Preliminaries</h1>
+<section id="complex-variables-and-chain-rules" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="complex-variables-and-chain-rules"><span class="header-section-number">1.1</span> Complex variables and chain rules</h2>
 <p>Consider a scalar-valued function <span class="math inline">\(f\)</span>, depending on complex parameters <span class="math inline">\(z^k = x^k + {\mathrm{i}}y^k\)</span>, that is real-valued (and can thus not be holomorphic). Given a trajectory <span class="math inline">\(z^k(t)\)</span> with derivatives <span class="math inline">\(\dot{z}^k = \dot{x}^k + {\mathrm{i}}\dot{y}^k\)</span>, we can write</p>
 <p><span class="math display">\[\begin{align}
 \dot{f} &amp;= \sum_{k} \frac{\partial f}{\partial x^k} \dot{x}^k + \frac{\partial f}{\partial y^k} \dot{y}^k \\
@@ -207,15 +263,15 @@ window.Quarto = {
 \end{align}\]</span></p>
 <p>which (not unexpectedly) yields the same result for <span class="math inline">\(\breve{z}_l\)</span>, upon substituing <span class="math inline">\(\overline{\frac{\partial w^k}{\partial z^l}} = \frac{\partial \bar{w}^k}{\partial \bar{z}^l}\)</span>. The reverse rules required by automatic differentation are exactly of the form that relate <span class="math inline">\(\breve{z}_l\)</span> to <span class="math inline">\(\breve{w}_k\)</span> (and possibly its conjugate). The way we derive them in practice is by starting from <span class="math inline">\(\mathop{\mathrm{Re}}\left(\sum_k \overline{\breve{w}_k} \dot{w}^k\right)\)</span> and inserting the (easier) forward rule that expresses <span class="math inline">\(\dot{w}^k\)</span> in terms of <span class="math inline">\(\dot{z}^l\)</span> (and possibly its conjugate), and then using the fact that we can conjugate within the argument of <span class="math inline">\(\mathop{\mathrm{Re}}\)</span> or <span class="math inline">\(\mathop{\mathrm{RTr}}\)</span> in order to isolate the contribution that is contracted with <span class="math inline">\(\dot{z}^l\)</span>.</p>
 </section>
-<section id="matrices-and-their-tangents-and-cotangents" class="level2">
-<h2 class="anchored" data-anchor-id="matrices-and-their-tangents-and-cotangents">Matrices and their tangents and cotangents</h2>
+<section id="matrices-and-their-tangents-and-cotangents" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="matrices-and-their-tangents-and-cotangents"><span class="header-section-number">1.2</span> Matrices and their tangents and cotangents</h2>
 <p>We will be working with complex matrices <span class="math inline">\(A \in {\mathbb{C}}^{m \times n}\)</span>. Sometimes these matrices satisfy additional constraints, which also constrains their tangents <span class="math inline">\(\dot{A}\)</span>. Given that the constraints on the tangent vectors are always linear (in contrast to those on the variables themselves), we can typically satisfy them explicitly by choosing a proper parameterisation.</p>
 <p>Constraints on the parameters do not directly impose constraints on the adjoint/dual variables <span class="math inline">\(\breve{A}\)</span> (cotangents). However, in the way they couple to the tangents, they will be automatically projected into the relevant subspace.</p>
 <p>Note that the coupling between tangents and cotangents takes the form <span class="math inline">\(\mathop{\mathrm{RTr}}(\breve{A}^\dagger \dot{A})\)</span>, which can be read as an inner product <span class="math inline">\({\left\langle A,B\right\rangle} = \mathop{\mathrm{RTr}}(A^\dagger B)\)</span>. However, because we are taking the real part, this corresponds to treating the vector spaces <span class="math inline">\({\mathbb{C}}^{m \times n}\)</span> of complex matrices as a real vector space. Indeed, the inner product can be rewritten as the standard (real) Euclidean inner product</p>
 <p><span class="math display">\[{\left\langle A,B,=\right\rangle} \sum_{i=1}^m\sum_{j=1}^n \mathop{\mathrm{Re}}(A_{ij}) \mathop{\mathrm{Re}}(B_ij) + \mathop{\mathrm{Im}}(A_ij)\mathop{\mathrm{Im}}(B_ij).\]</span></p>
 <p>This has a number of interesting implications.</p>
-<section id="diagonal-and-triangular-matrices" class="level3">
-<h3 class="anchored" data-anchor-id="diagonal-and-triangular-matrices">Diagonal and triangular matrices</h3>
+<section id="diagonal-and-triangular-matrices" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="diagonal-and-triangular-matrices"><span class="header-section-number">1.2.1</span> Diagonal and triangular matrices</h3>
 <p>The easiest classes of special matrices are those where some of the entries are zero, such as diagonal or upper triangular matrices. Because of the structure of the inner product, only the corresponding entries of the dual variables will contribute. In fact, because of the structure of the real-valued inner product that we work with, we can even impose the real or imaginary component of an entry to be zero separately, and this information will also propagate onto the dual variables.</p>
 <p>We can make this explicit by introducing specific projection (super)operators <span class="math inline">\({\mathbb{C}}^{m\times n} \to {\mathbb{C}}^{m\times n}\)</span> onto the relevant subspaces that we need below, namely <span class="math display">\[\begin{align}
 \mathcal{P}_L(A)_{k,l} &amp;= \begin{cases} A_{k,l},&amp; k &gt; l\\ 0,&amp; k\leq l\end{cases}\\
@@ -235,14 +291,14 @@ window.Quarto = {
 \end{align}\]</span> which also satisfy</p>
 <p><span class="math display">\[\mathop{\mathrm{RTr}}(B^\dagger \mathcal{P}_{H/A}(A)) = \mathop{\mathrm{RTr}}(\mathcal{P}_{H/A}(B)^\dagger A)\]</span></p>
 </section>
-<section id="unitary-matrices" class="level3">
-<h3 class="anchored" data-anchor-id="unitary-matrices">Unitary matrices</h3>
+<section id="unitary-matrices" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="unitary-matrices"><span class="header-section-number">1.2.2</span> Unitary matrices</h3>
 <p>We now turn to matrix constraints which are nonlinear, and give rise to known manifolds of special matrices. The first relevant case is a unitarity constraint, which requires <span class="math inline">\(m=n\)</span>: <span class="math display">\[U^\dagger U = I_n = U^\dagger U\]</span></p>
 <p>For the tangent directions, we find in this case that <span class="math display">\[U^\dagger \dot{U} + \dot{U}^\dagger U=O.\]</span></p>
 <p>For the tangent directions, the constraint has thus become linear and can easily be satisfied by parameterising <span class="math inline">\(\dot{U} = U\dot{K}\)</span> where <span class="math inline">\(\dot{K}=-\dot{K}^\dagger\)</span>, i.e.&nbsp;<span class="math inline">\(\dot{K}\)</span> is an antihermitian matrix, parameterised by <span class="math inline">\(n(n-1)/2\)</span> complex parameters below the diagonal (and their conjugates above the diagonal) and <span class="math inline">\(n\)</span> purely imaginary parameters on the diagonal.</p>
 </section>
-<section id="isometric-matrices" class="level3">
-<h3 class="anchored" data-anchor-id="isometric-matrices">Isometric matrices</h3>
+<section id="isometric-matrices" class="level3" data-number="1.2.3">
+<h3 data-number="1.2.3" class="anchored" data-anchor-id="isometric-matrices"><span class="header-section-number">1.2.3</span> Isometric matrices</h3>
 <p>Isometric matrices are rectangular matrices with <span class="math inline">\(m \geq n\)</span> that satisfy</p>
 <p><span class="math display">\[Q^\dagger Q = I_n\]</span></p>
 <p>In this case, <span class="math inline">\(P=QQ^\dagger\)</span> is not the identity, but an orthogonal projector (<span class="math inline">\(P^2 =P=P^\dagger\)</span>)</p>
@@ -260,11 +316,11 @@ window.Quarto = {
 </ul>
 </section>
 </section>
-<section id="linear-problems-with-matrices" class="level2">
-<h2 class="anchored" data-anchor-id="linear-problems-with-matrices">Linear problems with matrices</h2>
+<section id="linear-problems-with-matrices" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="linear-problems-with-matrices"><span class="header-section-number">1.3</span> Linear problems with matrices</h2>
 <p>Another common operation with matrices that we encounter is that the matrix of interest, for example, the tangent <span class="math inline">\(\dot{A}\)</span> of some matrix, is only specified implicitly as the solution of a linear system. Indeed, the matrix factorisations are written down as equations for the final solution (rather than as the algorithm that gave rise to them). Differentating such defining equations gives rise to (sometimes coupled) linear equations that need to be solved.</p>
-<section id="sylvester-equation-and-hadamard-product" class="level3">
-<h3 class="anchored" data-anchor-id="sylvester-equation-and-hadamard-product">Sylvester equation and Hadamard product</h3>
+<section id="sylvester-equation-and-hadamard-product" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="sylvester-equation-and-hadamard-product"><span class="header-section-number">1.3.1</span> Sylvester equation and Hadamard product</h3>
 <p>The most common type of linear system for a matrix quantity <span class="math inline">\(X\)</span> that we encounter takes the form of a Sylvester equation</p>
 <p><span class="math display">\[ A X - X B = C\]</span></p>
 <p>where thus <span class="math inline">\(X\)</span> is the unknown. Let us denote the left hand side as the (Sylvester) superoperator <span class="math inline">\(\mathcal{S}_{A,B}(X) = AX - XB\)</span>. For <span class="math inline">\(X\in{\mathbb{C}}^{m \times n}\)</span>, it is assumed that <span class="math inline">\(A\in{\mathbb{C}}^{m\times m}\)</span> and <span class="math inline">\(B \in {\mathbb{C}}^{n \times n}\)</span>, so that <span class="math inline">\(\mathcal{S}_{A,B}\)</span> is indeed a linear (super)opeator <span class="math inline">\({\mathbb{C}}^{m\times n} \mapsto {\mathbb{C}}^{m\times n}\)</span>, i.e.&nbsp;it is mapping matrices to the same size.</p>
@@ -298,18 +354,18 @@ D_{A} \tilde{X} - \tilde{X}D_{B} = \tilde{C}
 <p>All of these results will prove useful below.</p>
 </section>
 </section>
-<section id="gauge-freedom" class="level2">
-<h2 class="anchored" data-anchor-id="gauge-freedom">Gauge freedom</h2>
+<section id="gauge-freedom" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="gauge-freedom"><span class="header-section-number">1.4</span> Gauge freedom</h2>
 <p>A final issue that is in some sense “orthogonal” to constraints is that of gauge freedom. This arises when certain variables are not uniquely determined, such as the phase of eigenvectors or singular vectors. For example, it could happen that an output matrix <span class="math inline">\(A\)</span> of a certain step of the computation is only determined up to an overall multiplication with another matrix <span class="math inline">\(D\)</span> (for example diagonal, or unitary, …), so that we could also have obtained <span class="math inline">\(A' = AD\)</span>.</p>
 <p>If we now consider a one-parameter family of such equivalent matrices, this gives rise to tangent vectors <span class="math inline">\(\dot{A}=A\dot{D}\)</span>. However, for objective functions <span class="math inline">\(f\)</span> that are insensitive to such gauge changes, it should hold that the partial derivatives <span class="math inline">\(\breve{A} = \frac{\partial f}{\partial \overline{A}_{ij}}\)</span> should be such that</p>
 <p><span class="math display">\[\mathop{\mathrm{RTr}}(\breve{A}^\dagger A\dot{D}) = 0\]</span></p>
 <p>for all <span class="math inline">\(\dot{D}\)</span> that are allowed. Such a condition can easily be checked at the beginning of a reverse rule, and then warned about if it is not satisfied, as this would be indicative of an objective function that uses <span class="math inline">\(A\)</span> in a way that depends on implementation details, i.e.&nbsp;an objective function that is not “gauge invariant”.</p>
 </section>
 </section>
-<section id="qr-decomposition" class="level1">
-<h1>QR decomposition</h1>
-<section id="full-rank-case" class="level2">
-<h2 class="anchored" data-anchor-id="full-rank-case">Full rank case</h2>
+<section id="qr-decomposition" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> QR decomposition</h1>
+<section id="full-rank-case" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="full-rank-case"><span class="header-section-number">2.1</span> Full rank case</h2>
 <p>Consider a rectangular matrix <span class="math inline">\(A\in {\mathbb{C}}^{m \times n}\)</span>. The typical scenario is when <span class="math inline">\(m \geq n\)</span> and <span class="math inline">\(\mathop{\mathrm{rank}}(A)=n\)</span>, i.e.&nbsp;<span class="math inline">\(A\)</span> has full rank. In this case, there exists a decomposition</p>
 <p><span class="math display">\[A  =Q R\]</span></p>
 <p>with <span class="math inline">\(Q\in {\mathbb{C}}^{m\times n}\)</span> an isometric matrix (<span class="math inline">\(Q^\dagger Q=I_n\)</span>) and <span class="math inline">\(R\in{\mathbb{C}}^{n \times n}\)</span> an upper-triangular matrix (<span class="math inline">\(R_{k,l}=0\)</span> for <span class="math inline">\(k &gt; l\)</span>). This decomposition can be made unique by choosing the diagonal elemenents <span class="math inline">\(R_{kk} &gt; 0\)</span>. For <span class="math inline">\(\mathop{\mathrm{rank}}(A)=\mathop{\mathrm{rank}}(R)=n\)</span>, none of those elements can be zero and <span class="math inline">\(R\)</span> is invertible, with its inverse <span class="math inline">\(R^{-1}\)</span> also being an upper triangular matrix</p>
@@ -351,8 +407,8 @@ Q^\dagger \dot{A} R^{-1} &amp;= \dot{K}  + \dot{R}R^{-1}\\
 \breve{A} = \breve{Q}R^{-\dagger} + Q(\mathcal{P}_{rD}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})^\dagger)R^{-\dagger}
 \end{align}\]</span></p>
 </section>
-<section id="general-result" class="level2">
-<h2 class="anchored" data-anchor-id="general-result">General result</h2>
+<section id="general-result" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="general-result"><span class="header-section-number">2.2</span> General result</h2>
 <p>Now suppose that we have a matrix <span class="math inline">\(A\in{\mathbb{C}}^{m \times n}\)</span>, where we do not require that <span class="math inline">\(m \geq n\)</span>, and furthermore can have <span class="math inline">\(\mathop{\mathrm{rank}}(A) = r \leq \min(m,n)\)</span>. Let us split <span class="math inline">\(m=m_1 + m_2 + m_3\)</span> and <span class="math inline">\(n=n_1 + n_2 =\)</span> with <span class="math inline">\(n_1 = m_1 = r\)</span>, <span class="math inline">\(m_2 = \min(m,n)-r\)</span>, <span class="math inline">\(n_2 = n-r\)</span> and <span class="math inline">\(m_3=m-\min(m,n)\)</span>. We still have to make one assumption, which is that <span class="math inline">\(A\)</span> is such that its first <span class="math inline">\(n_1=r\)</span> columns already span its image (column space), so that a full rank QR decomposition of size <span class="math inline">\(m \times r\)</span> could be obtained from these columns.</p>
 <p>We now write the QR decomposition using a square (and thus unitary) matrix <span class="math inline">\(Q\)</span>, in the form</p>
 <p><span class="math display">\[\begin{bmatrix} A_1 &amp; A_2\end{bmatrix} = \begin{bmatrix} Q_1 &amp; Q_2 &amp;  Q_3\end{bmatrix} \begin{bmatrix} R_{11} &amp; R_{12} \\ O&amp; O\\  O&amp; O\end{bmatrix}\]</span></p>
@@ -399,10 +455,10 @@ Q_3^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{32} S_{22}
 \end{align}\]</span> should be inserted.</p>
 </section>
 </section>
-<section id="eigenvalue-decomposition" class="level1">
-<h1>Eigenvalue decomposition</h1>
-<section id="hermitian-eigenvalue-decomposition" class="level2">
-<h2 class="anchored" data-anchor-id="hermitian-eigenvalue-decomposition">Hermitian eigenvalue decomposition</h2>
+<section id="eigenvalue-decomposition" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Eigenvalue decomposition</h1>
+<section id="hermitian-eigenvalue-decomposition" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="hermitian-eigenvalue-decomposition"><span class="header-section-number">3.1</span> Hermitian eigenvalue decomposition</h2>
 <p>Given a Hermitian matrix <span class="math inline">\(A=A^\dagger\)</span> with <span class="math inline">\(A\in{\mathbb{C}}^{n\times n}\)</span>, it admits an eigenvalue decomposition of the form</p>
 <p><span class="math display">\[A = U D U^{\dagger}\]</span></p>
 <p>with <span class="math inline">\(U\in{\mathbb{C}}^{n\times n}\)</span> unitary and <span class="math inline">\(D\)</span> a real diagonal matrix containing the eigenvalues. This decomposition is not unique, as we can multiply <span class="math inline">\(U\)</span> with another unitary matrix <span class="math inline">\(V\)</span> that commutes with <span class="math inline">\(D\)</span>. If all eigenvalues in <span class="math inline">\(D\)</span> are mutually distinct, this amounts to <span class="math inline">\(V\)</span> being diagonal and unitary, or thus, a matrix with pure complex phases. If some eigenvalues are repeated, <span class="math inline">\(V\)</span> can take a block diagonal form.</p>
@@ -437,8 +493,8 @@ Q_3^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{32} S_{22}
 <p><span class="math display">\[\breve{A} = U(F\odot (U^\dagger \breve{U}) + \mathcal{P}_{rD}(\breve{D}))U^\dagger\]</span></p>
 <p>with thus <span class="math inline">\(F_{ij} = \begin{cases} 0, &amp;\lambda_i = \lambda_j\\ \frac{1}{\lambda_j-\lambda_i},&amp;\text{otherwise}\end{cases}\)</span>. As <span class="math inline">\(F\)</span> is real, no complex conjugations are introduced when it <span class="math inline">\(F\)</span> moved from the tangent to the cotangent variables.</p>
 </section>
-<section id="nonhermitian-eigenvalue-decomposition" class="level2">
-<h2 class="anchored" data-anchor-id="nonhermitian-eigenvalue-decomposition">Nonhermitian eigenvalue decomposition</h2>
+<section id="nonhermitian-eigenvalue-decomposition" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="nonhermitian-eigenvalue-decomposition"><span class="header-section-number">3.2</span> Nonhermitian eigenvalue decomposition</h2>
 <p>Most of this analysis can be repeated for the nonhermitian case, where the eigenvalue decomposition reads</p>
 <p><span class="math display">\[A =VDV^{-1} \iff AV=VD\]</span></p>
 <p>with <span class="math inline">\(D\)</span> still diagonal, but <span class="math inline">\(V\)</span> no longer unitary. Still parameterising <span class="math inline">\(\dot{V}=V\dot{K}\)</span>, where <span class="math inline">\(\dot{K}\)</span> can now be a general matrix, we find</p>
@@ -459,8 +515,8 @@ Q_3^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{32} S_{22}
 <p>and thus obtain</p>
 <p><span class="math display">\[\breve{A} = V^{-\dagger}(\overline{F}\odot (V^\dagger \breve{V}) + \mathcal{P}_{D}(\breve{D}))V^{\dagger}\]</span></p>
 </section>
-<section id="schur-decomposition" class="level2">
-<h2 class="anchored" data-anchor-id="schur-decomposition">Schur decomposition</h2>
+<section id="schur-decomposition" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="schur-decomposition"><span class="header-section-number">3.3</span> Schur decomposition</h2>
 <p>Another decomposition that is closely related to the eigenvalue decomposition of general matrices <span class="math inline">\(A\in{\mathbb{C}}^{n \times n}\)</span> is the Schur decomposition, namely</p>
 <p><span class="math display">\[A = UTU^\dagger\]</span></p>
 <p>where now <span class="math inline">\(U\in {\mathbb{C}}^{n\times n}\)</span> is unitary, and <span class="math inline">\(T\in{\mathbb{C}}^{n\times n}\)</span> is upper triangular. In the case of a hermitian matrix <span class="math inline">\(A\)</span>, the hermiticity of <span class="math inline">\(T\)</span> requires that also its entries above the diagonal vanish, so that the Schur decomposition then coincides with the eigenvalue decomposition. As in the hermitian eigenvalue decomposition, the phase of the columns of <span class="math inline">\(U\)</span> is not fixed by this equation. However, in this case, a phase change in the columns of <span class="math inline">\(U\)</span> also affects the off-diagonal (=above diagonal) elements of <span class="math inline">\(T\)</span>.</p>
@@ -474,16 +530,16 @@ Q_3^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{32} S_{22}
 <p>… to be continued …</p>
 </section>
 </section>
-<section id="partial-eigenvalue-and-schur-factorisation" class="level1">
-<h1>Partial eigenvalue and Schur factorisation</h1>
-<section id="invariant-subspaces" class="level2">
-<h2 class="anchored" data-anchor-id="invariant-subspaces">Invariant subspaces</h2>
+<section id="partial-eigenvalue-and-schur-factorisation" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Partial eigenvalue and Schur factorisation</h1>
+<section id="invariant-subspaces" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="invariant-subspaces"><span class="header-section-number">4.1</span> Invariant subspaces</h2>
 <p>Consider a matrix <span class="math inline">\(A\in{\mathbb{C}}^{n \times n}\)</span>, and a matrix <span class="math inline">\(V \in {\mathbb{C}}^{n \times r}\)</span> of which the columns span an invariant subspace of <span class="math inline">\(A\)</span>. This means that it is such that there exists a matrix <span class="math inline">\(B \in {\mathbb{C}}^{r \times r}\)</span> such that we have an exact equality</p>
 <p><span class="math display">\[AV = VB\]</span></p>
 <p>The matrix <span class="math inline">\(V\)</span> could be composed out of a number of eigenvectors of <span class="math inline">\(A\)</span>, in which case <span class="math inline">\(B\)</span> would be diagonal and contain the corresponding eigenvalues. Alternatively, we can choose the columns of <span class="math inline">\(V\)</span> to be orthonormal, i.e.&nbsp;<span class="math inline">\(V\)</span> isometric, and at the same time <span class="math inline">\(B\)</span> upper triangular. We then have a partial Schur factorisation. As always, both choices coincide in the case where <span class="math inline">\(A\)</span> is hermitian.</p>
 </section>
-<section id="single-eigenvector" class="level2">
-<h2 class="anchored" data-anchor-id="single-eigenvector">Single eigenvector</h2>
+<section id="single-eigenvector" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="single-eigenvector"><span class="header-section-number">4.2</span> Single eigenvector</h2>
 <p>We start with the case where <span class="math inline">\(r=1\)</span>. A one-dimensional invariant subspace needs to be an eigenvector. A single eigenvector <span class="math inline">\(\boldsymbol{u}\)</span> and associated eigenvalue <span class="math inline">\(\lambda\)</span> satisfy</p>
 <p><span class="math display">\[A\boldsymbol{u} = \lambda \boldsymbol{u}\]</span></p>
 <p>from which we obtain</p>
@@ -569,8 +625,8 @@ Q_3^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{32} S_{22}
 <p>from which we obtain</p>
 <p><span class="math display">\[\breve{A} = (\overline{\lambda}I-A^\dagger -\frac{1}{\overline{a}}\boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}[(I-\boldsymbol{u}\boldsymbol{u}^\dagger)\boldsymbol{\breve{u}} - \frac{1}{\overline{a}}\breve{\lambda}\boldsymbol{u}]\boldsymbol{u}^\dagger\]</span></p>
 </section>
-<section id="single-eigenvector-alternative" class="level2">
-<h2 class="anchored" data-anchor-id="single-eigenvector-alternative">Single eigenvector (alternative)</h2>
+<section id="single-eigenvector-alternative" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="single-eigenvector-alternative"><span class="header-section-number">4.3</span> Single eigenvector (alternative)</h2>
 <p>The previous scheme of course hints towards an alternative scheme, that is probably better known or more expected, for the case of a nonhermitian matrix <span class="math inline">\(A\)</span> for which both the left eigenvector <span class="math inline">\(\boldsymbol{u}\)</span> and the right eigenvector <span class="math inline">\(\boldsymbol{v}^\dagger\)</span> associated with an eigenvalue <span class="math inline">\(\lambda\)</span> are known. It is furthermore assumed that <span class="math inline">\(\lambda\)</span> has (algebraic and geometric) multiplicity one, so that there are no Jordan blocks and <span class="math inline">\(\boldsymbol{v}^\dagger \boldsymbol{u}\neq 0\)</span>. We then normalise <span class="math inline">\(\boldsymbol{v}^\dagger\)</span> such that <span class="math inline">\(\boldsymbol{v}^\dagger \boldsymbol{u}=1\)</span>. If we are only interested in the chain rule with respect to <span class="math inline">\(\boldsymbol{u}\)</span>, we can now gauge the tangent direction so that <span class="math inline">\(\boldsymbol{v}^\dagger \boldsymbol{\dot{u}} =0\)</span>, giving rise to the linear system</p>
 <p><span class="math display">\[\begin{align}
 \begin{bmatrix}
@@ -592,15 +648,15 @@ Q_3^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{32} S_{22}
 <p><span class="math display">\[\breve{A} = (\overline{\lambda}I-A^\dagger -\frac{1}{\overline{a}}\boldsymbol{v}\boldsymbol{u}^\dagger)^{-1}(I-\boldsymbol{u}\boldsymbol{v}^\dagger)\boldsymbol{\breve{u}}  + \breve{\lambda}\boldsymbol{v}\boldsymbol{u}^\dagger\]</span></p>
 <p>Note that this alternative method is useful if the left eigenvector is already known. If however it still needs to be computed, the previous approach is expected to be computationally cheaper, as it only requires solving one linear system. In the case where <span class="math inline">\(A\)</span> is hermitian and thus <span class="math inline">\(v=u\)</span>, these two approaches coincides.</p>
 </section>
-<section id="higher-dimensional-invariant-subspace" class="level2">
-<h2 class="anchored" data-anchor-id="higher-dimensional-invariant-subspace">Higher-dimensional invariant subspace</h2>
+<section id="higher-dimensional-invariant-subspace" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="higher-dimensional-invariant-subspace"><span class="header-section-number">4.4</span> Higher-dimensional invariant subspace</h2>
 <p>Now let us consider the case where <span class="math inline">\(V\in{\mathbb{C}}^{n \times p}\)</span> and contains <span class="math inline">\(p\)</span> eigenvectors <span class="math inline">\({v}_i\)</span> and associated eigenvectors <span class="math inline">\(\lambda_i\)</span> for <span class="math inline">\(i=1,\ldots,p\)</span>. Of course, we can just reuse the result from the previous subsection for each pair <span class="math inline">\((\lambda_i,{v}_i)\)</span> separately. For the reverse rule, because of linearity, we can then simply add the results, i.e.</p>
 <p><span class="math display">\[\begin{align}
 \breve{A} = \sum_{i=1}^{p}(\overline{\lambda}_iI-A^\dagger -\frac{1}{\overline{a}}\boldsymbol{v}_i\boldsymbol{v}_i^\dagger)^{-1}[(I-\boldsymbol{v}_i\boldsymbol{v}_i^\dagger)\boldsymbol{\breve{v}_i} - \frac{1}{\overline{a}}\breve{\lambda}_i\boldsymbol{v}_i]\boldsymbol{v}_i^\dagger
 \end{align}\]</span></p>
 <p>However, it might be that there are alternative approaches.</p>
-<section id="hermitian-case" class="level3">
-<h3 class="anchored" data-anchor-id="hermitian-case">Hermitian case</h3>
+<section id="hermitian-case" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="hermitian-case"><span class="header-section-number">4.4.1</span> Hermitian case</h3>
 <p>Let us first focus on the case where <span class="math inline">\(A\)</span> is hermitian, as in this case the matrix <span class="math inline">\(V\)</span> satisfies the additional constraint that it is isometric, so that it columns are not independent.</p>
 <p>We can then parameterise <span class="math inline">\(\dot{V}=V\dot{K}+\dot{L}\)</span> where <span class="math inline">\(\dot{K}\)</span> is antihermitian and <span class="math inline">\(V^\dagger \dot{L} = O\)</span>. We insert this decomposition in</p>
 <p><span class="math display">\[\dot{A}V + A\dot{V}=\dot{V}D+V\dot{D}\]</span></p>
@@ -637,8 +693,8 @@ V^\dagger \dot{A}V &amp;= \dot{K}D-D\dot{K} + \dot{D}\\
 <p>where again we assume that <span class="math inline">\(A\)</span> does not have common eigenvalues in the subspace <span class="math inline">\(V\)</span> (diagonal elements of <span class="math inline">\(D\)</span>) and in the subspace <span class="math inline">\(V_\perp\)</span>. This description translates to a reverse rule</p>
 <p><span class="math display">\[\breve{A}=V[(V^\dagger\breve{V})\odot F + \mathcal{P}_{rD}(\breve{D})]V^\dagger - V_\perp\mathcal{S}_{V_\perp^\dagger AV_\perp , D}^{-1}(V_\perp^\dagger\breve{V})V^\dagger\]</span></p>
 </section>
-<section id="non-hermitian-case" class="level3">
-<h3 class="anchored" data-anchor-id="non-hermitian-case">Non-hermitian case</h3>
+<section id="non-hermitian-case" class="level3" data-number="4.4.2">
+<h3 data-number="4.4.2" class="anchored" data-anchor-id="non-hermitian-case"><span class="header-section-number">4.4.2</span> Non-hermitian case</h3>
 <p>For a non-hermitian matrix <span class="math inline">\(A\)</span>, we can still have a subspace spanned by the columns of <span class="math inline">\(V\)</span>, where we assume these columns to be different eigenvectors, such that <span class="math inline">\(AV=VD\)</span></p>
 <p>As these columns are now not necessarily orthogonal, we first compute their Gram matrix <span class="math inline">\(G=V^\dagger V\)</span>, in order to build an orthogonal projector</p>
 <p><span class="math display">\[P_{V} = V G^{-1} V^\dagger\]</span></p>
@@ -687,8 +743,8 @@ Z &amp;= (V^+)^\dagger[(V^\dagger \breve{V}) \odot {\overline{F}} + \mathcal{P}_
 </section>
 </section>
 </section>
-<section id="singular-value-decomposition" class="level1">
-<h1>Singular value decomposition</h1>
+<section id="singular-value-decomposition" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Singular value decomposition</h1>
 <p>A matrix <span class="math inline">\(A\in {\mathbb{C}}^{m\times n}\)</span> can be decomposed as</p>
 <p><span class="math display">\[A=USV^\dagger\]</span></p>
 <p>where <span class="math inline">\(S \in {\mathbb{C}}^{k \times k}\)</span> is diagonal with real non-negative elements and are typically sorted such that <span class="math inline">\(S_{ii} = s_i \geq s_{i+1}\)</span>. Furthermore, <span class="math inline">\(U\in {\mathbb{C}}^{m \times k}\)</span> and <span class="math inline">\(V\in{\mathbb{C}}^{n \times k}\)</span> are isometric. Here, <span class="math inline">\(k=\min(m,n)\)</span>, but can be chosen equal to some smaller value <span class="math inline">\(r = \mathop{\mathrm{rank}}(A)\)</span> as <span class="math inline">\(s_{r+1}=s_{r+2}=\ldots=s_{\min(m,n)}=0\)</span>.</p>
@@ -698,8 +754,8 @@ A V &amp;= U S\\
 A^\dagger U &amp;= V S
 \end{align}\]</span></p>
 <p>Note that we always have the gauge freedom <span class="math inline">\(U\to UD\)</span> and <span class="math inline">\(V\to VD\)</span> with <span class="math inline">\(D\)</span> a unitary matrix that satisfies <span class="math inline">\(DS = SD\)</span>. When all the singular values are distinct, this amounts to a diagonal matrix with pure phases.</p>
-<section id="full-rank-decomposition" class="level2">
-<h2 class="anchored" data-anchor-id="full-rank-decomposition">Full rank decomposition</h2>
+<section id="full-rank-decomposition" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="full-rank-decomposition"><span class="header-section-number">5.1</span> Full rank decomposition</h2>
 <p>We start with the case of a square matrix (<span class="math inline">\(m=n\)</span>) that has full rank (<span class="math inline">\(r=m\)</span>), for which we consider the full singular value decomposition.</p>
 <p>To derive the forward rule, we write</p>
 <p><span class="math display">\[\dot{A} V + A\dot{V} = \dot{U}S + U\dot{S}\]</span></p>
@@ -764,8 +820,8 @@ G_{ij} &amp;= \frac{1}{s_i+s_j}.
 <p><span class="math display">\[\mathcal{P}_{iD}(U^\dagger\breve{U} - V^\dagger\breve{V}) = -2 \mathcal{P}_{iD}(V^\dagger\breve{V})\]</span></p>
 <p>Using this substitution, our reverse rule equals Equation 1 in <a href="https://arxiv.org/1909.02659">https://arxiv.org/1909.02659</a>.</p>
 </section>
-<section id="general-result-1" class="level2">
-<h2 class="anchored" data-anchor-id="general-result-1">General result</h2>
+<section id="general-result-1" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="general-result-1"><span class="header-section-number">5.2</span> General result</h2>
 <p>We now discuss the general result for the singular value decomposition of a rectangular matrix <span class="math inline">\(A \in {\mathbb{C}}^{m\times n}\)</span>, which potentially has a rank <span class="math inline">\(r \leq \min(m,n)\)</span>, and which is possibly truncated, i.e.&nbsp;for which we only compute <span class="math inline">\(p\leq r\)</span> (typically the largest) singular values and corresponding vectors. We start from the exact relations</p>
 <p><span class="math display">\[\begin{align}
 AV &amp;= US,&amp;A^\dagger U &amp;= VS
@@ -903,8 +959,8 @@ V_\perp^\dagger\breve{V}
 <p>for the remaining values <span class="math inline">\(i=r-p+1,\ldots,m-p\)</span> and <span class="math inline">\(j=r-p+1,\ldots,n-p\)</span>, again for all <span class="math inline">\(k=1,\ldots,p\)</span>.</p>
 </section>
 </section>
-<section id="polar-decomposition" class="level1">
-<h1>Polar decomposition</h1>
+<section id="polar-decomposition" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Polar decomposition</h1>
 <p>We consider the case of a matrix <span class="math inline">\(A\in{\mathbb{C}}^{m \times n}\)</span> with <span class="math inline">\(m \geq n\)</span>, and write the “left” polar decomposition as <span class="math inline">\(A = W P\)</span> where <span class="math inline">\(W \in {\mathbb{C}}^{m\times n}\)</span> with <span class="math inline">\(W^\dagger W = I\)</span> and <span class="math inline">\(P \in {\mathbb{C}}^{n \times n}\)</span> with <span class="math inline">\(P = P^\dagger\)</span> and <span class="math inline">\(P &gt; 0\)</span> (positive definite). Here, we also assume that <span class="math inline">\(A\)</span> is not rank-deficient, i.e.&nbsp;<span class="math inline">\(A\)</span> and <span class="math inline">\({\hat{P}}\)</span> have rank <span class="math inline">\(n\)</span>. The case with <span class="math inline">\(m \leq n\)</span> where we want t owrite <span class="math inline">\(A = P W^\dagger\)</span> can be obtained by simply taking appropriate hermitian conjugates in all the equations.</p>
 <p>For the tangent directions, we find <span class="math display">\[\begin{align}
 \dot{A} = \dot{W} P + W \dot{P}
@@ -941,8 +997,8 @@ W^\dagger \dot{A} - \dot{A}^\dagger W  &amp;= \dot{K} P + P \dot{K}
 <p><span class="math display">\[\begin{align}
 \breve{A} = W \left[\mathcal{S}_{P,-P}^{-1}(2 \mathcal{P}_A(W^\dagger \breve{W} - \mathcal{P}_H(\breve{P})P)) + \mathcal{P}_H(\breve{P})\right] + (I- WW^\dagger) \breve{W}P^{-1}.
 \end{align}\]</span></p>
-<section id="alternative-from-svd" class="level2">
-<h2 class="anchored" data-anchor-id="alternative-from-svd">Alternative from SVD</h2>
+<section id="alternative-from-svd" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="alternative-from-svd"><span class="header-section-number">6.1</span> Alternative from SVD</h2>
 <p>Given that the polar decomposition is often computed from the SVD as <span class="math display">\[\begin{align}
 W &amp;= U V^\dagger &amp; P &amp;= V S V^\dagger
 \end{align}\]</span> we also find <span class="math display">\[\begin{align}
