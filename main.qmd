@@ -1,0 +1,1327 @@
+---
+title: "Automatic differentation rules for linear algebra"
+author: "Jutho Haegeman"
+date: "10/27/2023"
+format: html
+---
+
+::: {.hidden}
+$$
+% Math operators
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\GL}{GL}
+\DeclareMathOperator{\SL}{SL}
+\DeclareMathOperator{\Unitary}{U}
+\DeclareMathOperator{\Orthogonal}{O}
+\DeclareMathOperator{\SU}{SU}
+\DeclareMathOperator{\SO}{SO}
+\DeclareMathOperator{\Aff}{Aff}
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\cod}{codom}
+\DeclareMathOperator{\D}{\mathcal{D}}
+\DeclareMathOperator{\E}{\mathcal{E}}
+\DeclareMathOperator{\R}{\mathcal{R}}
+\DeclareMathOperator{\Schw}{\mathcal{S}}
+\DeclareMathOperator{\im}{im}
+%\DeclareMathOperator{\ker}{ker}
+%\DeclareMathOperator{\dim}{dim}
+\DeclareMathOperator{\codim}{codim}
+\DeclareMathOperator{\convhull}{co}
+
+\newcommand{\opgreek}[1]{\begingroup\mathgroup-1 #1\endgroup}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\nullity}{nullity}
+
+\DeclareMathOperator{\Pv}{Pv}
+
+\DeclareMathOperator{\tr}{Tr}
+\DeclareMathOperator{\rtr}{RTr}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\id}{id}
+\DeclareMathOperator{\adj}{adj}
+
+\DeclareMathOperator*{\varmin}{min}
+\DeclareMathOperator*{\varmax}{max}
+\DeclareMathOperator*{\argmin}{arg\ min}
+\DeclareMathOperator*{\argmax}{arg\ max}
+\DeclareMathOperator{\order}{\mathscr{O}}
+\DeclareMathOperator{\sign}{sgn}
+\DeclareMathOperator{\spanop}{span}
+\DeclareMathOperator{\arctanh}{arctanh}
+\DeclareMathOperator{\arccosh}{arccosh}
+\DeclareMathOperator{\arcsinh}{arcsinh}
+\DeclareMathOperator{\arccot}{arccot}
+\DeclareMathOperator{\sinc}{sinc}
+
+
+\newcommand{\commutator}[2]{{\left[#1,#2\right]}}
+\newcommand{\anticommutator}[2]{{\left\{#1,#2\right\}}}
+
+\DeclareMathOperator{\real}{Re}
+\DeclareMathOperator{\imag}{Im}
+\newcommand{\conj}[1]{{\overline{#1}}}
+\newcommand{\abs}[1]{{\left\lvert#1\right\rvert}}
+\newcommand{\norm}[1]{{\left\lVert#1\right\rVert}}
+\newcommand{\inner}[2]{{\left\langle#1,#2\right\rangle}}
+
+\newcommand{\drm}{{\mathrm{d}}}
+\newcommand{\erm}{{\mathrm{e}}}
+\newcommand{\irm}{{\mathrm{i}}}
+
+
+% VECTORS
+\newcommand{\vect}[1]{{#1}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} % specifically for vectors in F^n
+\newcommand{\zerovec}{{o}}
+\newcommand{\vu}{\vect{u}}
+\newcommand{\vv}{\vect{v}}
+\newcommand{\vw}{\vect{w}}
+\newcommand{\ve}{\vect{e}}
+\newcommand{\vf}{\vect{f}}
+\newcommand{\vx}{\vect{x}}
+\newcommand{\vy}{\vect{y}}
+
+% MATRICES
+\newcommand{\mat}[1]{#1}
+\newcommand{\zeromat}{\mat{O}}
+\newcommand{\idmat}{\mat{I}}
+
+% SCALARS
+\newcommand{\scalara}{{a}}
+\newcommand{\scalarb}{{b}}
+\newcommand{\scalarc}{{c}}
+
+% LINEAR MAPS
+\DeclareMathAlphabet{\mymathbb}{U}{BOONDOX-ds}{m}{n}
+\newcommand{\map}[1]{{\hat{#1}}}
+\newcommand{\idmap}{\map{1}}
+\newcommand{\zeromap}{\map{0}}
+
+\newcommand{\transpose}{{\mathsf{T}}}
+\newcommand{\hermitian}{{\mathsf{H}}}
+
+\renewcommand{\d}{{\mathrm{d}}}
+
+% FIELDS
+\newcommand{\bbF}{{\mathbb{F}}}
+\newcommand{\bbN}{{\mathbb{N}}}
+\newcommand{\bbZ}{{\mathbb{Z}}}
+\newcommand{\bbQ}{{\mathbb{Q}}}
+\newcommand{\bbR}{{\mathbb{R}}}
+\newcommand{\bbC}{{\mathbb{C}}}
+\newcommand{\bbH}{{\mathbb{H}}}
+\newcommand{\bbT}{{\mathbb{T}}}
+
+% RELATIONS
+\newcommand{\subspace}{{\preccurlyeq}}
+\newcommand{\supspace}{{\succcurlyeq}}
+
+%\newcommand{\vz}{{\bm{z}}}
+%\newcommand{\ovz}{{\overline{\bm{z}}}}
+%\newcommand{\oz}{{\overline{z}}}
+%\newcommand{\vu}{{\bm{u}}}
+%\newcommand{\ovu}{{\overline{\bm{u}}}}
+%\newcommand{\ou}{{\overline{u}}}
+%\newcommand{\vr}{{\bm{r}}}
+%\newcommand{\ovr}{{\overline{\bm{r}}}}
+%\newcommand{\orr}{{\overline{r}}}
+
+\newcommand{\eps}{{\varepsilon}}
+\newcommand{\levicivita}{{\epsilon}}
+
+\newcommand{\sx}{{\sigma^x}}
+\newcommand{\sy}{{\sigma^y}}
+\newcommand{\sz}{{\sigma^z}}
+\renewcommand{\sp}{{\sigma^+}}
+\newcommand{\sm}{{\sigma^-}}
+%
+
+\DeclareMathOperator*{\sumint}{%
+\mathchoice%
+  {\ooalign{$\displaystyle\sum$\cr\hidewidth$\displaystyle\int$\hidewidth\cr}}
+  {\ooalign{\raisebox{.14\height}{\scalebox{.7}{$\textstyle\sum$}}\cr\hidewidth$\textstyle\int$\hidewidth\cr}}
+  {\ooalign{\raisebox{.2\height}{\scalebox{.6}{$\scriptstyle\sum$}}\cr$\scriptstyle\int$\cr}}
+  {\ooalign{\raisebox{.2\height}{\scalebox{.6}{$\scriptstyle\sum$}}\cr$\scriptstyle\int$\cr}}
+}
+$$
+:::
+
+
+In this document we derive the forward and reverse chain rule for a number of common matrix factorisations. In particular, we also focus partial or incomplete factorisations, as appear in Krylov algorithms, as well as on truncated (low-rank) factorisations. We first introduce some important concepts that will be used in several of those rules.
+
+
+# Preliminaries
+
+## Complex variables and chain rules
+
+Consider a scalar-valued function $f$, depending on complex parameters $z^k = x^k + \irm y^k$, that is real-valued (and can thus not be holomorphic). Given a trajectory $z^k(t)$ with derivatives $\dot{z}^k = \dot{x}^k + \irm \dot{y}^k$, we can write
+
+\begin{align}
+\dot{f} &= \sum_{k} \frac{\partial f}{\partial x^k} \dot{x}^k + \frac{\partial f}{\partial y^k} \dot{y}^k \\
+&= \sum_{k,l} \frac{\partial f}{\partial z^l} \left(\frac{\partial z^l}{\partial x^k} \dot{x}^k + \frac{\partial z^l}{\partial y^k} \dot{y}^k\right) + \frac{\partial f}{\partial \bar{z}^l} \left(\frac{\partial \bar{z}^l}{\partial x^k} \dot{x}^k + \frac{\partial \bar{z}^l}{\partial y^k} \dot{y}^k\right)\\
+&= \sum_{k} \frac{\partial f}{\partial z^k} \dot{z}^k +  \frac{\partial f}{\partial \bar{z}^k} \dot{\bar{z}}^k
+\end{align}
+Here, we have that
+\begin{align}
+\frac{\partial f}{\partial z^k} &= \frac{1}{2}\left(\frac{\partial f}{\partial x^k} - \irm \frac{\partial f}{\partial y^k}\right)\\
+\frac{\partial f}{\partial \bar{z}^k} &= \frac{1}{2}\left(\frac{\partial f}{\partial x^k} + \irm \frac{\partial f}{\partial y^k}\right) = \overline{\frac{\partial f}{\partial z^k}}
+\end{align}
+where the final equality only holds because $f$ is assumed real. Typically, we can compute $\frac{\partial f}{\partial z^k}$ easily without explicitly going to real and imaginary components. We thus find
+\begin{align}
+\dot{f} = \sum_{k} \frac{\partial f}{\partial z^k} \dot{z}^k + \overline{\frac{\partial f}{\partial z^k}} \overline{\dot{z}^k}
+= 2 \real\left(\sum_{k} \frac{\partial f}{\partial z^k} \dot{z}^k\right)
+= 2 \real\left(\sum_{k} \overline{\frac{\partial f}{\partial \bar{z}^k}} \dot{z}^k\right)
+= 2 \real\left(\vec{\breve{z}}^\dagger \vec{\dot{z}}\right)
+\end{align}
+with thus $\vec{\dot{z}}$ the vector with components $\dot{z}^k$ and $\vec{\breve{z}}$ the vector with components $\breve{z}_k=\frac{\partial f}{\partial \bar{z}^k}$.
+
+When the coefficients $z^k \cong Z^{(i,j)}$ would be the components of a matrix $\mat{Z}$, we would rather write
+this as
+\begin{align}
+\dot{f} = 2 \real\left(\sum_{k} \overline{\frac{\partial f}{\partial \bar{z}^k}} \dot{z}^k\right) = 2 \real\left(\sum_{i,j} \overline{\frac{\partial f}{\partial \bar{Z}^{i,j}}} \dot{Z}^{i,j}\right)
+= 2 \real\left(\tr\left[\mat{\breve{Z}}^\dagger \mat{\dot{Z}}\right]\right) = 2\rtr\left[\mat{\breve{Z}}^\dagger \mat{\dot{Z}}\right]
+\end{align}
+where I have introduced the new symbol $\rtr$ for the real part of the trace.
+
+Now consider the composition where $f$ is itself a function of complex parameters $\vec{w}$, which
+are themselves complex (not necessarily holomorphic) functions of other complex paramters $\vec{z}$. We can then write
+
+\begin{align}
+\dot{f} = \sum_{k,l} \begin{bmatrix} \overline{\breve{w}_k} & \breve{w}_k\end{bmatrix}\begin{bmatrix} \frac{\partial w^k}{\partial z^l} & \frac{\partial w^k}{\partial \bar{z}^l}\\
+\frac{\partial \bar{w}^k}{\partial z^l} & \frac{\partial \bar{w}^k}{\partial \bar{z}^l} \end{bmatrix}
+\begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} = \sum_{k,l} \begin{bmatrix} \breve{w}_k \\ \overline{\breve{w}_k}\end{bmatrix}^\dagger \begin{bmatrix} \frac{\partial w^k}{\partial z^l} & \frac{\partial w^k}{\partial \bar{z}^l}\\
+\frac{\partial \bar{w}^k}{\partial z^l} & \frac{\partial \bar{w}^k}{\partial \bar{z}^l} \end{bmatrix}
+\begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix}
+\end{align}
+In this case (where $w$ is complex), the entries of the Jacobian matrix are related via
+$\overline{\frac{\partial w^k}{\partial z^l}} = \frac{\partial \bar{w}^k}{\partial \bar{z}^l}$
+and $\overline{\frac{\partial w^k}{\partial \bar{z}^l}} = \frac{\partial \bar{w}^k}{\partial z^l}$ Trying to rewrite the above expression in the standard form $2\real(\vec{\breve{z}}^\dagger \vec{\dot{z}})$, we find
+
+\begin{align}
+\dot{f} &= \sum_{l} \begin{bmatrix} \left(\sum_k \overline{\breve{w}_k} \frac{\partial w^k}{\partial z^l} + \breve{w}_k \frac{\partial \bar{w}^k}{\partial z^l}\right) & \left(\sum_k \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l} + \breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l}\right) \end{bmatrix} \begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} \\
+&= \sum_{l} \begin{bmatrix} \sum_k \breve{w}_k \overline{\frac{\partial w^k}{\partial z^l}} + \overline{\breve{w}_k} \overline{\frac{\partial \bar{w}^k}{\partial z^l}} \\
+\sum_k \breve{w}_k \overline{\frac{\partial w^k}{\partial \bar{z}^l}} + \overline{\breve{w}_k} \overline{\frac{\partial \bar{w}^k}{\partial \bar{z}^l}} \end{bmatrix}^\dagger \begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} \\
+&= \sum_{l} \begin{bmatrix} \sum_k \breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l} + \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l} \\
+\sum_k \overline{\breve{w}_k} \overline{\frac{\partial \bar{w}^k}{\partial \bar{z}^l}} + \breve{w}_k \overline{\frac{\partial w^k}{\partial \bar{z}^l}}\end{bmatrix}^\dagger \begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} \qquad \begin{matrix}\text{(by substituting $\conj{\frac{\partial \bar{w}^k}{\partial z^l}}\to\frac{\partial w^k}{\partial \bar{z}^l}$)}\\ \text{(by switching the order of the two terms)}\end{matrix}\\
+&= 2\real\left(\sum_l \left[\sum_{k} \breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l} + \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}\right]^\dagger \dot{z}^l\right) = 2\real(\vec{\breve{z}}^\dagger\dot{z})
+\end{align}
+
+with thus $\breve{z}_l = \sum_k \left[\breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l} + \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}\right]$. The same result would have been obtained from inserting $\dot{w}^k = \frac{\partial w^k}{\partial z^l}\dot{z}^l + \frac{\partial w^k}{\partial \bar{z}^l}\dot{\bar{z}}^l$ in $\dot{f} = 2\real(\vec{\breve{w}}^\dagger \vec{\dot{w}})$ as
+
+\begin{align}
+\dot{f} &= 2\real(\vec{\breve{w}}^\dagger \vec{\dot{w}}) = 2\real\left(\sum_k \overline{\breve{w}_k} \dot{w}^k\right)\\
+&= 2\real\left(\sum_{k,l} \overline{\breve{w}_k} \frac{\partial w^k}{\partial z^l} \dot{z}^l\right) + 2\real\left(\sum_{k,l} \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l} \overline{\dot{z}^l}\right)\\
+&= 2\real\left(\sum_{k,l} \overline{\breve{w}_k \overline{\frac{\partial w^k}{\partial z^l}}} \dot{z}^l\right) + 2\real\left(\sum_{k,l} \overline{\overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}} \dot{z}^l\right)
+\end{align}
+where in the second term we have used that we can conjugate the whole argument of the $\real$ function. Hence, we again obtain
+
+\begin{align}
+\dot{f} = 2\real\left(\sum_{k,l} \overline{\left[\breve{w}_k \overline{\frac{\partial w^k}{\partial z^l}}+\overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}\right]} \dot{z}^l\right) 
+\end{align}
+
+which (not unexpectedly) yields the same result for $\breve{z}_l$, upon substituing $\overline{\frac{\partial w^k}{\partial z^l}} = \frac{\partial \bar{w}^k}{\partial \bar{z}^l}$. The reverse rules required by automatic differentation are exactly of the form that relate $\breve{z}_l$ to $\breve{w}_k$ (and possibly its conjugate). The way we derive them in practice is by starting from $\real\left(\sum_k \overline{\breve{w}_k} \dot{w}^k\right)$ and inserting the (easier) forward rule that expresses $\dot{w}^k$ in terms of $\dot{z}^l$ (and possibly its conjugate), and then using the fact that we can conjugate within the argument of $\real$ or $\rtr$ in order to isolate the contribution that is contracted with $\dot{z}^l$.
+
+
+## Matrices and their tangents and cotangents
+
+We will be working with complex matrices $\mat{A} \in \bbC^{m \times n}$. Sometimes these matrices satisfy additional constraints, which also constrains their tangents $\mat{\dot{A}}$. Given that the constraints on the
+tangent vectors are always linear (in contrast to those on the variables themselves), we can typically satisfy them explicitly by choosing a proper parameterisation.
+
+Constraints on the parameters do not directly impose constraints on the adjoint/dual variables $\mat{\breve{A}}$ (cotangents). However, in the way they couple to the tangents, they will be automatically projected into the relevant subspace.
+
+Note that the coupling between tangents and cotangents takes the form $\rtr(\mat{\breve{A}}^\dagger \mat{\dot{A}})$, which can be read as an inner product $\inner{\mat{A}}{\mat{B}} = \rtr(\mat{A}^\dagger \mat{B})$. However, because we are taking the real part, this corresponds to treating the vector spaces $\bbC^{m \times n}$ of complex matrices as a real vector space. Indeed, the inner product can be rewritten as the standard (real) Euclidean inner product
+
+$$\inner{\mat{A},\mat{B}} = \sum_{i=1}^m\sum_{j=1}^n \real(\mat{A}_{ij}) \real(\mat{B}_ij) + \imag(\mat{A}_ij)\imag(\mat{B}_ij).$$
+
+This has a number of interesting implications.
+
+### Diagonal and triangular matrices
+
+The easiest classes of special matrices are those where some of the entries are zero, such as diagonal or upper triangular matrices. Because of the structure of the inner product, only the corresponding entries of the dual variables will contribute. In fact, because of the structure of the real-valued inner product that we work with, we can even impose the real or imaginary component of an entry to be zero separately, and this information will also propagate onto the dual variables.
+
+We can make this explicit by introducing specific projection (super)operators $\bbC^{m\times n} \to \bbC^{m\times n}$ onto the relevant subspaces that we need below, namely
+\begin{align}
+\mathcal{P}_L(\mat{A})_{k,l} &= \begin{cases} A_{k,l},& k > l\\ 0,& k\leq l\end{cases}\\
+\mathcal{P}_U(\mat{A})_{k,l} &= \begin{cases} A_{k,l},& k < l\\ 0,& k\geq l\end{cases}\\
+\mathcal{P}_{rD}(\mat{A})_{k,l} &= \begin{cases} \real(A_{k,k}),& k = l\\ 0,& k\neq l\end{cases}\\
+\mathcal{P}_{iD}(\mat{A})_{k,l} &= \begin{cases} \irm \imag(A_{k,k}),& k = l\\ 0,& k\neq l\end{cases}\\
+\mathcal{P}_{D}(\mat{A})_{k,l} &= (\mathcal{P}_{rD}+\mathcal{P}_{iD})(\mat{A})_{k,l} \\
+&= \begin{cases} A_{k,k},& k = l\\ 0,& k\neq l\end{cases}
+\end{align}
+All of those operators are self-adjoint with respect to the (real) inner product, i.e.
+
+$$\rtr\left[\mat{A}^\dagger \mathcal{P}(\mat{B})\right] = \rtr\left[\mathcal{P}(\mat{A})^\dagger \mat{B}\right]$$
+
+This will be important to derive the reverse rules, and it shows that the cotangents will be automatically projected onto the subspace where the tangents are defined.
+
+Closely related to this is the remark that we made above about the dagger. We can define a dagger superoperator $\mathcal{D}:\bbC^{m \times n} \to \bbC^{n\times m}: \mat{A}\mapsto \mathcal{D}(\map{A})=\mat{A}^\dagger$. Note that this is not a single (super)operator, but one for every matrix size, and in case of rectangular matrices, it maps to matrices of opposite size. It is a complex antilinear operator, but with respect to the real vector space structure, it is real linear and we can write, for all $\mat{A}\in \bbC^{m \times n}$ and $\mat{B}\in \bbC^{n \times m}$,
+
+$$\rtr(\mat{B}^\dagger \mathcal{D}(\mat{A}))= \rtr(\mat{B}^\dagger \mat{A}^\dagger) = \rtr(\mat{B}\mat{A}) = \rtr(\mathcal{D}(B)^\dagger \mat{A}).$$
+
+We can then define two more projection superoperators on the spaces of square matrices $\mat{A}\in \bbC^{n\times n}$, namely those that project onto the hermitian and antihermitian part as
+\begin{align}
+\mathcal{P}_{H}(\mat{A}) &= \frac{\mathcal{I}+\mathcal{D}}{2}(\mat{A}) = \frac{\mat{A}+\mat{A}^\dagger}{2}\\
+\mathcal{P}_{A}(\mat{A}) &= \frac{\mathcal{I}-\mathcal{D}}{2}(\mat{A}) = \frac{\mat{A}-\mat{A}^\dagger}{2}
+\end{align}
+which also satisfy
+
+$$\rtr(\mat{B}^\dagger \mathcal{P}_{H/A}(\mat{A})) = \rtr(\mathcal{P}_{H/A}(\mat{B})^\dagger \mat{A})$$
+
+### Unitary matrices
+We now turn to matrix constraints which are nonlinear, and give rise to known manifolds of special matrices. The first relevant case is a unitarity constraint, which requires $m=n$:
+$$\mat{U}^\dagger \mat{U} = \idmat_n = \mat{U}^\dagger \mat{U}$$
+
+For the tangent directions, we find in this case that
+$$\mat{U}^\dagger \mat{\dot{U}} + \mat{\dot{U}}^\dagger \mat{U}=\zeromat.$$
+
+For the tangent directions, the constraint has thus become linear and can easily be satisfied by parameterising $\dot{U} = \mat{U}\dot{K}$ where $\dot{K}=-\dot{K}^\dagger$, i.e.\ $\dot{K}$ is an antihermitian matrix, parameterised by $n(n-1)/2$ complex parameters below the diagonal (and their conjugates above the diagonal) and $n$ purely imaginary parameters on the diagonal.
+
+### Isometric matrices
+
+Isometric matrices are rectangular matrices with $m \geq n$ that satisfy
+
+$$\mat{Q}^\dagger \mat{Q} = \idmat_n$$
+
+In this case, $\mat{P}=\mat{Q}\mat{Q}^\dagger$ is not the identity, but an orthogonal projector ($\mat{P}^2 =\mat{P}=\mat{P}^\dagger$)
+
+We can think of $\mat{Q}$ as the first $n$ column of a unitary $(m \times m)$ matrix 
+
+$$\mat{U} = \begin{bmatrix} \mat{Q} & \mat{Q}_\perp \end{bmatrix}$$
+
+where $\mat{Q}_\perp$ are an additional $(m-n)$ orthonormal columns that complete the unitary matrix, and thus satisfy $\mat{Q}^\dagger \mat{Q}_\perp = \zeromat$ and $\mat{Q}_\perp^\dagger \mat{Q}_\perp = \idmat_{m-n}$. It furthermore holds that $\mat{Q}_\perp \mat{Q}_\perp = \idmat_m - \mat{Q}\mat{Q}^\dagger$.
+
+If we parameterise the tangent of $\mat{U}$ as
+\begin{align}
+\begin{bmatrix} \mat{\dot{Q}} & \mat{\dot{Q}_\perp}\end{bmatrix} = \begin{bmatrix} \mat{Q} & \mat{Q_\perp}\end{bmatrix}\begin{bmatrix} \mat{\dot{K}} & -\mat{\dot{K}_\perp}^\dagger \\ \mat{\dot{K}_\perp} & \mat{\dot{K}_{\perp\perp}}\end{bmatrix}
+\end{align}
+with $\mat{\dot{K}}=-\mat{\dot{K}}^\dagger$ (and also $\mat{\dot{K}_{\perp\perp}}=-\mat{\dot{K}_{\perp\perp}}^\dagger$), then we find
+\begin{align}
+\mat{\dot{Q}} = \mat{Q} \mat{\dot{K}} + \mat{Q}_{\perp} \mat{\dot{K}_\perp} = \mat{Q} \mat{\dot{K}} + \mat{\dot{L}}
+\end{align}
+where $\mat{\dot{L}}$ only needs to satisfy $\mat{Q}^\dagger \mat{\dot{L}}=\zeromat$. In practice, both representations of $\mat{\dot{Q}}$ can be useful, depending on the situation:
+
+* If we have $n \approx m$ (e.g. $n=m/2$), it can be useful to explicitly determine a $m \times (m-n)$ matrix $\mat{Q}_\perp$ that completes $\mat{Q}$ to unitary matrix, and to use the parameterisation $\mat{\dot{Q}} = \mat{Q} \mat{\dot{K}} + \mat{Q}_{\perp} \mat{\dot{K}_\perp}$ where the $(m-n) \times n$ matrix $\mat{\dot{K}_\perp}$ is completely unconstrained. 
+
+* On the other hand, if $n \ll m$, then it might be that it is undesirable or even infeasible to compute and manipulate a matrix $\mat{Q}_\perp$ of size $m \times (m-n)$. In that case, it is more efficient to use the parameterisation $\mat{Q} \mat{\dot{K}} + \mat{\dot{L}}$, where $\mat{\dot{L}}$ also only has size $(m\times n)$ (like $\mat{Q}$ and $\mat{\dot{Q}}$), but does need to satisfy the requirement that $\mat{Q}^\dagger \mat{\dot{L}} = 0$. Even though we can exploit this condition on $\mat{\dot{L}}$ in order to derive or simplify the equations that it needs to satisfy, we have to make sure that the final equation that determines $\mat{\dot{L}}$ (which will always be a linear equation), is such that it either explicitly imposes the condition $\mat{Q}^\dagger \mat{\dot{L}} = 0$, or is solved in such a way that the solution does satisfy this condition. Failure of doing so will typically result in the linear system for $\dot{L}$ having a nontrivial kernel and thus being singular.
+
+## Linear problems with matrices
+
+Another common operation with matrices that we encounter is that the matrix of interest, for example, the tangent $\mat{\dot{A}}$ of some matrix, is only specified implicitly as the solution of a linear system. Indeed, the matrix factorisations are written down as equations for the final solution (rather than as the algorithm that gave rise to them). Differentating such defining equations gives rise to (sometimes coupled) linear equations that need to be solved. 
+
+### Sylvester equation and Hadamard product
+
+The most common type of linear system for a matrix quantity $\mat{X}$ that we encounter takes the form of a Sylvester equation
+
+$$ \mat{A} \mat{X} - \mat{X} \mat{B} = \mat{C}$$
+
+where thus $\mat{X}$ is the unknown. Let us denote the left hand side as the (Sylvester) superoperator $\mathcal{S}_{\mat{A},\mat{B}}(\mat{X}) = \mat{A}\mat{X} - \mat{X}\mat{B}$. For $\mat{X}\in\bbC^{m \times n}$, it is assumed that $\mat{A}\in\bbC^{m\times m}$ and $\mat{B} \in \bbC^{n \times n}$, so that $\mathcal{S}_{\mat{A},\mat{B}}$ is indeed a linear (super)opeator $\bbC^{m\times n} \mapsto \bbC^{m\times n}$, i.e. it is mapping matrices to the same size. 
+
+The solution of the linear system is then given by
+
+$$\mat{X} = \mat{S}_{\mat{A},\mat{B}}^{-1}(\mat{C})$$
+
+provided the inverse of the Sylvester superoperator exists. The Sylvester superoperator has a nontrivial kernel (and is thus not invertible) whenever $\mat{A}$ and $\mat{B}$ have a common eigenvalue $\lambda$. Indeed, with $\mat{A}\vec{v}=\lambda \vec{v}$ and $\vec{w}^\dagger\mat{B} = \lambda \vec{w}^\dagger$, it is clear that $\mathcal{S}_{\mat{A},\mat{B}}(\vec{v}\vec{w}^\dagger) = \zeromat$. 
+
+If both $\mat{A}$ and $\mat{B}$ can be diagonalised as $\mat{A}=\mat{V}_\mat{A}\mat{D}_\mat{A}\mat{V}_{A}^{-1}$ and $\mat{B}=\mat{V}_\mat{B}\mat{D}_\mat{B}\mat{V}_{B}^{-1}$, a simple way to obtain the solution of the Sylvester equation is as
+\begin{align}
+\mat{D}_{\mat{A}} \mat{\tilde{X}} - \mat{\tilde{X}}\mat{D}_{\mat{B}} = \mat{\tilde{C}}
+\end{align}
+with $\mat{\tilde{X}} = \mat{V}_{\mat{A}}^{-1}\mat{X}\mat{V}_{\mat{B}}$ and analoguously for $\mat{\tilde{C}}$. In this case, the $i,j$ component of this equation reads
+
+$$(\lambda_i - \mu_j) \mat{\tilde{X}}_{ij} = \mat{\tilde{C}}_{ij}$$
+
+with $(\mat{D}_\mat{A})_{ii} = \lambda_i$ and $(\mat{D}_{\mat{B}})_{jj}=\mu_j$ the respective eigenvalues. Here too, the importance of not having coinciding eigenvalues of $\mat{A}$ and $\mat{B}$ is clear, unless then also $\mat{\tilde{C}}_{ij} = 0$. In the above form, we can solve the equation and find
+
+$$ \mat{\tilde{X}}_{ij} = \frac{\mat{\tilde{C}}_{ij}}{\lambda_i - \mu_j}$$
+
+We will typically denote this 
+
+$$\mat{\tilde{X}}=\mat{\tilde{C}} \odot \mat{F}$$
+
+where $\mat{F}_{ij} = \frac{1}{\lambda_i - \mu_j}$ and $\odot$ is the pointwise or Hadamard product, satisfying
+
+$$(\mat{A}\odot \mat{B})_{ij} = (\mat{B}\odot \mat{A})_{ij} = \mat{A}_{ij} \mat{B}_{ij}$$.
+
+Finally, we investigate how these operations behave with respect to the real inner product. Note that the Sylvester superoperator acts as
+
+\begin{align}
+\rtr(\mat{X}^\dagger \mathcal{S}_{\mat{A},\mat{B}}(\mat{Y})) &= \rtr(\mat{X}^\dagger (\mat{A}\mat{Y}-\mat{Y}\mat{B})) \\
+&= \rtr((\mat{A}^\dagger \mat{X} - \mat{X}\mat{B}^\dagger)^\dagger \mat{Y})\\
+&= \rtr(\mathcal{S}_{\mat{A}^\dagger,\mat{B}^\dagger}(\mat{X})^\dagger \mat{Y})
+\end{align}
+
+As a consequence, when we have a variable $\dot{\mat{X}} = \mathcal{S}_{\mat{A},\mat{B}}^{-1}(\mat{\dot{Y}})$, it must hold that
+
+\begin{align}
+\rtr(\mat{\breve{X}}^\dagger \dot{\mat{X}})&= \rtr(\mat{\breve{X}}^\dagger \mathcal{S}_{\mat{A},\mat{B}}^{-1}(\mat{\dot{Y}}))\\
+&= \rtr(\mathcal{S}_{\mat{A}^\dagger,\mat{B}^\dagger}^{-1}(\mat{\breve{X}})^\dagger \mat{\dot{Y}})
+\end{align}
+
+and thus $\mat{\breve{Y}} = \mathcal{S}_{\mat{A}^\dagger,\mat{B}^\dagger}^{-1}(\mat{\breve{X}})$.
+
+Related to this is the behaviour of the Hadamard product with respect to this inner product, for which we obtain
+
+$$\rtr(\mat{A}^\dagger (\mat{B} \odot \mat{C})) = \rtr((\mat{A}\odot \overline{\mat{B}})^\dagger \mat{C}).$$
+
+All of these results will prove useful below.
+
+## Gauge freedom
+
+A final issue that is in some sense "orthogonal" to constraints is that of gauge freedom. This arises when certain variables are not uniquely determined, such as the phase of eigenvectors or singular vectors. For example, it could happen that an output matrix $\mat{A}$ of a certain step of the computation is only determined up to an overall multiplication with another matrix $\mat{D}$ (for example diagonal, or unitary, …), so that we could also have obtained $\mat{A'} = \mat{A}\mat{D}$.
+
+If we now consider a one-parameter family of such equivalent matrices, this gives rise to tangent vectors $\mat{\dot{A}}=\mat{A}\mat{\dot{D}}$. However, for objective functions $f$ that are insensitive to such gauge changes, it should hold that the partial derivatives $\mat{\breve{A}} = \frac{\partial f}{\partial \overline{\mat{A}}_{ij}}$ should be such that
+
+$$\rtr(\mat{\breve{A}}^\dagger \mat{A}\mat{\dot{D}}) = 0$$
+
+for all $\mat{\dot{D}}$ that are allowed. Such a condition can easily be checked at the beginning of a reverse rule, and then warned about if it is not satisfied, as this would be indicative of an objective function that uses $\mat{A}$ in a way that depends on implementation details, i.e. an objective function that is not "gauge invariant".
+
+
+# QR decomposition
+
+## Full rank case
+Consider a rectangular matrix $\mat{A}\in \bbC^{m \times n}$. The typical scenario is when
+$m \geq n$ and $\rank(\mat{A})=n$, i.e. $\mat{A}$ has full rank. In this case, there exists a decomposition
+
+$$\mat{A}  =\mat{Q} \mat{R}$$
+
+with $\mat{Q}\in \bbC^{m\times n}$ an isometric matrix ($\mat{Q}^\dagger \mat{Q}=\idmat_n$) and $\mat{R}\in\bbC^{n \times n}$ an upper-triangular matrix ($R_{k,l}=0$ for $k > l$). This decomposition can be made unique by choosing the diagonal elemenents $R_{kk} > 0$. For $\rank(\mat{A})=\rank(\mat{R})=n$, none of those elements can be zero and $\mat{R}$ is invertible, with its inverse $\mat{R}^{-1}$ also being an upper triangular matrix
+
+For the forward rule, we find
+
+$$\mat{\dot{A}} = \mat{\dot{Q}} \mat{R} + \mat{Q} \dot{\mat{R}}$$
+
+where we now insert $\mat{\dot{Q}} = \mat{Q}\mat{\dot{K}}+\mat{\dot{L}}$ as described above. Projecting those equations onto the column space of $\mat{Q}$ and onto the orthogonal complement thereof, we obtain
+
+\begin{align}
+\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1} &= \mat{\dot{K}}  + \dot{\mat{R}}\mat{R}^{-1}\\
+(\idmat - \mat{Q}\mat{Q}^\dagger)\mat{\dot{A}}\mat{R}^{-1} &= \mat{\dot{L}}
+\end{align}
+
+using $(\idmat - \mat{Q}\mat{Q}^\dagger)\mat{\dot{L}} =\mat{\dot{L}}$ by definition. For the first equation, the second term in the right hand side is also upper triangular with a real diagonal, whereas the first term is antihermitian. The first term is thus determined by the part below the diagonal on the left hand side, as well as the imaginary part of its diagonal. We can then write the forward rule as
+
+\begin{align}
+\mat{\dot{K}} &= \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) + \mathcal{P}_{iD}(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) - \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})^\dagger\\
+\mat{\dot{R}} &= \left[\mathcal{P}_{rD}(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) + \mathcal{P}_U(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) +  \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})^\dagger \right]\mat{R}\\
+\mat{\dot{L}} &= (\idmat - \mat{Q}\mat{Q}^\dagger)\mat{\dot{A}}\mat{R}^{-1}\\
+\Rightarrow \mat{\dot{Q}} &= \mat{Q} \mat{\dot{K}} + \mat{\dot{L}} \\
+&= \mat{\dot{A}}\mat{R}^{-1} + \mat{Q}\left[-\mat{Q}^\dagger \mat{\dot{A}}\mat{R}^{-1} + \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})+ \mathcal{P}_{iD}(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) - \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})^\dagger\right]\\
+&= \mat{\dot{A}}\mat{R}^{-1} - \mat{Q}\left[\mathcal{P}_U(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) + \mathcal{P}_{rD}(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) + \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})^\dagger\right] = \mat{\dot{A}}\mat{R}^{-1} - \mat{Q}\mat{\dot{R}}\mat{R}^{-1}
+\end{align}
+
+To derive the reverse rule, we then start from $\rtr(\mat{\breve{Q}}^\dagger\mat{\dot{Q}}) + \rtr(\mat{\breve{R}}^\dagger\mat{\dot{R}})$ and insert the expressions above, which we then simplify by making use of the cyclic invariance of the trace and the self-adjointness of the $\mathcal{P}$ operators with respect to the real $\rtr$ inner product. We find
+
+\begin{align}
+\rtr(\mat{\breve{Q}}^\dagger\mat{\dot{Q}}) &+ \rtr(\mat{\breve{R}}^\dagger\mat{\dot{R}}) \\
+&= \rtr(\mat{\breve{Q}}^\dagger \mat{\dot{A}}\mat{R}^{-1}) + \rtr([\mat{\breve{R}}^\dagger - \mat{R}^{-1} \mat{\breve{Q}}^\dagger \mat{Q}]\mat{\dot{R}})\\
+&= \rtr([\mat{\breve{Q}}\mat{R}^{-\dagger}]^\dagger \mat{\dot{A}}) + \rtr([\mat{\breve{R}} -  \mat{Q}^\dagger\mat{\breve{Q}}\mat{R}^{-\dagger}]^\dagger\mat{\dot{R}})\\
+&= \rtr([\mat{\breve{Q}}\mat{R}^{-\dagger}]^\dagger \mat{\dot{A}}) + \rtr([\mat{\breve{R}} -  \mat{Q}^\dagger\mat{\breve{Q}}\mat{R}^{-\dagger}]^\dagger [\mathcal{P}_{rD}(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) + \mathcal{P}_U(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) +  \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})^\dagger ]\mat{R})\\
+&= \rtr([\mat{\breve{Q}}\mat{R}^{-\dagger}]^\dagger \mat{\dot{A}}) + \rtr([\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}}]^\dagger [\mathcal{P}_{rD}(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) + \mathcal{P}_U(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1}) +  \mathcal{P}_L(\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})^\dagger ])\\
+&= \rtr([\mat{\breve{Q}}\mat{R}^{-\dagger}]^\dagger \mat{\dot{A}}) + \\
+&\qquad \rtr([ \mathcal{P}_{rD}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{L}((\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})^\dagger)]^\dagger\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})
+\end{align}
+
+Note that, for the last term in the square brackets, we first had to use $\rtr(\mat{A}^\dagger \mat{B}^\dagger) = \rtr(\mat{A}\mat{B}) = \rtr((\mat{A}^\dagger)^\dagger \mat{B})$, before we could use the self-adjointness property of $\mathcal{P}_L$. Halfway in the computation, we have also introduced the short-hand notation $\mat{R}^{-\dagger} = (\mat{R}^{-1})^\dagger = (\mat{R}^\dagger)^{-1}$. If we furthermore use that $\mathcal{P}_L(\mat{A}^\dagger) = \mathcal{P}_U(\mat{A})^\dagger$, we can further rewrite this result as
+
+\begin{align}
+\rtr(\mat{\breve{Q}}^\dagger\mat{\dot{Q}}) &+ \rtr(\mat{\breve{R}}^\dagger\mat{\dot{R}}) \\
+&= \rtr([\mat{\breve{Q}}\mat{R}^{-\dagger}]^\dagger \mat{\dot{A}}) + \\
+&\qquad \rtr([ \mathcal{P}_{rD}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})^\dagger]^\dagger\mat{Q}^\dagger \mat{\dot{A}} \mat{R}^{-1})\\
+&=  \rtr([\mat{\breve{Q}}\mat{R}^{-\dagger} + \mat{Q}(\mathcal{P}_{rD}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})^\dagger)\mat{R}^{-\dagger}]^\dagger \mat{\dot{A}}) 
+\end{align}
+
+from which we obtain the final result for the reverse rule
+
+\begin{align}
+\mat{\breve{A}} = \mat{\breve{Q}}\mat{R}^{-\dagger} + \mat{Q}(\mathcal{P}_{rD}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}\mat{R}^\dagger -  \mat{Q}^\dagger\mat{\breve{Q}})^\dagger)\mat{R}^{-\dagger}
+\end{align}
+
+## General result
+
+Now suppose that we have a matrix $\mat{A}\in\bbC^{m \times n}$, where we do not require that $m \geq n$, and furthermore can have $\rank(\mat{A}) = r \leq \min(m,n)$. Let us split $m=m_1 + m_2 + m_3$ and $n=n_1 + n_2 =$ with $n_1 = m_1 = r$, $m_2 = \min(m,n)-r$, $n_2 = n-r$ and $m_3=m-\min(m,n)$. We still have to make one assumption, which is that $\mat{A}$ is such that its first $n_1=r$ columns already span its image (column space), so that a full rank QR decomposition of size $m \times r$ could be obtained from these columns.
+
+We now write the QR decomposition using a square (and thus unitary) matrix $Q$, in the form
+
+$$\begin{bmatrix} \mat{A}_1 & \mat{A}_2\end{bmatrix} = \begin{bmatrix} \mat{Q}_1 & \mat{Q}_2 &  \mat{Q}_3\end{bmatrix} \begin{bmatrix} \mat{R}_{11} & \mat{R}_{12} \\ \zeromat & \zeromat \\  \zeromat & \zeromat \end{bmatrix}$$
+
+Here, $\mat{A}_j \in \bbC^{m \times n_j}$, $\mat{Q}_j \in \bbC^{m \times m_i}$ and $\mat{R}_{ij} \in \bbC^{m_i \times n_j}$ for $i=1,2,3$ and $j=1,2$. Note that $\mat{R}_{21}$, $\mat{R}_{31}$ and $\mat{R}_{32}$ are always zero because of the upper triangularity of $\mat{R}$. A compact QR decomposition would not return $\mat{Q}_3$ and the bottom row of $\mat{R}$, since already $m_1 + m_2 = \min(m,n)$. We include it here for completeness.
+
+Note that the partitioning of $m$ and $n$ is dependent on the current matrix $\mat{A}$, and we only have $m_2>0$ and $n_2>0$ when both $m$ and $n$ exceed the rank $r$ of the current matrix. That the block $\mat{R}_{22}$ is zero expresses precisely this rank deficiency, but it will become nonzero as soon as we perturb away from it. A consequence of this is that $\mat{\dot{R}}_{22}$ will be nonzero. To assess the effect of $\mat{R}_{22}=0$, we will actually replace it with $\mat{R}_{22} = \epsilon \mat{S}_{22}$ and study the limit $\epsilon \to 0$.
+
+Note that $\mat{Q}_3$ (present for $m > n$) can never be uniquely defined, whereas $\mat{Q}_2$ becomes ambiguous in the limit $\epsilon \to 0$ and will change abruptly under small variations. Hence, we can expect  that $\dot{Q}_{22}$ will scale as $\frac{1}{\epsilon}$. We first try to derive a forward rule by writing
+
+$$\begin{bmatrix} \mat{\dot{A}}_1 & \mat{\dot{A}}_2\end{bmatrix} = \begin{bmatrix} \mat{\dot{Q}}_1 & \mat{\dot{Q}}_2 & \mat{\dot{Q}}_3 \end{bmatrix} \begin{bmatrix} \mat{R}_{11} & \mat{R}_{12} \\ \zeromat & \epsilon \mat{S}_{22}\\ \zeromat & \zeromat \end{bmatrix} + \begin{bmatrix} \mat{Q}_1 & \mat{Q}_2 & \mat{Q}_3\end{bmatrix} \begin{bmatrix} \mat{\dot{R}}_{11} & \mat{\dot{R}}_{12} \\ \zeromat & \mat{\dot{R}}_{22} \\ \zeromat & \zeromat\end{bmatrix}$$
+
+which gives rise to
+
+\begin{align}
+\mat{\dot{A}}_1 &= \mat{\dot{Q}}_1 \mat{R}_{11} + \mat{Q}_1 \mat{\dot{R}}_{11}\\
+\mat{\dot{A}}_2 &= \mat{\dot{Q}}_1 \mat{R}_{12} + \epsilon \mat{\dot{Q}}_2 \mat{S}_{22} + \mat{Q}_1 \mat{\dot{R}}_{12} + \mat{Q}_2 \mat{\dot{R}}_{22}
+\end{align}
+
+The first equation fixes $\mat{\dot{Q}}_1$ and $\mat{\dot{R}}_{11}$ completely, using the forward rule of the full rank QR derived above. Suppose that the resulting $\mat{\dot{Q}}_1$ takes the form $\mat{\dot{Q}}_1 = \mat{Q}_1 \mat{\dot{K}}_{11} + \mat{\dot{L}}_1$. From the structure of $\mat{\dot{Q}}$, we know that $\mat{\dot{L}}_1 = \mat{Q}_2 \mat{\dot{K}}_{21} + \mat{Q}_3 \mat{\dot{K}}_{31}$, and then $\mat{\dot{Q}}_2 = -\mat{Q}_1 \mat{\dot{K}}_{21}^\dagger + \mat{Q}_2 \mat{\dot{K}}_{22}+\mat{Q}_3 \mat{\dot{K}}_{32}$, where thus $\mat{\dot{K}}_{21} = \mat{Q}_2^\dagger \mat{\dot{L}}_1 =  \mat{Q}_2^\dagger \mat{\dot{Q}}_1$ and $\mat{\dot{K}}_{22}$ and $\mat{\dot{K}}_{32}$ are new variables (with $\mat{\dot{K}}_{22}$ antihermitian). Inserting this expression for $\mat{\dot{Q}}_2$ into the second equation and projection onto $\mat{Q}_1$, $\mat{Q}_2$ and $\mat{Q}_3$ separately, we obtain
+
+\begin{align}
+\mat{Q}_1^\dagger (\mat{\dot{A}}_2-\mat{\dot{Q}}_1 \mat{R}_{12}) &= \epsilon \mat{Q}_1^\dagger\mat{\dot{Q}}_2 \mat{S}_{22} + \mat{\dot{R}}_{12} = -\epsilon \mat{\dot{Q}}_1^\dagger \mat{Q}_2 \mat{S}_{22} + \mat{\dot{R}}_{12}\\
+\mat{Q}_2^\dagger (\mat{\dot{A}}_2-\mat{\dot{Q}}_1 \mat{R}_{12}) &= \epsilon \mat{\dot{K}}_{22} \mat{S}_{22} + \mat{\dot{R}}_{22} \\
+\mat{Q}_3^\dagger (\mat{\dot{A}}_2-\mat{\dot{Q}}_1 \mat{R}_{12}) &= \epsilon \mat{\dot{K}}_{32} \mat{S}_{22}
+\end{align}
+
+We see that the divergent contribution in $\dot{Q}_2$ disappears along the component $\mat{Q}_1^\dagger\mat{\dot{Q}}_2$, because this equals $-\mat{Q}_2^\dagger\mat{\dot{Q}}_1$. Here, we can safely take the limit $\epsilon \to 0$, which yields 
+
+\begin{align}
+\mat{\dot{R}}_{12} = \mat{Q}_1^\dagger (\mat{\dot{A}}_2-\mat{\dot{Q}}_1 \mat{R}_{12}).
+\end{align}
+
+The divergent contributions will thus appear in $\mat{\dot{K}_{22}}=\mat{Q}_2 \mat{\dot{Q}_2}$ and $\mat{\dot{K}_{32}}=\mat{Q}_3 \mat{\dot{Q}_2}$. As the original matrix $\mat{A}$ only fixes $\mat{Q}_1$, but not $\mat{Q}_2$ and $\mat{Q}_3$ (except for the fact that together they span the orthogonal complement of $\mat{Q}_1$), it follows naturally that the objective function is such that $\mat{Q}_2^\dagger \mat{\breve{Q}_2}$ and $\mat{Q}_3^\dagger \mat{\breve{Q}_3}$ are approximately zero. The fact that we know that $\mat{Q}_2$ needs to be orthogonal to $\mat{Q}_1$ does give meaning tot the projection $\mat{Q}_1^\dagger \mat{\breve{Q}_2}$, which thus does not need to be zero. As $\mat{Q}_3$ is typically not part of the return result, we do not consider its tangent and cotangent at all. 
+
+PS: In practice, this doesn't work. For any small update $A \to A +\epsilon \dot{A}$, we know that the change to $\mat{Q}_2$ will be of order 1, i.e. writing this is $\mat{Q}_2 + \epsilon \mat{\dot{Q}_2}$, this implies that $\mat{\dot{Q}_2}$ is $\order(\epsilon^{-1})$. While it is true that it is only $\mat{Q}_2^\dagger \mat{\dot{Q}_2}$ that order $\epsilon^{-1}$, and $\mat{Q}_1^\dagger \mat{\dot{Q}_2}$ is indeed of order 1, it does not correspond to $-(\mat{Q}_2^\dagger \mat{\dot{Q}_1})^\dagger$ up to order $\epsilon$, because there are order $\epsilon * \epsilon^{-1} = 1$ corrections. As a consequence, the physically meaningfull contribution to $\mat{Q}_1^\dagger \mat{\breve{Q}_2}$ is polluted and it only makes sense to check for $\mat{\breve{Q}_2}$ as a whole to be zero as a condition for a gauge-invariant cost function.
+
+What remains to be discussed is the faith of $\mat{\dot{R}_{22}}$, and thus, whether there can be a meaningfull cotangent $\mat{\breve{R}}_{22}$ associated to it. As it seems from these equations, it couples to $\mat{Q}_2$, which is not well defined, which seems to imply that also $\mat{\dot{R}_{22}}$ can impossibly defined unambiguously and would potentially also be divergent. It turns out that the truth is more subtle. Consider thereto 
+
+\begin{align}
+(\idmat-\mat{Q}_1\mat{Q}_1^\dagger)(\mat{\dot{A}_2} - \mat{\dot{Q}}_1 \mat{R}_{12})=\mat{\dot{A}_2} - \mat{\dot{Q}}_1 \mat{R}_{12} - \mat{Q}_1\mat{\dot{R}}_{12} = \epsilon \mat{\dot{Q}}_2 \mat{S}_22 + \mat{Q}_2 \mat{\dot{R}}_{22}.
+\end{align}
+
+The left hand side is by construction orthogonal to $\mat{Q}_1$, and thus supported in its orthogonal complement. If it would happen that the QR decomposition of the left hand side is exactly $\mat{Q}_2 \mat{\dot{R}_{22}}$, there would be no need for divergent contributions in $\mat{\dot{Q}}_{22}$, i.e. we would have $\mat{\dot{K}}_{22} =\zeromat$ and $\mat{\dot{K}}_{33}=\zeromat$. Note also that, as $\mat{\dot{R}}_{22}$ is a tangent to $\mat{R}_{22}=\zeromat$, we want to diagonal elements of $\mat{\dot{R}}_{22}$ to be positive instead of just real, if the whole decomposition is to represent a QR decomposition with positive diagonal elements. Any deviation between the value of $\mat{Q}_2$ that happens to be chosen in the QR decomposition of $\mat{A}$, and the Q-factor in the QR decomposition of $\mat{\dot{A}_2} - \mat{\dot{Q}}_1 \mat{R}_{12} - \mat{Q}_1\mat{\dot{R}}_{12}$ gives rise to divergent contributions in $\mat{\dot{Q}}_2$, but does not affect $\mat{\dot{R}}_{22}$. Hence, $\mat{\dot{R}}_{22}$ is well defined and nondiverging as the R-factor in the (positive) QR decomposition of $\mat{\dot{A}_2} - \mat{\dot{Q}}_1 \mat{R}_{12} - \mat{Q}_1\mat{\dot{R}}_{12}$. However, while the R-factor in a QR decomposition is homogeneous (rescaling the matrix rescales the R-factor) it is not additive (the R-factor of the sum of two matrices is not the sum). Hence, $\mat{\dot{R}}_{22}$, while being non-diverging, does not satisfy the linearity properties associated with a well defined tangent. Hence, we must also assume (or verify) that the associated cotangent $\mat{\breve{R}}_{22}$ approximates zero for a gauge invariant cost function.
+
+For the reverse rule, we now start from
+\begin{align}
+\rtr(\mat{\breve{Q}}_1^\dagger\mat{\dot{Q}}_1) &+ \rtr(\mat{\breve{Q}}_2^\dagger\mat{\dot{Q}}_2)+ \rtr(\mat{\breve{R}}_{11}^\dagger\mat{\dot{R}}_{11})+ \rtr(\mat{\breve{R}}_{12}^\dagger\mat{\dot{R}}_{12})+ \rtr(\mat{\breve{R}}_{22}^\dagger\mat{\dot{R}}_{22})\end{align}
+
+and use our assumptions that $\mat{\breve{R}}_{22}=0$ and $\mat{\breve{Q}}_2 = (\mat{Q}_1\mat{Q}_1^\dagger + \mat{Q}_2\mat{Q}_2^\dagger + \mat{Q}_3\mat{Q}_3^\dagger)\mat{\breve{Q}}_2 = \mat{Q}_1\mat{Q}_1^\dagger\mat{\breve{Q}_2}$ together with $\mat{Q}_1^\dagger\mat{\dot{Q}}_2 = -\mat{\dot{Q}}_1^\dagger \mat{Q}_2$ to write
+
+
+\begin{align}
+\rtr(\mat{\breve{Q}}_1^\dagger\mat{\dot{Q}}_1) &- \rtr((\mat{Q}_1^\dagger \mat{\breve{Q}}_2]^\dagger\mat{\dot{Q}}_1^\dagger \mat{Q}_2)+ \rtr(\mat{\breve{R}}_{11}^\dagger\mat{\dot{R}}_{11})+ \rtr(\mat{\breve{R}}_{12}^\dagger\mat{\dot{R}}_{12}) \\
+&= \rtr([\mat{\breve{Q}}_1-\mat{Q}_2\mat{\breve{Q}}_2^\dagger \mat{Q}_1]^\dagger\mat{\dot{Q}}_1) + \rtr(\mat{\breve{R}}_{11}^\dagger\mat{\dot{R}}_{11})+ \rtr(\mat{\breve{R}}_{12}^\dagger \mat{Q}_1^\dagger(\mat{\dot{A}}_2 - \mat{\dot{Q}}_1\mat{R}_{12}))\\
+&= \rtr([\mat{\breve{Q}}_1-\mat{Q}_2\mat{\breve{Q}}_2^\dagger \mat{Q}_1 - \mat{Q}_1\mat{\breve{R}}_{12}\mat{R}_{12}^\dagger]^\dagger\mat{\dot{Q}}_1) + \rtr(\mat{\breve{R}}_{11}^\dagger\mat{\dot{R}}_{11})+ \rtr([\mat{Q}_1\mat{\breve{R}}_{12}]^\dagger \mat{\dot{A}}_2)
+\end{align}
+
+From this point on, we can follow the derivation of the full rank case to reduce $\mat{\dot{Q}}_1$ and $\mat{\dot{R}}_11$ to $\mat{\dot{A}}_1$, which then defines the cotangent $\mat{\breve{A}}_1$, while we can immediately read of $\mat{\breve{A}}_2$. We thus find
+
+\begin{align}
+\mat{\breve{A}}_1 &= \mat{\breve{Q}}\mat{R}_{11}^{-\dagger} + \mat{Q}_1(\mathcal{P}_{rD}(\mat{\breve{R}}_{11}\mat{R}_{11}^\dagger -  \mat{Q}_1^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}_{11}\mat{R}_{11}^\dagger -  \mat{Q}_1^\dagger\mat{\breve{Q}})+\mathcal{P}_{U}(\mat{\breve{R}}_{11}\mat{R}_{11}^\dagger -  \mat{Q}_1^\dagger\mat{\breve{Q}})^\dagger)\mat{R}_{11}^{-\dagger}\\
+\mat{\breve{A}}_2 &= \mat{Q}_1\mat{\breve{R}}_{12}
+\end{align}
+where the value
+\begin{align}
+\mat{\breve{Q}} = \mat{\breve{Q}}_1-\mat{Q}_2\mat{\breve{Q}}_2^\dagger \mat{Q}_1 - \mat{Q}_1\mat{\breve{R}}_{12}\mat{R}_{12}^\dagger
+\end{align}
+should be inserted.
+
+# Eigenvalue decomposition
+
+## Hermitian eigenvalue decomposition
+
+Given a Hermitian matrix $\mat{A}=\mat{A}^\dagger$ with $\mat{A}\in\bbC^{n\times n}$, it admits an eigenvalue decomposition of the form
+
+$$\mat{A} = \mat{U} \mat{D} \mat{U}^{\dagger}$$
+
+with $\mat{U}\in\bbC^{n\times n}$ unitary and $\mat{D}$ a real diagonal matrix containing the eigenvalues. This decomposition is not unique, as we can multiply $\mat{U}$ with another unitary matrix $\mat{V}$ that commutes with $\mat{D}$. If all eigenvalues in $\mat{D}$ are mutually distinct, this amounts to $\mat{V}$ being diagonal and unitary, or thus, a matrix with pure complex phases. If some eigenvalues are repeated, $\mat{V}$ can take a block diagonal form.
+
+Let us first derive the forward rule from writing the decomposition as $\mat{A}\mat{U} =\mat{U}\mat{D}$
+
+$$\mat{\dot{A}} \mat{U} + \mat{A} \mat{\dot{U}} = \mat{\dot{U}} \mat{D} + \mat{U}\mat{\dot{D}}$$
+
+and inserting $\mat{\dot{U}}=\mat{U}\mat{\dot{K}}$ with $\mat{K}=-\mat{K}^\dagger$, we obtain
+
+$$\mat{U}^\dagger \mat{\dot{A}}\mat{U}= \mat{\dot{K}}\mat{D} - \mat{D}\mat{\dot{K}} + \mat{\dot{D}}$$
+
+or, in components, where we denote the $i$th column of $\mat{U}$ as $\vec{u}_i$, the $i$th eigenvector, and the $i$th diagonal element of $\mat{D}$ as $\lambda_i$, the corresponding eigenvalue:
+
+$$\vec{u}_i^\dagger \mat{\dot{A}} \vec{u}_j = \mat{\dot{K}}_{ij} (\lambda_j - \lambda_i) + \dot{\lambda}_i \delta_{ij}$$
+
+Note that $\mat{\dot{K}}_{ij}$ cannot be determined if $\lambda_j = \lambda_i$, which includes in particular the diagonal elements $i=j$. This corresponds exactly to
+the indeterminedness of $\mat{U}$ itself in these cases. Any adjoint variables originating from a "gauge-invariant" objective function should thus satisfy
+
+$$\rtr(\mat{\breve{U}}^\dagger \mat{U} \mat{K}) = 0$$
+
+for any antihermitian $\mat{K}$ that contains nonzero entries $(i,j)$ only where $\lambda_i = \lambda_j$. This leads to
+
+$$(\mat{U}^\dagger \mat{\breve{U}})_{ij} - \overline{(\mat{U}^\dagger \mat{\breve{U}})_{ji}} = 0,\quad \text{for all $1\leq i\leq j\leq n$ for which $\lambda_i = \lambda_j$}$$
+
+We can then solve the forward rule as
+
+\begin{align}
+\mat{\dot{K}}_{ij} &= \begin{cases} 0,& i = j\text{ or } \lambda_i=\lambda_j \\ \frac{\vec{u}_i^\dagger \mat{\dot{A}}\vec{u}_j}{\lambda_i-\lambda_j},&\text{otherwise}\end{cases}\\
+\dot{\lambda}_i &= \vec{u}_i^\dagger \mat{\dot{A}}\vec{u}_i
+\end{align}
+
+The rule for $\dot{K}$ is often written as $\mat{\dot{K}} = \mat{F} \odot (\mat{U}^\dagger \mat{\dot{A}}\mat{U})$ with $\odot$ the Hadamard product (see above) and $\mat{F}_{ij} = \begin{cases} 0, &\lambda_i = \lambda_j\\ \frac{1}{\lambda_j-\lambda_i},&\text{otherwise}\end{cases}$. 
+
+It is furthermore important whether we consider $\mat{D}$, and thus also its adjoint $\mat{\breve{D}}$, to be a matrix, or only a vector of its diagonal elements. Here, we make the former choice. Indeed, we can write the forward rules as
+
+\begin{align}
+\mat{\dot{K}} &= \mat{F} \odot (\mat{U}^\dagger \mat{\dot{A}}\mat{U})\\
+\mat{\dot{D}} &= \mathcal{P}_{rD}(\mat{U}^\dagger \mat{\dot{A}}\mat{U})
+\end{align}
+with $\mathcal{P}_{rD}$ the superoperator from before, that projects away everything but the real part of the diagonal. Note that the diagonal elements are anyway real in this case. If the adjoint $\mat{\breve{D}}$ would be a full matrix, all its non-diagonal elements as well as possible imaginary contributions on the diagonal are projected away, because of the self-adjointness property of this superoperator. Indeed, we can now obtain the backward rule as
+
+\begin{align}
+\rtr(\mat{\breve{U}}^\dagger \mat{\dot{U}})+ \rtr(\mat{\breve{D}}^\dagger \mat{\dot{D}}) &= \rtr(\mat{\breve{U}}^\dagger \mat{U}\mat{\dot{K}})+ \rtr(\mat{\breve{D}}^\dagger \mat{\dot{D}})\\
+&= \rtr\left[(\mat{U}^\dagger \mat{\breve{U}})^\dagger (\mat{F} \odot (\mat{U}^\dagger\mat{\dot{A}}\mat{U}))\right] + \rtr\left[\mat{\breve{D}}^\dagger \mathcal{P}_{rD}(\mat{U}^\dagger \mat{\dot{A}}\mat{U})\right]\\
+&= \rtr\left[(\mat{F}\odot(\mat{U}^\dagger \mat{\breve{U}}))^\dagger (\mat{U}^\dagger\mat{\dot{A}}\mat{U})\right] + \rtr\left[\mathcal{P}_{rD}(\mat{\breve{D}})^\dagger (\mat{U}^\dagger \mat{\dot{A}}\mat{U})\right]\\
+&=\rtr \left[(\mat{U}(\mat{F}\odot (\mat{U}^\dagger \mat{\breve{U}}) + \mathcal{P}_{rD}(\mat{\breve{D}}))\mat{U}^\dagger)^\dagger \mat{\dot{A}}\right]
+\end{align}
+
+and thus obtain
+
+$$\mat{\breve{A}} = \mat{U}(\mat{F}\odot (\mat{U}^\dagger \mat{\breve{U}}) + \mathcal{P}_{rD}(\mat{\breve{D}}))\mat{U}^\dagger$$
+
+with thus $\mat{F}_{ij} = \begin{cases} 0, &\lambda_i = \lambda_j\\ \frac{1}{\lambda_j-\lambda_i},&\text{otherwise}\end{cases}$. As $\mat{F}$ is real, no complex conjugations are introduced when it $\mat{F}$ moved from the tangent to the cotangent variables.
+
+## Nonhermitian eigenvalue decomposition
+
+Most of this analysis can be repeated for the nonhermitian case, where the eigenvalue decomposition reads
+
+$$\mat{A} =\mat{V}\mat{D}\mat{V}^{-1} \iff \mat{A}\mat{V}=\mat{V}\mat{D}$$
+
+with $\mat{D}$ still diagonal, but $\mat{V}$ no longer unitary. Still parameterising $\mat{\dot{V}}=\mat{V}\mat{\dot{K}}$, where $\mat{\dot{K}}$ can now be a general matrix, we find
+
+\begin{align}
+\mat{\dot{K}}&= \mat{F} \odot (\mat{V}^{-1}\mat{\dot{A}}\mat{V})\\
+\mat{\dot{D}}&= \mathcal{P}_D (\mat{V}^{-1}\mat{\dot{A}}\mat{V})
+\end{align}
+
+with $\mathcal{P}_{D} = \mathcal{P}_{rD}+\mathcal{P}_{iD}$ the superoperator that selects the diagonal entries (real + imaginary part) and removes all non-diagonal entries. The matrix $\mat{F}$ is still given by
+
+$$\mat{F}_{ij} = \begin{cases} 0, &\lambda_i = \lambda_j\\ \frac{1}{\lambda_j-\lambda_i},&\text{otherwise}\end{cases}$$
+
+and still uses the fact that $\dot{K}_{ij}$ cannot be determined if $\lambda_i = \lambda_j$, and that we just put these components equal to zero. The major difference with the Hermitian case is that now the eigenvalues $\lambda_i = \mat{D}_{ii}$ can no longer assumed to be real.
+
+From this result, we obtain the reverse rule
+
+\begin{align}
+\rtr(\mat{\breve{V}}^\dagger \mat{\dot{V}})+ \rtr(\mat{\breve{D}}^\dagger \mat{\dot{D}})&=  \rtr(\mat{\breve{V}}^\dagger \mat{V}\mat{\dot{K}})+ \rtr(\mat{\breve{D}}^\dagger \mat{\dot{D}})\\
+&= \rtr\left[(\mat{V}^\dagger\mat{\breve{V}})^\dagger (\mat{F} \odot (\mat{V}^{-1}\mat{\dot{A}}\mat{V}))\right] + \rtr\left[\mat{\breve{D}}^\dagger \mathcal{P}_{D}(\mat{V}^{-1} \mat{\dot{A}}\mat{V})\right]\\
+&= \rtr\left[(\overline{\mat{F}}\odot (\mat{V}^\dagger\mat{\breve{V}}))^\dagger (\mat{V}^{-1}\mat{\dot{A}}\mat{V})\right] + \rtr\left[\mathcal{P}_{D}(\mat{\breve{D}})^\dagger (\mat{V}^{-1} \mat{\dot{A}}\mat{V})\right]\\
+&=\rtr \left[(\mat{V}^{-\dagger}(\overline{\mat{F}}\odot (\mat{V}^\dagger\mat{\breve{V}}) + \mathcal{P}_{D}(\mat{\breve{D}}))\mat{V}^{\dagger})^\dagger \mat{\dot{A}}\right]
+\end{align}
+
+and thus obtain
+
+$$\mat{\breve{A}} = \mat{V}^{-\dagger}(\overline{\mat{F}}\odot (\mat{V}^\dagger \mat{\breve{V}}) + \mathcal{P}_{D}(\mat{\breve{D}}))\mat{V}^{\dagger}$$
+
+## Schur decomposition
+
+Another decomposition that is closely related to the eigenvalue decomposition of general matrices $\mat{A}\in\bbC^{n \times n}$ is the Schur decomposition, namely
+
+$$\mat{A} = \mat{U}\mat{T}\mat{U}^\dagger$$
+
+where now $\mat{U}\in \bbC^{n\times n}$ is unitary, and $\mat{T}\in\bbC^{n\times n}$ is upper triangular. In the case of a hermitian matrix $\mat{A}$, the hermiticity of $\mat{T}$ requires that also its entries above the diagonal vanish, so that the Schur decomposition then coincides with the eigenvalue decomposition. As in the hermitian eigenvalue decomposition, the phase of the columns of $\mat{U}$ is not fixed by this equation. However, in this case, a phase change in the columns of $\mat{U}$ also affects the off-diagonal (=above diagonal) elements of $\mat{T}$.
+
+For the forward rule, we again parameterise $\mat{\dot{U}}=\mat{U}\mat{\dot{K}}$ with $\mat{\dot{K}}=-\mat{\dot{K}}^\dagger$ in order to find
+
+$$\mat{\dot{A}}\mat{U} + \mat{A}\mat{\dot{U}} = \mat{\dot{U}}\mat{T}+ \mat{U}\mat{\dot{T}}$$
+
+or thus
+
+$$\mat{U}^\dagger \mat{\dot{A}}\mat{U} = \mat{\dot{K}}\mat{T}-\mat{T}\mat{\dot{K}} + \mat{\dot{T}}$$
+
+From the gauge freedom, it follows that the diagonal elements of $\mat{\dot{K}}$ do not appear in this equations, and can be put to zero (but we should have that the imaginary diagonal components of $\mat{U}^\dagger \mat{\breve{U}}$ should be zero for the adjoint variables associated with a gauge invariant objective function). We can interpret the equation above as a black-box linear system for the below-diagonal entries of $\dot{K}$ (which also fix the above-diagonal entries via antihermiticity) and the entries of $\mat{\dot{T}}$ and feed it into a linear solver. Note that we should then actually separate everything into real and imaginary components.
+
+Let us instead try to find some more structure in these equations. We first focus on the entries $1 \leq j < i \leq n$, for which $\mat{\dot{T}}_{ij} = 0$. We then find
+
+$$(\mat{U}^\dagger\mat{\dot{A}}\mat{U})_{ij} = \sum_{k=1}^j \mat{\dot{K}}_{ik} \mat{T}_{kj} - \sum_{k=i}^n \mat{T}_{ik} \mat{\dot{K}}_{kj}$$
+
+... to be continued ...
+
+
+# Partial eigenvalue and Schur factorisation
+
+## Invariant subspaces
+Consider a matrix $\mat{A}\in\bbC^{n \times n}$, and a matrix $\mat{V} \in \bbC^{n \times r}$ of which the columns span an invariant subspace of $\mat{A}$. This means that it is such that there exists a matrix $\mat{B} \in \bbC^{r \times r}$ such that we have an exact equality
+
+$$\mat{A}\mat{V} = \mat{V}\mat{B}$$
+
+The matrix $\mat{V}$ could be composed out of a number of eigenvectors of $\mat{A}$, in which case $\mat{B}$ would be diagonal and contain the corresponding eigenvalues. Alternatively, we can choose the columns of $\mat{V}$ to be orthonormal, i.e. $\mat{V}$ isometric, and at the same time $\mat{B}$ upper triangular. We then have a partial Schur factorisation. As always, both choices coincide in the case where $\mat{A}$ is hermitian.
+
+## Single eigenvector
+
+We start with the case where $r=1$. A one-dimensional invariant subspace needs to be an eigenvector. A single eigenvector $\vec{u}$ and associated eigenvalue $\lambda$ satisfy
+
+$$\mat{A}\vec{u} = \lambda \vec{u}$$
+
+from which we obtain
+
+$$\mat{\dot{A}}\vec{u} + \mat{A}\vec{\dot{u}} = \dot{\lambda} \vec{u} + \lambda \vec{\dot{u}}$$
+
+Since a single eigenvector can always be chosen normalised, we now set $\vec{\dot{u}} = \vec{u} k + \vec{\dot{l}}$ where $k$ is purely imaginary and $\vec{\dot{l}}$ is orthogonal to $\vec{u}$. The scalar $k$ corresponds to changes in the phase of the eigenvector, and will disappear from the equations. It cannot be uniquely determined and so it should also be annihilated by the adjoint associated with any gauge-invariant objective function, i.e. it should hold for any purely imaginary $k$ that
+
+$$\real(\vec{\breve{u}}^\dagger \vec{u} k) = 0\quad \Rightarrow\quad \imag(\vec{\breve{u}}^\dagger \vec{u}) = 0$$
+
+If we thus choose $\dot{k}=0$, we find that $\vec{\dot{u}}=\vec{\dot{l}}$ lives in the orthogonal complement of $\vec{u}$, i.e. $\vec{u}^\dagger \vec{\dot{u}}=0$. By projecting the equation above onto $\vec{u}$ and its orthogonal complement, we then find
+\begin{align}
+\dot{\lambda} &= \vec{u}^\dagger \mat{\dot{A}}\vec{u} + \vec{u}^\dagger \mat{A}\vec{\dot{u}} \\
+\lambda \vec{\dot{u}} - (\idmat - \vec{u}\vec{u}^\dagger)\mat{A}\vec{\dot{u}} &= (\lambda \idmat - \mat{A})\vec{\dot{u}} + \vec{u}\vec{u}^\dagger \mat{A}\vec{\dot{u}}= (\idmat - \vec{u}\vec{u}^\dagger) \mat{\dot{A}} \vec{u}\\
+\end{align}
+When $\mat{A}$ is hermitian, $\vec{u}^\dagger$ is also a left eigenvector and we can omit the terms containing $\vec{u}^\dagger \mat{A}\vec{\dot{u}}$ in the first and second equation. In particular, we recover the well-known result $\dot{\lambda}=\vec{u}^\dagger \mat{\dot{A}}\vec{u}$. However, we here deal with the more general case.
+
+Another way to write this linear system is as
+\begin{align}
+\begin{bmatrix}
+\lambda \idmat - \mat{A}  & \vec{u}\\
+\vec{u}^\dagger & 0
+\end{bmatrix}\begin{bmatrix} \vec{\dot{u}} \\ \dot{\lambda}\end{bmatrix}
+= \begin{bmatrix} \mat{\dot{A}}\vec{u}\\ 0 \end{bmatrix}
+\end{align}
+
+Despite the appearance of $(\lambda \idmat-\mat{A})$, which has an eigenvalue zero, the coefficient matrix in this system can be inverted (provided the multiplicity of eigenvalue $\lambda$ of $\mat{A}$ is one). This follows from writing it as
+
+\begin{align}
+\begin{bmatrix}
+\lambda \idmat - \mat{A}  & \vec{u}\\
+\vec{u}^\dagger & 0
+\end{bmatrix}=\begin{bmatrix}
+\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger  & \vec{o}\\
+\vec{o}^\dagger & -a
+\end{bmatrix} + \frac{1}{a} \begin{bmatrix} \vec{u} \\ a\end{bmatrix}\begin{bmatrix} \vec{u}^\dagger & a \end{bmatrix}
+\end{align}
+where $a$ is an arbitrary nonzero number. When $\mat{A}$ is hermitian, it is useful to also restrict $a$ to be real, so that both terms in this sum are hermitian.
+
+Assuming that the eigenvalue $\lambda$ has multiplicity one, the matrix $\lambda \idmat - \mat{A}-\frac{1}{a} \vec{u}\vec{u}^\dagger$ is invertible for any $a \neq \infty$, since the spectrum of $\mat{A}+\frac{1}{a} \vec{u}\vec{u}^\dagger$ is given by the spectrum of $\mat{A}$ with eigenvalue $\lambda$ replaced by $\lambda+\frac{1}{a}$. Indeed, we find that $\vec{u}$ is still a right eigenvector as
+
+$$ (\mat{A}+\frac{1}{a} \vec{u}\vec{u}^\dagger)\vec{u} = \lambda \vec{u} + \frac{1}{a} \vec{u}(\vec{u}^\dagger \vec{u})$$
+
+and $\vec{u}$ was assumed normalised to one. Note that this does not require that $\mat{A}$ is hermitian. That the other eigenvalues $\tilde{\lambda}\neq \lambda$ are not affected by this extra term, follows from applying the left eigenvector $\vec{\tilde{v}}^\dagger$ associated with those eigenvalues, which satisfy $\vec{\tilde{v}}^\dagger\vec{u}=0$. However, in the general non-Hermitian case, both the left eigenvector for eigenvalue $\lambda$ and the right eigenvectors associated with eigenvalues $\tilde{\lambda}\neq \lambda$ are affected by this extra term. 
+
+We can then compute the inverse of this matrix using the Sherman-Morisson formula, as the second term is a rank-1 update. We find
+
+\begin{align}
+&\begin{bmatrix}
+\lambda \idmat - \mat{A}  & \vec{u}\\
+\vec{u}^\dagger & 0
+\end{bmatrix}^{-1} \\ 
+&=\begin{bmatrix}
+(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}  & \vec{o}\\
+\vec{o}^\dagger & -\frac{1}{a} \end{bmatrix} - \frac{1}{a} \frac{\begin{bmatrix}
+(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}  & \vec{o}\\
+\vec{o}^\dagger & -\frac{1}{a} \end{bmatrix}  \begin{bmatrix} \vec{u} \\ a\end{bmatrix}\begin{bmatrix} \vec{u}^\dagger & a \end{bmatrix}  \begin{bmatrix}
+(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}  & \vec{o}\\
+\vec{o}^\dagger & -\frac{1}{a} \end{bmatrix}}{1+ \frac{1}{a} \begin{bmatrix} \vec{u}^\dagger & a \end{bmatrix} \begin{bmatrix}
+(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}  & \vec{o}\\
+\vec{o}^\dagger & -\frac{1}{a} \end{bmatrix}   \begin{bmatrix} \vec{u} \\ a\end{bmatrix}}\\
+
+&=\begin{bmatrix}
+(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}  & \vec{o}\\
+\vec{o}^\dagger & -\frac{1}{a} \end{bmatrix} - \frac{1}{a} \frac{ \begin{bmatrix} -a\vec{u} \\ -1\end{bmatrix}\begin{bmatrix}  \vec{u}^\dagger(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1} & -1 \end{bmatrix}}{1+ \frac{1}{a} \begin{bmatrix} \vec{u}^\dagger & a \end{bmatrix} \begin{bmatrix} -a\vec{u} \\ -1\end{bmatrix}}\\
+
+&=\begin{bmatrix}
+(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}  & \vec{o}\\
+\vec{o}^\dagger & -\frac{1}{a} \end{bmatrix} -  \begin{bmatrix} \vec{u} \\ \frac{1}{a}\end{bmatrix}\begin{bmatrix}  \vec{u}^\dagger(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1} & -1 \end{bmatrix}\\
+
+&=\begin{bmatrix}
+(\idmat-\vec{u}\vec{u}^\dagger)(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}  & \vec{u}\\
+-\frac{1}{a}\vec{u}^\dagger(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1} & 0 \end{bmatrix} 
+\end{align}
+
+Here, we have used that $(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}\vec{u} = -a \vec{u}$, but we have not assumed that $\mat{A}$ is hermitian. If that is the case, then also the entry in the bottom left corner simplifies down to $\vec{u}^\dagger$. 
+
+Inserting this inverse in the linear system, we now find
+
+\begin{align}
+\begin{bmatrix}
+\vec{\dot{u}}\\
+\dot{\lambda}
+\end{bmatrix} = \begin{bmatrix} (\idmat-\vec{u}\vec{u}^\dagger)(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1} \mat{\dot{A}}\vec{u}\\
+-\frac{1}{a}\vec{u}^\dagger(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}\mat{\dot{A}}\vec{u}
+\end{bmatrix}
+\end{align}
+
+Note that the equation
+
+$$\dot{\lambda} = -\frac{1}{a}\vec{u}^\dagger(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}\mat{\dot{A}}\vec{u}$$
+
+reduced to its well known form $\dot{\lambda}=\vec{u}^\dagger \mat{\dot{A}}\vec{u}$ in the case where $\mat{A}$ is Hermitian. One might have expected the nonhermitian generalisation $\dot{\lambda}=\vec{v}^\dagger \mat{\dot{A}}\vec{u}$ where $\vec{v}^\dagger$ is the left eigenvector of $\mat{A}$ corresponding to eigenvalue $\lambda$. In fact, it turns out that it holds indeed that
+
+$$\vec{v}^\dagger = -\frac{1}{a}\vec{u}^\dagger(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}$$
+
+as can be verified by writing it as
+
+$$\vec{v}^\dagger(\lambda \idmat - \mat{A}) - \frac{1}{a} (\vec{v}^\dagger \vec{u})\vec{u^\dagger} = -\frac{1}{a}\vec{u}^\dagger$$
+
+Indeed, it is exactly the left eigenvector $\vec{v}$, normalised such that $\vec{v}^\dagger \vec{u}=1$, that satisfies this equation. However, instead of explicitly needing to know this left eigenvector, either by separately solving the eigenvalue equation for the left eigenvector, or by solving the linear system above, we only need to solve one linear system, namely
+
+$$(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}\mat{\dot{A}}\vec{u}$$
+
+in order to determine both $\vec{\dot{u}}$ and $\dot{\lambda}$. Note, finally, that while the precise choice of $a$ was irrelevant in all of the above, in practice it might affect the condition number of the matrix that needs to be inverted, and it can be beneficial to make a careful choice, based on what properties of $\mat{A}$ are known.
+
+Finally, we derive the backward rule, via
+
+\begin{align}
+\real(\vec{\breve{u}}^\dagger \vec{\dot{u}})+\real(\breve{\lambda}^\dagger \dot{\lambda}) &=\real([(\idmat-\vec{u}\vec{u}^\dagger)\vec{\breve{u}} - \frac{1}{\overline{a}}\breve{\lambda}\vec{u}]^\dagger(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{u}^\dagger)^{-1}\mat{\dot{A}}\vec{u})\\
+&=\rtr(((\overline{\lambda}\idmat-\mat{A}^\dagger -\frac{1}{\overline{a}}\vec{u}\vec{u}^\dagger)^{-1}[(\idmat-\vec{u}\vec{u}^\dagger)\vec{\breve{u}} - \frac{1}{\overline{a}}\breve{\lambda}\vec{u}]\vec{u}^\dagger)^\dagger \mat{\dot{A}})
+\end{align}
+
+from which we obtain
+
+$$\mat{\breve{A}} = (\overline{\lambda}\idmat-\mat{A}^\dagger -\frac{1}{\overline{a}}\vec{u}\vec{u}^\dagger)^{-1}[(\idmat-\vec{u}\vec{u}^\dagger)\vec{\breve{u}} - \frac{1}{\overline{a}}\breve{\lambda}\vec{u}]\vec{u}^\dagger$$
+
+## Single eigenvector (alternative)
+
+The previous scheme of course hints towards an alternative scheme, that is probably better known or more expected, for the case of a nonhermitian matrix $\mat{A}$ for which both the left eigenvector $\vec{u}$ and the right eigenvector $\vec{v}^\dagger$ associated with an eigenvalue $\lambda$ are known. It is furthermore assumed that $\lambda$ has (algebraic and geometric) multiplicity one, so that there are no Jordan blocks and $\vec{v}^\dagger \vec{u}\neq 0$. We then normalise $\vec{v}^\dagger$ such that $\vec{v}^\dagger \vec{u}=1$. If we are only interested in the chain rule with respect to $\vec{u}$, we can now gauge the tangent direction so that $\vec{v}^\dagger \vec{\dot{u}} =0$, giving rise to the linear system
+
+\begin{align}
+\begin{bmatrix}
+\lambda \idmat - \mat{A}  & \vec{u}\\
+\vec{v}^\dagger & 0
+\end{bmatrix}\begin{bmatrix} \vec{\dot{u}} \\ \dot{\lambda}\end{bmatrix}
+= \begin{bmatrix} \mat{\dot{A}}\vec{u}\\ 0 \end{bmatrix}
+\end{align}
+
+Most of the analysis from the previous subsection can easily be generalised by substituting $\vec{u}^\dagger$ with $\vec{v}^\dagger$. But since now $\vec{v}^\dagger$ is a left eigenvector of $\mat{A}$, and also of $\mat{A} + \frac{1}{a} \vec{u}\vec{v}^\dagger$, some simplification occurs. In this case, the spectral (or Jordan) decomposition of $\mat{A} + \frac{1}{a} \vec{u}\vec{v}^\dagger$ coincides completely with that of $\mat{A}$ (both eigenvalues and left and right eigenvectors), except for eigenvalue $\lambda$ being shifted to $\lambda + \frac{1}{a}$. We obtain as final result
+
+\begin{align}
+\begin{bmatrix}
+\vec{\dot{u}}\\
+\dot{\lambda}
+\end{bmatrix} = \begin{bmatrix} (\idmat-\vec{u}\vec{v}^\dagger)(\lambda \idmat - \mat{A} - \frac{1}{a} \vec{u}\vec{v}^\dagger)^{-1} \mat{\dot{A}}\vec{u}\\
+\vec{v}^\dagger\mat{\dot{A}}\vec{u}
+\end{bmatrix}
+\end{align}
+
+For the reverse rule, we now obtain
+
+$$\mat{\breve{A}} = (\overline{\lambda}\idmat-\mat{A}^\dagger -\frac{1}{\overline{a}}\vec{v}\vec{u}^\dagger)^{-1}(\idmat-\vec{u}\vec{v}^\dagger)\vec{\breve{u}}  + \breve{\lambda}\vec{v}\vec{u}^\dagger$$
+
+Note that this alternative method is useful if the left eigenvector is already known. If however it still needs to be computed, the previous approach is expected to be computationally cheaper, as it only requires solving one linear system. In the case where $\mat{A}$ is hermitian and thus $\mat{v}=\mat{u}$, these two approaches coincides.
+
+## Higher-dimensional invariant subspace
+
+Now let us consider the case where $\mat{V}\in\bbC^{n \times p}$ and contains $p$ eigenvectors $\vv_i$ and associated eigenvectors $\lambda_i$ for $i=1,\ldots,p$. Of course, we can just reuse the result from the previous subsection for each pair $(\lambda_i,\vv_i)$ separately. For the reverse rule, because of linearity, we can then simply add the results, i.e.
+
+\begin{align}
+\mat{\breve{A}} = \sum_{i=1}^{p}(\overline{\lambda}_i\idmat-\mat{A}^\dagger -\frac{1}{\overline{a}}\vec{v}_i\vec{v}_i^\dagger)^{-1}[(\idmat-\vec{v}_i\vec{v}_i^\dagger)\vec{\breve{v}_i} - \frac{1}{\overline{a}}\breve{\lambda}_i\vec{v}_i]\vec{v}_i^\dagger
+\end{align}
+
+However, it might be that there are alternative approaches.
+
+### Hermitian case
+
+Let us first focus on the case where $\mat{A}$ is hermitian, as in this case the matrix $\mat{V}$ satisfies the additional constraint that it is isometric, so that it columns are not independent.
+
+We can then parameterise $\mat{\dot{V}}=\mat{V}\mat{\dot{K}}+\mat{\dot{L}}$ where $\mat{\dot{K}}$ is antihermitian and $\mat{V}^\dagger \mat{\dot{L}} = \zeromat$. We insert this decomposition in
+
+$$\mat{\dot{A}}\mat{V} + \mat{A}\mat{\dot{V}}=\mat{\dot{V}}\mat{D}+\mat{V}\mat{\dot{D}}$$
+
+and project the resulting equation onto $\mat{V}$ and its orthogonal complement, in order to obtain
+
+\begin{align}
+\mat{V}^\dagger \mat{\dot{A}}\mat{V} &= \mat{\dot{K}}\mat{D}-\mat{D}\mat{\dot{K}} + \mat{\dot{D}}\\
+(\idmat - \mat{V}\mat{V}^\dagger)\mat{\dot{A}}\mat{V} &=  \mat{\dot{L}}\mat{D} -(\idmat - \mat{V}\mat{V}^\dagger)\mat{A}\mat{\dot{L}}=-\mathcal{S}_{(\idmat - \mat{V}\mat{V}^\dagger)\mat{A},\mat{D}}(\mat{\dot{L}})
+\end{align}
+
+The first equation is identical to that of a full eigenvalue decomposition, so that we can recycle the results from that section. For the Sylvester equation on the second line, one might be inclined to omit the projection $(\idmat - \mat{V}\mat{V}^\dagger)$ in front of $\mat{A}\mat{\dot{L}}$, as $\mat{V}^\dagger\mat{A}\mat{\dot{L}}=\mat{D}\mat{V^\dagger}\mat{\dot{L}}$, and $\mat{V^\dagger}\mat{\dot{L}}$ is supposed to be zero. However, it is exactly the presence of this factor that will enforce that $\mat{\dot{L}}$ will satisfy this constraint. A different perspective is that the projection is necessary to ensure $(\idmat-\mat{V}\mat{V}^\dagger)\mat{A}$ and $\mat{D}$ do not have common eigenvalues, which makes that the Sylvester equation will have a unique solution. In fact, this requires that all eigenvalues with higher multiplicity are either completely contained in the subspace $\mat{V}$ or in its orthogonal complement. Furthermore, it is also important that none of the eigenvalues in $\mat{V}$, or thus of the diagonal elements in $\mat{D}$, are zero. If this is the case, it can help to regularise the second equation as
+
+\begin{align}
+(\idmat - \mat{V}\mat{V}^\dagger)\mat{\dot{A}}\mat{V} &=  \mat{\dot{L}}\mat{D} -\mat{A}\mat{\dot{L}} - \mat{V}\mat{D'}\mat{V}^\dagger \mat{\dot{L}}
+\end{align}
+
+where $\mat{D'}$ is a diagonal matrix that is chosen such that $\mat{D}$ and $\mat{D}+\mat{D'}$ do not have any eigenvalues (diagonal elements) in common. If $\mat{D}$ does not contain eigenvalues zero, then the choice $\mat{D'}=-\mat{D}$ reduces this equation to its original form.
+
+We now find the solution
+
+\begin{align}
+\mat{\dot{K}} &= \mat{F} \odot (\mat{V}^\dagger \mat{\dot{A}}\mat{V})\\
+\mat{\dot{D}} &= \mathcal{P}_{rD}(\mat{V}^\dagger \mat{\dot{A}}\mat{V})\\
+\mat{\dot{L}} &= - \mathcal{S}_{\mat{A}+\mat{V}\mat{D'}\mat{V}^\dagger , \mat{D}}^{-1}((\idmat - \mat{V}\mat{V}^\dagger)\mat{\dot{A}}\mat{V})
+\end{align}
+with $\mat{F}_{ij}=\begin{cases} \frac{1}{\lambda_j-\lambda_i},& i\neq j\\ 0,&i=j\end{cases}$ and $\lambda_i = \mat{D}_{ii} \in \bbR$. 
+
+For the reverse rule, we insert $\mat{\dot{V}}=\mat{V}\mat{\dot{K}} + (\idmat - \mat{V}\mat{V}^\dagger)\mat{\dot{L}}$, where the explicit projector onto the orthogonal complement of $\mat{V}$ in the second term does not affect $\mat{\dot{L}}$, but will help in projecting the corresponding component out of the adjoint variable $\mat{\breve{V}}$. We then find 
+\begin{align}
+\rtr(\mat{\breve{V}}^\dagger \mat{\dot{V}})&+\rtr(\mat{\breve{D}}^\dagger \mat{\dot{D}})\\
+&=\rtr([(\mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_{rD}(\mat{\breve{D}})]^\dagger \mat{V}^\dagger\mat{\dot{A}}\mat{V}) + \rtr([-\mathcal{S}_{\mat{A}+\mat{V}\mat{D'}\mat{V}^\dagger , \mat{D}}^{-1}((\idmat - \mat{V}\mat{V}^\dagger)\mat{\breve{V}})]^\dagger (\idmat - \mat{V}\mat{V}^\dagger)\mat{\dot{A}}\mat{V})\\
+&= \rtr([\mat{V}\{(\mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_{rD}(\mat{\breve{D}})\}\mat{V}^\dagger - (\idmat - \mat{V}\mat{V}^\dagger)\mathcal{S}_{\mat{A}+\mat{V}\mat{D'}\mat{V}^\dagger , \mat{D}}^{-1}((\idmat - \mat{V}\mat{V}^\dagger)\mat{\breve{V}})\mat{V}^\dagger]^\dagger\mat{\dot{A}})
+\end{align}
+
+where we have used the hermiticity of $\mat{A}$ (and $\mat{D}$ and $\mat{D}'$) in order to bring the (inverse) Sylvester superoperator to the dual variables. We thus find
+
+$$\mat{\breve{A}}=\mat{V}[(\mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_{rD}(\mat{\breve{D}})]\mat{V}^\dagger - (\idmat - \mat{V}\mat{V}^\dagger)\mathcal{S}_{\mat{A}+\mat{V}\mat{D'}\mat{V}^\dagger , \mat{D}}^{-1}((\idmat - \mat{V}\mat{V}^\dagger)\mat{\breve{V}})\mat{V}^\dagger$$
+
+where, as mentioned above, $\mat{D'}$ is a an arbitrary (real) diagonal matrix that is chosen such that $\mat{D}$ and $\mat{D}+\mat{D'}$ do not have any eigenvalues (diagonal elements) in common.
+
+Alternatively, if we can afford to explicitly compute a complement $\mat{V}_\perp$ and parameterise $\mat{\dot{L}} = \mat{V}_\perp \mat{\dot{K}}_\perp$ and thus $\mat{\dot{V}}=\mat{V}\mat{\dot{K}}+\mat{V}_\perp \mat{\dot{K}}_\perp$, we would find
+
+\begin{align}
+\mat{\dot{K}} &= \mat{F} \odot (\mat{V}^\dagger \mat{\dot{A}}\mat{V})\\
+\mat{\dot{D}} &= \mathcal{P}_{rD}(\mat{V}^\dagger \mat{\dot{A}}\mat{V})\\
+\mat{\dot{K}}_\perp &= - \mathcal{S}_{\mat{V}_\perp^\dagger \mat{A}\mat{V}_\perp, \mat{D}}^{-1}(\mat{V}_\perp^\dagger\mat{\dot{A}}\mat{V})
+\end{align}
+
+where again we assume that $\mat{A}$ does not have common eigenvalues in the subspace $V$ (diagonal elements of $\mat{D}$) and in the subspace $\mat{V}_\perp$. This description translates to a reverse rule
+
+$$\mat{\breve{A}}=\mat{V}[(\mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_{rD}(\mat{\breve{D}})]\mat{V}^\dagger - \mat{V}_\perp\mathcal{S}_{\mat{V}_\perp^\dagger \mat{A}\mat{V}_\perp , \mat{D}}^{-1}(\mat{V}_\perp^\dagger\mat{\breve{V}})\mat{V}^\dagger$$
+
+### Non-hermitian case
+
+For a non-hermitian matrix $\mat{A}$, we can still have a subspace spanned by the columns of $\mat{V}$, where we assume these columns to be different eigenvectors, such that $\mat{A}\mat{V}=\mat{V}\mat{D}$
+
+As these columns are now not necessarily orthogonal, we first compute their Gram matrix $\mat{G}=\mat{V}^\dagger \mat{V}$, in order to build an orthogonal projector
+
+$$\mat{P}_{\mat{V}} = \mat{V} \mat{G}^{-1} \mat{V}^\dagger$$
+
+Note that $\mat{G}^{-1}\mat{V}^\dagger$ is often referred to as the (Moore-Penrose) pseudoinverse of $\mat{V}$ and is then denoted as $\mat{V}^+$. In the case where $\mat{V} = \bbF^{n \times n}$, it coincides with $\mat{V}^{-1}$. In the case where the columns of $\mat{V}$ are orthogonal, $\mat{G}=\idmat$ and it coincides with $\mat{V}^\dagger$.
+
+We can now again parameterise $\mat{\dot{V}} = \mat{V} \mat{\dot{K}} + \mat{\dot{L}}$, which is simply a way to decompose $\mat{\dot{V}}$ into a component along $\mat{V}$ and a component in the orthogonal complement. Put differently, we have $\mat{V}\mat{\dot{K}} = \mat{P}_{\mat{V}}\mat{\dot{V}}$ and $\mat{\dot{L}} = (\idmat - \mat{P}_{\mat{V}})\mat{\dot{V}}$, which shows that $\mat{V}^\dagger \mat{\dot{L}} =\zeromat$. In this case, however there is no contraint on $\mat{\dot{K}}$. However, as the individual columns of $\mat{V}$ are only determined up to phases and normalisation, we can still impose a condition on the diagonal of $\mat{\dot{K}}$. This is exactly what was used in the full eigenvalue decomposition.
+
+Now inserting $\mat{\dot{V}} = \mat{V} \mat{\dot{K}} + \mat{\dot{L}}$ in
+
+$$\mat{\dot{A}}\mat{V} + \mat{A}\mat{\dot{V}} = \mat{\dot{V}}\mat{D} + \mat{V}\mat{\dot{D}}$$
+
+and projecting onto $\mat{V}$ and its orthogonal complement, we find
+
+\begin{align}
+\mat{V}^\dagger\mat{\dot{A}}\mat{V} + \mat{G}\mat{D}\mat{\dot{K}} + \mat{V}^\dagger \mat{A} \mat{\dot{L}} &= \mat{G}\mat{\dot{K}} \mat{D} + \mat{G} \mat{\dot{D}}\\
+(\idmat - \mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{\dot{A}}\mat{V} + (\idmat - \mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{A}\mat{\dot{L}} &= \mat{\dot{L}} \mat{D}
+\end{align}
+
+or thus
+
+\begin{align}
+\mat{G}^{-1}\mat{V}^\dagger\left(\mat{\dot{A}}\mat{V} +\mat{A} \mat{\dot{L}}\right) &= \mat{\dot{K}} \mat{D} - \mat{D}\mat{\dot{K}} + \mat{\dot{D}}\\
+(\idmat - \mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{\dot{A}}\mat{V} &= \mat{\dot{L}} \mat{D} - (\idmat - \mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{A}\mat{\dot{L}} = - \mathcal{S}_{(\idmat - \mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{A},\mat{D}}(\mat{\dot{L}})
+\end{align}
+
+The first equation defines $\mat{\dot{D}}$ and $\mat{\dot{K}}$ in terms of the left hand side, which still includes $\mat{\dot{L}}$. The latter can be completely determined from the second equation. This second equation, as before, contains a Sylvester operator involving the matrices $\mat{D}$, the restriction of $\mat{A}$ onto the subspace $\mat{V}$, and $(\idmat-\mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{A}$. The second matrix has the same spectrum of $\mat{A}$, except that all eigenvalues contained in $\mat{V}$ have been mapped to zero. More generally, we could again regularise this Sylvester equation by replacing $(\idmat-\mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{A}$ with $\mat{A} + \mat{V}\mat{D'}\mat{G}^{-1}\mat{V}^\dagger = \mat{A}+\mat{V} \mat{D'}\mat{V}^+$, where $\mat{D'}$ is chosen such that $\mat{D}$ and $\mat{D}+\mat{D'}$ have no eigenvalues in common. Note that now both choices $(\idmat-\mat{V}\mat{G}^{-1}\mat{V}^\dagger)\mat{A}$ and $\mat{A} + \mat{V}\mat{D'}\mat{G}^{-1}\mat{V}^\dagger = \mat{A}+\mat{V} \mat{D'}\mat{V}^+$ do not become equal for the choice $\mat{D'}=-\mat{D}$, even though the effect on the spectrum is the same (right eigenvectors in $V$ are preserved and have eigenvalue zero, complementary eigenvalues are preserved together with their left eigenvectors). To streamline the rest of the discussion, I will denote either of these choises as $\mat{A'}$.
+
+We now find the solution
+
+\begin{align}
+\mat{\dot{L}} &= - \mathcal{S}_{\mat{A'}, \mat{D}}^{-1}((\idmat - \mat{V}\mat{V}^+)\mat{\dot{A}}\mat{V})=- \mathcal{S}_{\mat{A'}, \mat{D}}^{-1}((\idmat - \mat{P}_V)\mat{\dot{A}}\mat{V})\\
+\mat{\dot{K}} &= \mat{F} \odot (\mat{V}^+ \mat{\dot{A}}\mat{V} + \mat{V}^+ \mat{A}\mat{\dot{L}}) = \mat{F} \odot (\mat{V}^+ \mat{\dot{A}}\mat{V} - \mat{V}^+ \mat{A}\mathcal{S}_{\mat{A'}, \mat{D}}^{-1}((\idmat - \mat{P}_V)\mat{\dot{A}}\mat{V}))\\
+\mat{\dot{D}} &= \mathcal{P}_{D}(\mat{V}^+ \mat{\dot{A}}\mat{V} + \mat{V}^+ \mat{A}\mat{\dot{L}})=\mathcal{P}_{D}(\mat{V}^+ \mat{\dot{A}}\mat{V} - \mat{V}^+ \mat{A}\mathcal{S}_{\mat{A'}, \mat{D}}^{-1}((\idmat - \mat{P}_V)\mat{\dot{A}}\mat{V}))\\
+\end{align}
+
+with, as before, $\mat{F}_{ij}=\begin{cases} \frac{1}{\lambda_j-\lambda_i},& i\neq j\\ 0,&i=j\end{cases}$ and $\lambda_i = \mat{D}_{ii}$. 
+
+For the reverse rule, we then start from
+
+\begin{align}
+\rtr(\mat{\breve{V}}^\dagger \mat{\dot{V}}) &+ \rtr(\mat{\breve{D}}\mat{\dot{D}}) \\
+&= \rtr([(\mat{V}^\dagger \mat{\breve{V}}) \odot \conj{\mat{F}} + \mathcal{P}_{D}(\mat{\breve{D}})]^\dagger [ \mat{V}^+ \mat{\dot{A}}\mat{V} + \mat{V}^+ \mat{A}\mat{\dot{L}}]) + \rtr(((\idmat - \mat{P}_V)\mat{\breve{V}})^\dagger\mat{\dot{L}})
+\end{align}
+
+and using the shorthand
+\begin{align}
+\mat{Z} &= (\mat{V}^+)^\dagger[(\mat{V}^\dagger \mat{\breve{V}}) \odot \conj{\mat{F}} + \mathcal{P}_{D}(\mat{\breve{D}})] = \mat{V} \mat{G}^{-1} [(\mat{V}^\dagger \mat{\breve{V}}) \odot \conj{\mat{F}} + \mathcal{P}_{D}(\mat{\breve{D}})]
+\end{align}
+
+we find
+
+\begin{align}
+\rtr(\mat{\breve{V}}^\dagger \mat{\dot{V}}) &+ \rtr(\mat{\breve{D}}\mat{\dot{D}}) \\
+&= \rtr(\mat{Z}^\dagger \mat{\dot{A}}\mat{V}) + \rtr([(\idmat - \mat{P}_V)\mat{\breve{V}} + \mat{A}^\dagger \mat{Z}]^\dagger \mat{\dot{L}})\\
+&= \rtr(\mat{Z}^\dagger \mat{\dot{A}}\mat{V}) - \rtr([(\idmat - \mat{P}_V)\mat{\breve{V}} + \mat{A}^\dagger \mat{Z}]^\dagger\mathcal{S}_{\mat{A'}, \mat{D}}^{-1}((\idmat - \mat{P}_V)\mat{\dot{A}}\mat{V}))\\
+&= \rtr(\mat{Z}^\dagger \mat{\dot{A}}\mat{V}) - \rtr((\mathcal{S}_{\mat{A'}^\dagger,\mat{D}^\dagger}^{-1}((\idmat - \mat{P}_V)\mat{\breve{V}} + \mat{A}^\dagger \mat{Z}))^\dagger((\idmat - \mat{P}_V)\mat{\dot{A}}\mat{V}))\\
+&= \rtr([\mat{Z} \mat{V}^\dagger - (\idmat - \mat{P}_V) \mathcal{S}^{-1}_{\mat{A'}^\dagger,\mat{D}^\dagger}((\idmat -\mat{P}_V)\mat{\breve{V}}+\mat{A}^\dagger\mat{Z})\mat{V}^\dagger]^\dagger \mat{\dot{A}})
+\end{align}
+
+in order to find
+
+\begin{align}
+\mat{\breve{A}}=\mat{Z} \mat{V}^\dagger - (\idmat - \mat{P}_V) \mathcal{S}^{-1}_{\mat{A'}^\dagger,\mat{D}^\dagger}((\idmat -\mat{P}_V)\mat{\breve{V}}+\mat{A}^\dagger\mat{Z})\mat{V}^\dagger
+\end{align}
+
+
+# Singular value decomposition
+
+A matrix $\mat{A}\in \bbC^{m\times n}$ can be decomposed as
+
+$$\mat{A}=\mat{U}\mat{S}\mat{V}^\dagger$$
+
+where $\mat{S} \in \bbC^{k \times k}$ is diagonal with real non-negative elements and are typically sorted such that $\mat{S}_{ii} = s_i \geq s_{i+1}$. Furthermore, $\mat{U}\in \bbC^{m \times k}$ and $\mat{V}\in\bbC^{n \times k}$ are isometric. Here, $k=\min(m,n)$, but can be chosen equal to some smaller value $r = \rank(\mat{A})$ as $s_{r+1}=s_{r+2}=\ldots=s_{\min(m,n)}=0$. 
+
+Often, we are interested in a truncated singular value decomposition, where only the $p$ largest singular values are kept, but some smaller nonzero singular values are discarded. In this case, the decomposition is not exact. We however still have the exact equality
+
+\begin{align}
+\mat{A} \mat{V} &= \mat{U} \mat{S}\\
+\mat{A}^\dagger \mat{U} &= \mat{V} \mat{S}
+\end{align}
+
+Note that we always have the gauge freedom $\mat{U}\to \mat{U}\mat{D}$ and $\mat{V}\to \mat{V}\mat{D}$ with $\mat{D}$ a unitary matrix that satisfies $\mat{D}\mat{S} = \mat{S}\mat{D}$. When all the singular values are distinct, this amounts to a diagonal matrix with pure phases.
+
+## Full rank decomposition
+
+We start with the case of a square matrix ($m=n$) that has full rank ($r=m$), for which we consider the full singular value decomposition.
+
+To derive the forward rule, we write
+
+$$\mat{\dot{A}} \mat{V} + \mat{A}\mat{\dot{V}} = \mat{\dot{U}}\mat{S} + \mat{U}\mat{\dot{S}}$$
+
+and parameterise $\mat{\dot{U}}= \mat{U}\mat{\dot{K}}$ and $\mat{\dot{V}}=\mat{V}\mat{\dot{M}}$ with $\mat{\dot{K}}$ and $\mat{\dot{M}}$ are antihermitian. We then find
+
+$$\mat{U}^\dagger \mat{\dot{A}} \mat{V} =  \mat{\dot{K}} \mat{S} - \mat{S}\mat{\dot{M}} + \mat{\dot{S}}$$
+
+Writing the components of these equations for the diagonal and off-diagonal separately, we obtain
+
+\begin{align}
+(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ii} &= s_i(\mat{\dot{K}}_{ii} -\mat{\dot{M}}_{ii}) + \mat{\dot{S}}_{ii}\\
+(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} &= \mat{\dot{K}}_{ij} s_j -\mat{\dot{M}}_{ij} s_i, \qquad i\neq j
+\end{align}
+
+Because the antihermitian matrices $\mat{\dot{K}}$ and $\mat{\dot{M}}$ only have imaginary diagonal entries, we immediately obtain $\mat{\dot{S}}=\mathcal{P}_{rD}(\mat{U}^\dagger \mat{\dot{A}} \mat{V})$. For the imaginary part of the diagaonal components, we cannot unambiguously distribute them over $\mat{\dot{K}}_{ii}$ and $\mat{\dot{M}}_{ii}$ because of the gauge invariance, which means that only there difference is fixed. This implies that any adjoint variables resulting from a gauge invariant objective function should satisfy
+$\rtr(\mat{\breve{U}}^\dagger \mat{\dot{U}} + \mat{\breve{V}}^\dagger \mat{\dot{V}})=0$
+whenever $\mat{\dot{U}} = \mat{U}\mat{\dot{D}}$ and $\mat{\dot{V}}=\mat{V}\mat{\dot{D}}$ for the same purely imaginary and diagonal matrix $\mat{\dot{D}}$, which we could express as the condition
+
+$$\mathcal{P}_{iD}(\mat{U}^\dagger \mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})=0$$
+
+for the adjoint variables associated with a gauge-invariant cost function. We can generalise this constraint to the case where some singular values coincide.
+
+We now make an arbitrary gauge choice that
+
+$$\mat{\dot{K}}_{ii} = - \mat{\dot{M}}_{ii}= \frac{\irm}{2} \frac{\imag((\mat{U}^\dagger \mat{\dot{A}\mat{V}})_{ii})}{s_i} = \frac{(\mat{U}^\dagger \mat{\dot{A}\mat{V}})_{ii} - (\mat{V}^\dagger \mat{\dot{A}^\dagger\mat{U}})_{ii}}{4 s_i}$$
+
+For the off-diagonal components of $\mat{\dot{K}}$ and $\mat{\dot{M}}$, we parameterise the components above the diagonal in terms of those below the diagonal, in order to find
+
+\begin{align}
+(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} &= \mat{\dot{K}}_{ij} s_j -\mat{\dot{M}}_{ij} s_i, \qquad i > j\\
+(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} &= -\overline{\mat{\dot{K}}_{ji}} s_j +\overline{\mat{\dot{M}}_{ji}} s_i, \qquad i< j
+\end{align}
+
+or thus, for all $i > j$:
+\begin{align}
+(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} &= \mat{\dot{K}}_{ij} s_j -\mat{\dot{M}}_{ij} s_i\\
+-(\mat{V}^\dagger \mat{\dot{A}}^\dagger \mat{U})_{ij} &= \mat{\dot{K}}_{ij} s_i -\mat{\dot{M}}_{ij} s_j
+\end{align}
+from which we can solve
+\begin{align}
+\mat{\dot{K}}_{ij} &= \frac{s_j (\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} + s_i (\mat{V}^\dagger \mat{\dot{A}}^\dagger \mat{U})_{ij}}{s_j^2 - s_i^2} = \frac{1}{2} \frac{(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} + (\mat{V}^\dagger \mat{\dot{A}}^\dagger \mat{U})_{ij}}{s_j - s_i} + \frac{1}{2} \frac{(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} - (\mat{V}^\dagger \mat{\dot{A}}^\dagger \mat{U})_{ij}}{s_j + s_i} \\
+\mat{\dot{M}}_{ij} &= \frac{s_j (\mat{V}^\dagger \mat{\dot{A}}^\dagger \mat{U})_{ij} + s_i (\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij}}{s_j^2 - s_i^2}=\frac{1}{2} \frac{(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} + (\mat{V}^\dagger \mat{\dot{A}}^\dagger \mat{U})_{ij}}{s_j - s_i} - \frac{1}{2} \frac{(\mat{U}^\dagger \mat{\dot{A}} \mat{V})_{ij} - (\mat{V}^\dagger \mat{\dot{A}}^\dagger \mat{U})_{ij}}{s_j + s_i}
+\end{align}
+While these equations were derived for the entries of $\mat{\dot{K}}$ and $\mat{\dot{M}}$ with $i > j$, it can easily be verified that the same equations hold for $i < j$. Indeed, the first term on the last right hand side of both equations can be recognised as the Hermitian part $\mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V})$, which is then made antihermitian by the Hadamard product with $\mat{F}$, where $\mat{F}_{ij}=\begin{cases}\frac{1}{s_j - s_i},& i\neq j\\0,&\text{otherwise}\end{cases}$. The second term of both right hand sides corresponds to the antihermitian part $\mathcal{P}_{A}(\mat{U}^\dagger \mat{\dot{A}}\mat{V})$, which keeps remains antihermitian upon taking the Hadamard product with $\mat{G}$, where $\mat{G}_{ij} = \frac{1}{s_i+s_j}$. In fact, this last term is even compatible with the specific gauge we have chosen for the diagonal entries of $\mat{\dot{K}}$ and $\mat{\dot{M}}$, and can thus be taken to hold for all $i,j=1,\ldots,n$. We then obtain the final result for the forward rules
+
+\begin{align}
+\mat{\dot{S}} &= \mathcal{P}_{rD}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) = \mathcal{P}_{D}(\mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}))\\
+\mat{\dot{U}} &= \mat{U} (\mat{F}\odot \mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) + \mat{G}\odot \mathcal{P}_{A}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}))\\
+\mat{\dot{V}} &= \mat{V} (\mat{F}\odot \mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) - \mat{G}\odot \mathcal{P}_{A}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}))
+\end{align}
+
+We can now readily obtain the reverse rule using
+\begin{align}
+\rtr(\mat{\breve{U}}^\dagger \mat{\dot{U}})&+\rtr(\mat{\breve{V}}^\dagger \mat{\dot{V}})+\rtr(\mat{\breve{S}}^\dagger \mat{\dot{S}})\\
+&= \rtr(((\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F})^\dagger \mathcal{P}_H(\mat{U}^\dagger \mat{\dot{A}}\mat{V})) \\
+&\qquad + \rtr(((\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G})^\dagger \mathcal{P}_A(\mat{U}^\dagger \mat{\dot{A}}\mat{V}))\\
+&\qquad+ \rtr(\mathcal{P}_{rD}(\mat{\breve{S}})^\dagger (\mat{U}^\dagger\mat{\dot{A}}\mat{V}))\\
+&= \rtr((\mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_H((\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F}) + \mathcal{P}_A((\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G})]\mat{V}^\dagger)^\dagger\mat{\dot{A}})
+\end{align}
+from which we conclude that
+
+\begin{align}
+\mat{\breve{A}} &= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_H((\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F}) + \mathcal{P}_A((\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G})]\mat{V}^\dagger\\
+ &= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G}]\mat{V}^\dagger\\
+\end{align}
+
+where thus
+
+\begin{align}
+\mat{F}_{ij}&=\begin{cases}\frac{1}{s_j - s_i},& i\neq j\\0,&\text{otherwise}\end{cases},\\
+\mat{G}_{ij} &= \frac{1}{s_i+s_j}.
+\end{align}
+
+Using
+\begin{align}
+(\mat{\mat{F}\odot \mat{G}})_{ij}=\begin{cases}\frac{1}{s_j^2 - s_i^2},& i\neq j\\0,&\text{otherwise}\end{cases}
+\end{align}
+we could rewrite this as
+\begin{align}
+\mat{\breve{A}} &= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G}]\mat{V}^\dagger\\
+&= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + (\{\mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}}), \mat{S}\} + [\mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}}),\mat{S}])\odot (\mat{F} \odot \mat{G}) + \mathcal{P}_{iD}(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G}]\mat{V}^\dagger\\
+&= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + (2\mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}})\cdot \mat{S} + 2 \mat{S} \cdot \mathcal{P}_A(\mat{V}^\dagger\mat{\breve{V}}))\odot (\mat{F} \odot \mat{G})+ \mathcal{P}_{iD}(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G}]\mat{V}^\dagger\\
+&= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + 2\mathcal{P}_H(\mat{U}^\dagger\mat{\breve{U}}\odot (\mat{F} \odot \mat{G}))\cdot \mat{S} +  \mat{S} \cdot 2\mathcal{P}_H(\mat{V}^\dagger\mat{\breve{V}}\odot (\mat{F} \odot \mat{G}))+ \mathcal{P}_{iD}(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G}]\mat{V}^\dagger\\
+\end{align}
+
+It is this last form that appears for example in [https://arxiv.org/1909.02659](https://arxiv.org/1909.02659), except that a different gauge for the diagonal elements was chosen in the forward rule, which also alters the final term of the reverse rule. Indeed, in that reference, the gauge for the diagonal elements was chosen such that 
+
+$$\mat{\dot{K}}_{ii} =0, \qquad  \mat{\dot{M}}_{ii}= \frac{(\mat{U}^\dagger \mat{\dot{A}\mat{V}})_{ii} - (\mat{V}^\dagger \mat{\dot{A}^\dagger\mat{U}})_{ii}}{2 s_i}$$
+
+While it might seem suspicious that this affects the reverse rule, note that dual variables associated with gauge invariant objective functions should satisfy 
+
+$$\mathcal{P}_{iD}(\mat{U}^\dagger \mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})=0$$
+
+as mentioned above, so that we could then reexpress
+
+$$\mathcal{P}_{iD}(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}}) = -2 \mathcal{P}_{iD}(\mat{V}^\dagger\mat{\breve{V}})$$
+
+Using this substitution, our reverse rule equals Equation 1 in [https://arxiv.org/1909.02659](https://arxiv.org/1909.02659).
+
+## General result
+
+We now discuss the general result for the singular value decomposition of a rectangular matrix $\mat{A} \in \bbC^{m\times n}$, which potentially has a rank $r \leq \min(m,n)$, and which is possibly truncated, i.e. for which we only compute $p\leq r$ (typically the largest) singular values and corresponding vectors. We start from the exact relations
+
+\begin{align}
+\mat{A}\mat{V} &= \mat{U}\mat{S},&\mat{A}^\dagger \mat{U} &= \mat{V}\mat{S}
+\end{align}
+
+with thus $\mat{U} \in \bbC^{m \times p}$, $\mat{V} \in \bbC^{n \times p}$ and $\mat{S} \in \bbR_{\geq 0}^{p \times p}$. For the forward derivatives, we obtain
+
+\begin{align}
+\dot{\mat{A}}\mat{V} &= \mat{\dot{U}}\mat{S} - \mat{A}\mat{\dot{V}} + \mat{U}\mat{\dot{S}}\\
+\dot{\mat{A}}^\dagger\mat{U} &= \mat{\dot{V}}\mat{S} - \mat{A}^\dagger\mat{\dot{U}} + \mat{V}\mat{\dot{S}}
+\end{align}
+where we now insert
+\begin{align}
+\mat{\dot{U}}=\mat{U}\mat{\dot{K}}+\mat{\dot{L}},\qquad\mat{\dot{K}}=-\mat{\dot{K}}^\dagger,\qquad \mat{U}^\dagger \mat{\dot{L}}=\zeromat\\
+\mat{\dot{V}}=\mat{U}\mat{\dot{M}}+\mat{\dot{N}},\qquad\mat{\dot{L}}=-\mat{\dot{L}}^\dagger,\qquad \mat{V}^\dagger \mat{\dot{N}}=\zeromat
+\end{align}
+
+Projecting the first equation onto $\mat{U}^\dagger$ and the second onto $\mat{V}^\dagger$, we obtain
+
+\begin{align}
+\mat{U}^\dagger \dot{\mat{A}}\mat{V} &= \mat{\dot{K}}\mat{S} - \mat{S}\mat{\dot{M}} + \mat{\dot{S}}\\
+\mat{V}^\dagger \dot{\mat{A}}^\dagger\mat{U} &= \mat{\dot{M}}\mat{S} - \mat{S}\mat{\dot{K}} + \mat{\dot{S}}
+\end{align}
+which are the equations we had solved in the full rank case in the previous subsection.
+
+Instead, we now project the first equation onto $(\idmat - \mat{U}\mat{U}^\dagger)$ and the second on $(\idmat - \mat{V}\mat{V}^\dagger)$ in order to find
+
+\begin{align}
+(\idmat - \mat{U}\mat{U}^\dagger)\dot{\mat{A}}\mat{V} &= \mat{\dot{L}}\mat{S} - (\idmat - \mat{U}\mat{U}^\dagger)\mat{A}\mat{\dot{N}}\\
+(\idmat - \mat{V}\mat{V}^\dagger)\dot{\mat{A}}^\dagger\mat{U} &= \mat{\dot{N}}\mat{S} - (\idmat - \mat{V}\mat{V}^\dagger)\mat{A}^\dagger\mat{\dot{L}}
+\end{align}
+The best way to solve these equations is to treat them as a single Sylvester equation by rewriting it in block matrix form as
+
+\begin{align}
+\begin{bmatrix}
+(\idmat - \mat{U}\mat{U}^\dagger)\dot{\mat{A}}\mat{V}\\
+(\idmat - \mat{V}\mat{V}^\dagger)\dot{\mat{A}}^\dagger\mat{U}
+\end{bmatrix} = \begin{bmatrix} \mat{\dot{L}} \\ \mat{\dot{N}} \end{bmatrix} \mat{S} - \begin{bmatrix} \zeromat & (\idmat - \mat{U}\mat{U}^\dagger)\mat{A} \\
+(\idmat - \mat{V}\mat{V}^\dagger)\mat{A}^\dagger & \zeromat \end{bmatrix} \begin{bmatrix} \mat{\dot{L}} \\ \mat{\dot{N}} \end{bmatrix} = -\mathcal{S}_{\begin{bmatrix} \zeromat & (\idmat - \mat{U}\mat{U}^\dagger)\mat{A} \\
+(\idmat - \mat{V}\mat{V}^\dagger)\mat{A}^\dagger & \zeromat \end{bmatrix}, \mat{S}}\left(\begin{bmatrix} \mat{\dot{L}} \\ \mat{\dot{N}} \end{bmatrix}\right)
+\end{align}
+
+As in the case of the partial Hermitian eigenvalue factorisation, the terms $(\idmat - \mat{U}\mat{U}^\dagger)\mat{A}\mat{\dot{N}}$ and $(\idmat - \mat{V}\mat{V}^\dagger)\mat{A}^\dagger\mat{\dot{L}}$ could be simplified to $\mat{A}\mat{\dot{N}}$ and $\mat{A}^\dagger\mat{\dot{L}}$ by exploiting that $\mat{V}^\dagger \mat{\dot{N}}=\zeromat$ and $\mat{U}^\dagger \mat{\dot{L}}=\zeromat$. However, it is exactly the presence of these extra projectors that will enforce this condition, and make that the Sylvester operator has a trivial null space and thus becomes invertible. While we could consider more general types of regularisation as in the eigenvalue case, we now asssume that $\mat{S}$ does not contain zeros on the diagonal, as we are considering a truncated SVD, which is used in cases where zero singular values are probably meant to be truncated away. Furthermore note that $(\idmat - \mat{U}\mat{U}^\dagger)\mat{A}=\mat{A}(\idmat - \mat{V}\mat{V}^\dagger) = \mat{A}-\mat{U}\mat{S}\mat{V}^\dagger$ so that the first matrix appearing in the Sylvester operator is also Hermitian, and let us introduce the notation
+
+$$\mat{A}_\perp = (\idmat - \mat{U}\mat{U}^\dagger)\mat{A}=\mat{A}(\idmat - \mat{V}\mat{V}^\dagger) = \mat{A}-\mat{U}\mat{S}\mat{V}^\dagger = (\idmat - \mat{U}\mat{U}^\dagger)\mat{A}(\idmat - \mat{V}\mat{V}^\dagger)$$
+
+We thus obtain
+
+\begin{align}
+\mat{\dot{S}} &= \mathcal{P}_{rD}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) = \mathcal{P}_{D}(\mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}))\\
+\mat{\dot{U}} &= \mat{U} \mat{\dot{K}} + \mat{\dot{L}}\\
+\mat{\dot{V}} &= \mat{U} \mat{\dot{M}} + \mat{\dot{N}}\\
+\mat{\dot{K}} &= \mat{F}\odot \mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) + \mat{G}\odot \mathcal{P}_{A}(\mat{U}^\dagger \mat{\dot{A}}\mat{V})\\
+\mat{\dot{M}} &= \mat{F}\odot \mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) - \mat{G}\odot \mathcal{P}_{A}(\mat{U}^\dagger \mat{\dot{A}}\mat{V})\\
+\begin{bmatrix} \mat{\dot{L}} \\ \mat{\dot{N}} \end{bmatrix} &= -\mathcal{S}^{-1}_{\begin{bmatrix} \zeromat & \mat{A}_\perp \\
+\mat{A}_\perp^\dagger & \zeromat \end{bmatrix},\mat{S}}\left(\begin{bmatrix}
+(\idmat - \mat{U}\mat{U}^\dagger)\dot{\mat{A}}\mat{V}\\
+(\idmat - \mat{V}\mat{V}^\dagger)\dot{\mat{A}}^\dagger\mat{U}
+\end{bmatrix}\right)
+\end{align}
+
+with
+
+\begin{align}
+\mat{F}_{ij}&=\begin{cases}\frac{1}{s_j - s_i},& i\neq j\\0,&\text{otherwise}\end{cases},\\
+\mat{G}_{ij} &= \frac{1}{s_i+s_j}.
+\end{align}
+
+as before. To formulate the reverse rule, we will need the quantities
+
+\begin{align}
+\begin{bmatrix} \mat{\breve{X}} \\ \mat{\breve{Y}} \end{bmatrix} &= -\mathcal{S}^{-1}_{\begin{bmatrix} \zeromat & \mat{A}_\perp \\
+\mat{A}_\perp^\dagger & \zeromat \end{bmatrix},\mat{S}}\left(\begin{bmatrix}
+(\idmat - \mat{U}\mat{U}^\dagger)\mat{\breve{U}}\\
+(\idmat - \mat{V}\mat{V}^\dagger)\mat{\breve{V}}
+\end{bmatrix}\right)
+\end{align}
+
+so that we can now write
+
+\begin{align}
+\rtr(\mat{\breve{U}}^\dagger \mat{\dot{U}})&+\rtr(\mat{\breve{V}}^\dagger \mat{\dot{V}})+\rtr(\mat{\breve{S}}^\dagger \mat{\dot{S}})\\
+&= \rtr(((\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F})^\dagger \mathcal{P}_H(\mat{U}^\dagger \mat{\dot{A}}\mat{V})) \\
+&\qquad + \rtr(((\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G})^\dagger \mathcal{P}_A(\mat{U}^\dagger \mat{\dot{A}}\mat{V}))\\
+&\qquad+ \rtr(\mathcal{P}_{rD}(\mat{\breve{S}})^\dagger (\mat{U}^\dagger\mat{\dot{A}}\mat{V}))\\
+&\qquad +\rtr(\mat{\breve{X}}^\dagger (\idmat-\mat{U}\mat{U}^\dagger) \mat{\dot{A}}\mat{V})\\
+&\qquad +\rtr(\mat{\breve{Y}}^\dagger (\idmat-\mat{V}\mat{V}^\dagger) \mat{\dot{A}}^\dagger\mat{U})\\
+&= \rtr((\mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_H((\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F}) + \mathcal{P}_A((\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G})]\mat{V}^\dagger)^\dagger\mat{\dot{A}})\\
+&\qquad+\rtr([(\idmat - \mat{U}\mat{U}^\dagger)\mat{\breve{X}\mat{V}^\dagger}]^\dagger \mat{\dot{A}}) + \rtr([(\idmat - \mat{V}\mat{V}^\dagger)\mat{\breve{Y}\mat{U}^\dagger}]^\dagger \mat{\dot{A}}^\dagger)
+\end{align}
+from which we conclude that
+
+\begin{align}
+\mat{\breve{A}} &= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_H((\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F}) + \mathcal{P}_A((\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G})]\mat{V}^\dagger\\
+&\qquad + (\idmat - \mat{U}\mat{U}^\dagger)\mat{\breve{X}}\mat{V}^\dagger  + \mat{U}\mat{\breve{Y}}^\dagger (\idmat - \mat{V}\mat{V}^\dagger)\\
+ &= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G}]\mat{V}^\dagger\\
+&\qquad + (\idmat - \mat{U}\mat{U}^\dagger)\mat{\breve{X}}\mat{V}^\dagger  + \mat{U}\mat{\breve{Y}}^\dagger (\idmat - \mat{V}\mat{V}^\dagger).
+\end{align}
+
+Note that $\mat{U}^\dagger \mat{\breve{X}}=\zeromat$ and $\mat{V}^\dagger\mat{\breve{Y}}=\zeromat$ should automatically be satisfied by the solutions $(\mat{\breve{X}},\mat{\breve{Y}}$ of the Sylvester equation, and the inclusion of the extra projectors onto the orthogonal complement of $\mat{U}$ and $\mat{V}$ in the terms containing $\mat{\breve{X}}$ and $\mat{\breve{Y}}$ is therefore redundant.
+
+If we obtained the truncated SVD from first performing a full SVD, and thus have the orthogonal complements $\mat{U}_\perp$ and $\mat{V}_\perp$ available, we can rewrite this 
+
+
+\begin{align}
+\mat{\dot{S}} &= \mathcal{P}_{rD}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) = \mathcal{P}_{D}(\mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}))\\
+\mat{\dot{U}} &= \mat{U} \mat{\dot{K}} + \mat{U}_\perp \mat{\dot{K}_\perp}\\
+\mat{\dot{V}} &= \mat{U} \mat{\dot{M}} + \mat{V}_\perp \mat{\dot{M}_\perp}\\
+\mat{\dot{K}} &= \mat{F}\odot \mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) + \mat{G}\odot \mathcal{P}_{A}(\mat{U}^\dagger \mat{\dot{A}}\mat{V})\\
+\mat{\dot{M}} &= \mat{F}\odot \mathcal{P}_{H}(\mat{U}^\dagger \mat{\dot{A}}\mat{V}) - \mat{G}\odot \mathcal{P}_{A}(\mat{U}^\dagger \mat{\dot{A}}\mat{V})\\
+\begin{bmatrix} \mat{\dot{K}_\perp} \\ \mat{\dot{M}_\perp} \end{bmatrix} &= -\mathcal{S}^{-1}_{\begin{bmatrix} \zeromat & \mat{U}_\perp^\dagger\mat{A}\mat{V}_\perp \\
+\mat{V}_\perp^\dagger \dot{\mat{A}}^\dagger \mat{U}_\perp & \zeromat \end{bmatrix},\mat{S}}\left(\begin{bmatrix}
+\mat{U}_\perp^\dagger\dot{\mat{A}}\mat{V}\\
+\mat{V}_\perp^\dagger\dot{\mat{A}}^\dagger\mat{U}
+\end{bmatrix}\right)
+\end{align}
+
+and thus for the reverse rule
+
+\begin{align}
+\mat{\breve{A}} &= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_H((\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F}) + \mathcal{P}_A((\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G})]\mat{V}^\dagger\\
+&\qquad + \mat{U}_\perp \mat{\breve{X}'}\mat{V}^\dagger  + \mat{U}\mat{\breve{Y}'}^\dagger \mat{V}_\perp^\dagger\\
+ &= \mat{U} [ \mathcal{P}_{rD}(\mat{\breve{S}}) + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} + \mat{V}^\dagger\mat{\breve{V}})\odot \mat{F} + \mathcal{P}_A(\mat{U}^\dagger\mat{\breve{U}} - \mat{V}^\dagger\mat{\breve{V}})\odot \mat{G}]\mat{V}^\dagger\\
+&\qquad + \mat{U}_\perp \mat{\breve{X}'}\mat{V}^\dagger  + \mat{U}\mat{\breve{Y}'}^\dagger \mat{V}_\perp^\dagger\\
+\end{align}
+
+where now $\mat{\breve{X}'}=\mat{U}_\perp^\dagger \mat{\breve{X}}$ and $\mat{\breve{Y}'} =\mat{V}_\perp^\dagger \mat{\breve{Y}}$ (running out of letters) can directly be obtained from
+
+\begin{align}
+\begin{bmatrix} \mat{\breve{X}'} \\ \mat{\breve{Y}'} \end{bmatrix} &= -\mathcal{S}^{-1}_{\begin{bmatrix} \zeromat & \mat{U}_\perp^\dagger\mat{A}\mat{V}_\perp \\
+\mat{V}_\perp^\dagger \dot{\mat{A}}^\dagger \mat{U}_\perp & \zeromat \end{bmatrix},\mat{S}}\left(\begin{bmatrix}
+\mat{U}_\perp^\dagger\mat{\breve{U}}\\
+\mat{V}_\perp^\dagger\mat{\breve{V}}
+\end{bmatrix}\right)
+\end{align}
+
+or thus, writing out the sylvester equation explicitly,
+
+\begin{align}
+\mat{\breve{X}'} \mat{S} - \mat{U}_\perp^\dagger\mat{A}\mat{V}_\perp \mat{\breve{Y}'} &= \mat{U}_\perp^\dagger\mat{\breve{U}}\\
+\mat{\breve{Y}'}\mat{S} - \mat{V}_\perp^\dagger \dot{\mat{A}}^\dagger \mat{U}_\perp \mat{\breve{X}'} &= \mat{V}_\perp^\dagger\mat{\breve{V}}
+\end{align}
+
+If $\mat{U}_\perp$ and $\mat{V}_\perp$ are not just any orthogonal complement of $\mat{U}$ and $\mat{V}$, but truly come from a full SVD computation, it furthermore holds that $\mat{U}_\perp^\dagger\mat{A}\mat{V}_\perp$ will also be diagonalised. Note that $\mat{U}_\perp \in \bbC^{m \times (m-p)}$ and $\mat{V} \in \bbC^{n \times (n-p)}$, whereas $\mat{\breve{X}'} \in \bbC^{(m-p) \times p}$ en $\mat{\breve{V}'} \in \bbC^{(n-p)\times p}$. The matrix $\mat{U}_\perp^\dagger\mat{A}\mat{V}_\perp$ is thus a $(m-p) \times (n-p)$ matrix with nonzero elements only on the diagonal, namely $(\mat{U}_\perp^\dagger\mat{A}\mat{V}_\perp)_{ij} = s_{i+p} \delta_{ij}$ with $\{s_i, i=1,\ldots,\min(m,n)
+\}$ the list of all singular values of $\mat{A}$, and $\{s_i,i=1,\ldots,p\}$ the singular values contained in $\mat{S}$.
+
+We now find the componentwise equations
+
+\begin{align}
+\mat{\breve{X}'}_{ik} s_k - s_{i+p} \mat{\breve{Y}'}_{ik} &= (\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik}\\
+\mat{\breve{Y}'}_{jk} s_k - s_{j+p} \mat{\breve{X}'}_{ik} &= (\mat{V}_\perp^\dagger \mat{\breve{V}})_{jk}
+\end{align}
+with $i = 1,\ldots, m-p$, $j=1,\ldots,n-p$ and $k=1,\ldots,p$. Note that if $m \neq n$, we are already stretching the notation here, since the index of $s$ might be going out of bounds in the second term (which we interpret as the corresponding $s$ being zero). To solve this in way similar to the full SVD case for the square matrix, we first have to define a common square region for $i$ and $j$. Now, if there are only $r \leq \min(m,n)$ nonzero singular values ($r$ being the rank of $\mat{A}$) we can separate these equations into
+
+\begin{align}
+\mat{\breve{X}'}_{ik} s_k - s_{i+p} \mat{\breve{Y}'}_{ik} &= (\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik}\\
+\mat{\breve{Y}'}_{jk} s_k - s_{j+p} \mat{\breve{X}'}_{jk} &= (\mat{V}_\perp^\dagger \mat{\breve{V}})_{jk}
+\end{align}
+
+for the square region $i,j = 1,\ldots, r-p$ and $k=1,\ldots,p$, whereas
+
+\begin{align}
+\mat{\breve{X}'}_{ik} s_k &= (\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik}\\
+\mat{\breve{Y}'}_{jk} s_k &= (\mat{V}_\perp^\dagger \mat{\breve{V}})_{jk}
+\end{align}
+
+for the remaining values $i=r-p+1,\ldots,m-p$ and $j=r-p+1,\ldots,n-p$, again for all $k=1,\ldots,p$.
+
+This can now easily be solved to
+
+\begin{align}
+\mat{\breve{X}'}_{ik} &= \frac{(\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik} s_k + s_{i+p} (\mat{V}_\perp^\dagger \mat{\breve{V}})_{ik}}{s_k^2 - s_{i+p}^2}= \frac{1}{2} \frac{(\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik} + (\mat{V}_\perp^\dagger \mat{\breve{V}})_{ik}}{s_k - s_{i+p}} + \frac{1}{2}\frac{(\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik} - (\mat{V}_\perp^\dagger \mat{\breve{V}})_{ik}}{s_k + s_{i+p}}\\
+\mat{\breve{Y}'}_{ik} &= \frac{(\mat{V}_\perp^\dagger \mat{\breve{V}})_{ik} s_k + s_{i+p} (\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik}}{s_k^2 - s_{i+p}^2}=\frac{1}{2} \frac{(\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik} + (\mat{V}_\perp^\dagger \mat{\breve{V}})_{ik}}{s_k - s_{i+p}} - \frac{1}{2}\frac{(\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik} - (\mat{V}_\perp^\dagger \mat{\breve{V}})_{ik}}{s_k + s_{i+p}}\\
+\end{align}
+for $i = 1,\ldots, r-p$ and $k=1,\ldots,p$, and
+\begin{align}
+\mat{\breve{X}'}_{ik} &= \frac{(\mat{U}_\perp^\dagger \mat{\breve{U}})_{ik}}{s_k}\\
+\mat{\breve{Y}'}_{jk} &= \frac{(\mat{V}_\perp^\dagger \mat{\breve{V}})_{jk}}{s_k}
+\end{align}
+
+for the remaining values $i=r-p+1,\ldots,m-p$ and $j=r-p+1,\ldots,n-p$, again for all $k=1,\ldots,p$.
+
+# Polar decomposition
+
+We consider the case of a matrix $\mat{A}\in\bbC^{m \times n}$ with $m \geq n$, and write the "left" polar decomposition as $\mat{A} = \mat{W} \mat{P}$ where $\mat{W} \in \bbC^{m\times n}$ with $\mat{W}^\dagger \mat{W} = \idmat$ and $\mat{P} \in \bbC^{n \times n}$ with $\mat{P} = \mat{P}^\dagger$ and $\mat{P} > 0$ (positive definite).  Here, we also assume that $\mat{A}$ is not rank-deficient, i.e. $\mat{A}$ and $\map{P}$ have rank $n$. The case with $m \leq n$ where we want t owrite $\mat{A} = \mat{P} \mat{W}^\dagger$ can be obtained by simply taking appropriate hermitian conjugates in all the equations.
+
+For the tangent directions, we find
+\begin{align}
+\mat{\dot{A}} = \mat{\dot{W}} \mat{P} + \mat{W} \mat{\dot{P}}
+\end{align}
+where we again parameterise $\mat{\dot{W}} = \mat{W} \mat{\dot{K}} + \mat{\dot{L}}$ with $\mat{\dot{K}}$ antihermitian and $\mat{W}^\dagger \mat{\dot{L}} = \zeromat$.
+
+We thus find
+\begin{align}
+\mat{W}^\dagger \mat{\dot{A}} = \mat{\dot{K}} \mat{P} + \mat{\dot{P}}\\
+(\idmat - \mat{W}\mat{W}^\dagger)\mat{\dot{A}} &= \mat{\dot{L}}\mat{P}
+\end{align}
+and by also considering the Hermitian conjugate of the first equation and using the antihermiticity of $\dot{K}$ and the hermiticity of $\mat{P}$ and $\mat{\dot{P}}$:
+\begin{align}
+\mat{W}^\dagger \mat{\dot{A}} &= \mat{\dot{K}} \mat{P} + \mat{\dot{P}}\\
+\mat{\dot{A}}^\dagger \mat{W} &= -\mat{P} \mat{\dot{K}} + \mat{\dot{P}}
+\end{align}
+We then find
+\begin{align}
+\mat{W}^\dagger \mat{\dot{A}} - \mat{\dot{A}}^\dagger \mat{W}  &= \mat{\dot{K}} \mat{P} + \mat{P} \mat{\dot{K}}
+\end{align}
+and thus
+\begin{align}
+\mat{\dot{K}} = 2 \mathcal{S}_{\mat{P},-\mat{P}}^{-1}(\mathcal{P}_A(\mat{W}^\dagger \mat{\dot{A}}))\\
+\mat{\dot{L}} = (\idmat - \mat{W}\mat{W}^\dagger) \mat{\dot{A}} \mat{P}^{-1}
+\end{align}
+We can then compute
+\begin{align}
+\mat{\dot{P}} = \mat{W}^\dagger \mat{\dot{A}} - \mat{\dot{K}} \mat{P}
+\end{align}
+or more explicitly as
+\begin{align}
+\mat{\dot{P}} = \mathcal{S}_{\mat{P}^{-1},-\mat{P}^{-1}}^{-1} (\mathcal{P}_H(\mat{W}^\dagger \mat{\dot{A}})).
+\end{align}
+
+To obtain the reverse rule, we start from
+\begin{align}
+\rtr(\mat{\breve{W}}^\dagger \mat{\dot{W}}) + \rtr(\mat{\breve{P}}^\dagger \mat{\dot{P}})
+\end{align}
+where we should remember tath $\mat{\dot{P}}$ is hermitian, and we can thus add a hermitian projector around $\mat{\breve{P}}$, to further find
+
+\begin{align}
+\rtr&((\mat{W}^\dagger \mat{\breve{W}})^\dagger \mat{\dot{K}}) + \rtr(\mat{\breve{W}}^\dagger \mat{\dot{L}}) + \rtr(\mathcal{P}_H(\mat{\breve{P}})^\dagger (W^\dagger \mat{\dot{A}}-\mat{\dot{K}}\mat{P}))=\\
+&\rtr((\mat{W}^\dagger \mat{\breve{W}} - \mathcal{P}_H(\mat{\breve{P}}) \mat{P})^\dagger \mat{\dot{K}}) +  \rtr(\mat{\breve{W}}^\dagger (\idmat - \mat{W}\mat{W}^\dagger)\mat{\dot{A}}\mat{P}^{-1}) + \rtr((\mat{W}\mathcal{P}_H(\mat{\breve{P}}))^\dagger \mat{\dot{A}})
+\end{align}
+We can now further expand the first term, thereby remembering that $\dot{K}$ is antihermitian, and so we only want to antihermitian part of $\mat{W}^\dagger \mat{\breve{W}} - \mathcal{P}_H(\mat{\breve{P}})$. Alternatively, we can say that
+\begin{align}
+\mathcal{S}_{\mat{P},-\mat{P}}^{-1}\circ \mathcal{P}_A = \mathcal{P}_A \circ \mathcal{S}_{\mat{P},-\mat{P}}^{-1}
+\end{align}
+i.e. solutions of this specific Sylvester equation nicely separates into hermitian and antihermitian part (due to $\mat{P}$ being hermitian).
+
+We thus find for the first term
+\begin{align}
+\rtr&((\mat{W}^\dagger \mat{\breve{W}} - \mathcal{P}_H(\mat{\breve{P}}) \mat{P})^\dagger \mat{\dot{K}}) =\\
+ &\rtr(\mathcal{S}_{\mat{P},-\mat{P}}^{-1}(2 \mathcal{P}_A(\mat{W}^\dagger \mat{\breve{W}} - \mathcal{P}_H(\mat{\breve{P}})\mat{P}))^\dagger (\mat{W}^\dagger \mat{\dot{A}}))
+\end{align}
+such that, collecting everything together as $\rtr(\mat{\breve{A}}^\dagger \mat{\dot{A}})$, we obtain the final result
+
+\begin{align}
+\mat{\breve{A}} = \mat{W} \left[\mathcal{S}_{\mat{P},-\mat{P}}^{-1}(2 \mathcal{P}_A(\mat{W}^\dagger \mat{\breve{W}} - \mathcal{P}_H(\mat{\breve{P}})\mat{P})) + \mathcal{P}_H(\mat{\breve{P}})\right] + (\idmat - \mat{W}\mat{W}^\dagger) \mat{\breve{W}}\mat{P}^{-1}.
+\end{align}
+
+## Alternative from SVD
+
+Given that the polar decomposition is often computed from the SVD as
+\begin{align}
+\mat{W} &= \mat{U} \mat{V}^\dagger & \mat{P} &= \mat{V} \mat{S} \mat{V}^\dagger
+\end{align}
+we also find
+\begin{align}
+\mat{\dot{W}} &= \mat{\dot{U}} \mat{V}^\dagger + \mat{U} \mat{\dot{V}}^\dagger\\
+\mat{P} &= \mat{\dot{V}} \mat{S} \mat{V}^\dagger + \mat{V} \mat{\dot{S}} \mat{V}^\dagger + \mat{V} \mat{S} \mat{\dot{V}}^\dagger
+\end{align}
+
+We can then write
+\begin{align}
+\rtr&(\mat{\breve{W}}^\dagger \mat{\dot{W}}) + \rtr(\mathcal{P}_H(\mat{\breve{P}})^\dagger \mat{\dot{P}}) =\\
+&\rtr((\mat{\breve{W}}\mat{V})^\dagger \mat{\dot{U}}) + \rtr((\mat{U}^\dagger \mat{\breve{W}})^\dagger \mat{\dot{V}}^\dagger) +\\
+& \rtr((\mathcal{P}_H(\mat{\breve{P}})\mat{V} \mat{S})^\dagger \mat{\dot{V}}) + \rtr((\mat{V}^\dagger \mathcal{P}_H(\mat{\breve{P}})\mat{V} )^\dagger \mat{\dot{S}}) + \rtr((\mat{S}\mat{V}^\dagger \mathcal{P}_H(\mat{\breve{P}}) )^\dagger\mat{\dot{V}}^\dagger)
+\end{align}
+which can be rewritten as
+\begin{align}
+\rtr&((\mat{\breve{W}}\mat{V})^\dagger \mat{\dot{U}}) + \rtr(\mathcal{P}_D(\mat{V}^\dagger \mathcal{P}_H(\mat{\breve{P}})\mat{V} )^\dagger \mat{\dot{S}}) + \rtr((2\mathcal{P}_H(\mat{\breve{P}})\mat{V}\mat{S}+ \mat{\breve{W}}^\dagger \mat{U})^\dagger \mat{\dot{V}}).
+\end{align}
+Indeed, this is exactly what AD would do to pull back the polar cotangents $(\mat{\breve{W}},\mat{\breve{P}})$ to SVD cotangents
+\begin{align}
+\mat{\breve{U}} &= \mat{\breve{W}} V\\
+\mat{\breve{S}} &= \mathcal{P}_D(\mat{V}^\dagger \mathcal{P}_H(\mat{\breve{P}})\mat{V} )\\
+\mat{\breve{V}} &= 2\mathcal{P}_H(\mat{\breve{P}})\mat{V}\mat{S}+ \mat{\breve{W}}^\dagger \mat{U}
+\end{align}

@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jutho Haegeman">
+<meta name="dcterms.date" content="2023-10-27">
+
+<title>Automatic differentation rules for linear algebra</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Automatic differentation rules for linear algebra</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Jutho Haegeman </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 27, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="hidden">
+<p>$$ % Math operators % % </p>
+% VECTORS
+<p>% specifically for vectors in F^n </p>
+% MATRICES
+<p>% SCALARS </p>
+% LINEAR MAPS
+<p>% FIELDS </p>
+<p>% RELATIONS </p>
+<p>% % % % % % % % %</p>
+<p>%</p>
+<p>$$</p>
+</div>
+<p>In this document we derive the forward and reverse chain rule for a number of common matrix factorisations. In particular, we also focus partial or incomplete factorisations, as appear in Krylov algorithms, as well as on truncated (low-rank) factorisations. We first introduce some important concepts that will be used in several of those rules.</p>
+<section id="preliminaries" class="level1">
+<h1>Preliminaries</h1>
+<section id="complex-variables-and-chain-rules" class="level2">
+<h2 class="anchored" data-anchor-id="complex-variables-and-chain-rules">Complex variables and chain rules</h2>
+<p>Consider a scalar-valued function <span class="math inline">\(f\)</span>, depending on complex parameters <span class="math inline">\(z^k = x^k + {\mathrm{i}}y^k\)</span>, that is real-valued (and can thus not be holomorphic). Given a trajectory <span class="math inline">\(z^k(t)\)</span> with derivatives <span class="math inline">\(\dot{z}^k = \dot{x}^k + {\mathrm{i}}\dot{y}^k\)</span>, we can write</p>
+<p><span class="math display">\[\begin{align}
+\dot{f} &amp;= \sum_{k} \frac{\partial f}{\partial x^k} \dot{x}^k + \frac{\partial f}{\partial y^k} \dot{y}^k \\
+&amp;= \sum_{k,l} \frac{\partial f}{\partial z^l} \left(\frac{\partial z^l}{\partial x^k} \dot{x}^k + \frac{\partial z^l}{\partial y^k} \dot{y}^k\right) + \frac{\partial f}{\partial \bar{z}^l} \left(\frac{\partial \bar{z}^l}{\partial x^k} \dot{x}^k + \frac{\partial \bar{z}^l}{\partial y^k} \dot{y}^k\right)\\
+&amp;= \sum_{k} \frac{\partial f}{\partial z^k} \dot{z}^k +  \frac{\partial f}{\partial \bar{z}^k} \dot{\bar{z}}^k
+\end{align}\]</span> Here, we have that <span class="math display">\[\begin{align}
+\frac{\partial f}{\partial z^k} &amp;= \frac{1}{2}\left(\frac{\partial f}{\partial x^k} - {\mathrm{i}}\frac{\partial f}{\partial y^k}\right)\\
+\frac{\partial f}{\partial \bar{z}^k} &amp;= \frac{1}{2}\left(\frac{\partial f}{\partial x^k} + {\mathrm{i}}\frac{\partial f}{\partial y^k}\right) = \overline{\frac{\partial f}{\partial z^k}}
+\end{align}\]</span> where the final equality only holds because <span class="math inline">\(f\)</span> is assumed real. Typically, we can compute <span class="math inline">\(\frac{\partial f}{\partial z^k}\)</span> easily without explicitly going to real and imaginary components. We thus find <span class="math display">\[\begin{align}
+\dot{f} = \sum_{k} \frac{\partial f}{\partial z^k} \dot{z}^k + \overline{\frac{\partial f}{\partial z^k}} \overline{\dot{z}^k}
+= 2 \mathop{\mathrm{Re}}\left(\sum_{k} \frac{\partial f}{\partial z^k} \dot{z}^k\right)
+= 2 \mathop{\mathrm{Re}}\left(\sum_{k} \overline{\frac{\partial f}{\partial \bar{z}^k}} \dot{z}^k\right)
+= 2 \mathop{\mathrm{Re}}\left(\boldsymbol{\breve{z}}^\dagger \boldsymbol{\dot{z}}\right)
+\end{align}\]</span> with thus <span class="math inline">\(\boldsymbol{\dot{z}}\)</span> the vector with components <span class="math inline">\(\dot{z}^k\)</span> and <span class="math inline">\(\boldsymbol{\breve{z}}\)</span> the vector with components <span class="math inline">\(\breve{z}_k=\frac{\partial f}{\partial \bar{z}^k}\)</span>.</p>
+<p>When the coefficients <span class="math inline">\(z^k \cong Z^{(i,j)}\)</span> would be the components of a matrix <span class="math inline">\(Z\)</span>, we would rather write this as <span class="math display">\[\begin{align}
+\dot{f} = 2 \mathop{\mathrm{Re}}\left(\sum_{k} \overline{\frac{\partial f}{\partial \bar{z}^k}} \dot{z}^k\right) = 2 \mathop{\mathrm{Re}}\left(\sum_{i,j} \overline{\frac{\partial f}{\partial \bar{Z}^{i,j}}} \dot{Z}^{i,j}\right)
+= 2 \mathop{\mathrm{Re}}\left(\mathop{\mathrm{Tr}}\left[\breve{Z}^\dagger \dot{Z}\right]\right) = 2\mathop{\mathrm{RTr}}\left[\breve{Z}^\dagger \dot{Z}\right]
+\end{align}\]</span> where I have introduced the new symbol <span class="math inline">\(\mathop{\mathrm{RTr}}\)</span> for the real part of the trace.</p>
+<p>Now consider the composition where <span class="math inline">\(f\)</span> is itself a function of complex parameters <span class="math inline">\(\boldsymbol{w}\)</span>, which are themselves complex (not necessarily holomorphic) functions of other complex paramters <span class="math inline">\(\boldsymbol{z}\)</span>. We can then write</p>
+<p><span class="math display">\[\begin{align}
+\dot{f} = \sum_{k,l} \begin{bmatrix} \overline{\breve{w}_k} &amp; \breve{w}_k\end{bmatrix}\begin{bmatrix} \frac{\partial w^k}{\partial z^l} &amp; \frac{\partial w^k}{\partial \bar{z}^l}\\
+\frac{\partial \bar{w}^k}{\partial z^l} &amp; \frac{\partial \bar{w}^k}{\partial \bar{z}^l} \end{bmatrix}
+\begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} = \sum_{k,l} \begin{bmatrix} \breve{w}_k \\ \overline{\breve{w}_k}\end{bmatrix}^\dagger \begin{bmatrix} \frac{\partial w^k}{\partial z^l} &amp; \frac{\partial w^k}{\partial \bar{z}^l}\\
+\frac{\partial \bar{w}^k}{\partial z^l} &amp; \frac{\partial \bar{w}^k}{\partial \bar{z}^l} \end{bmatrix}
+\begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix}
+\end{align}\]</span> In this case (where <span class="math inline">\(w\)</span> is complex), the entries of the Jacobian matrix are related via <span class="math inline">\(\overline{\frac{\partial w^k}{\partial z^l}} = \frac{\partial \bar{w}^k}{\partial \bar{z}^l}\)</span> and <span class="math inline">\(\overline{\frac{\partial w^k}{\partial \bar{z}^l}} = \frac{\partial \bar{w}^k}{\partial z^l}\)</span> Trying to rewrite the above expression in the standard form <span class="math inline">\(2\mathop{\mathrm{Re}}(\boldsymbol{\breve{z}}^\dagger \boldsymbol{\dot{z}})\)</span>, we find</p>
+<p><span class="math display">\[\begin{align}
+\dot{f} &amp;= \sum_{l} \begin{bmatrix} \left(\sum_k \overline{\breve{w}_k} \frac{\partial w^k}{\partial z^l} + \breve{w}_k \frac{\partial \bar{w}^k}{\partial z^l}\right) &amp; \left(\sum_k \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l} + \breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l}\right) \end{bmatrix} \begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} \\
+&amp;= \sum_{l} \begin{bmatrix} \sum_k \breve{w}_k \overline{\frac{\partial w^k}{\partial z^l}} + \overline{\breve{w}_k} \overline{\frac{\partial \bar{w}^k}{\partial z^l}} \\
+\sum_k \breve{w}_k \overline{\frac{\partial w^k}{\partial \bar{z}^l}} + \overline{\breve{w}_k} \overline{\frac{\partial \bar{w}^k}{\partial \bar{z}^l}} \end{bmatrix}^\dagger \begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} \\
+&amp;= \sum_{l} \begin{bmatrix} \sum_k \breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l} + \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l} \\
+\sum_k \overline{\breve{w}_k} \overline{\frac{\partial \bar{w}^k}{\partial \bar{z}^l}} + \breve{w}_k \overline{\frac{\partial w^k}{\partial \bar{z}^l}}\end{bmatrix}^\dagger \begin{bmatrix} \dot{z}^l \\ \overline{\dot{z}^l} \end{bmatrix} \qquad \begin{matrix}\text{(by substituting ${\overline{\frac{\partial \bar{w}^k}{\partial z^l}}}\to\frac{\partial w^k}{\partial \bar{z}^l}$)}\\ \text{(by switching the order of the two terms)}\end{matrix}\\
+&amp;= 2\mathop{\mathrm{Re}}\left(\sum_l \left[\sum_{k} \breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l} + \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}\right]^\dagger \dot{z}^l\right) = 2\mathop{\mathrm{Re}}(\boldsymbol{\breve{z}}^\dagger\dot{z})
+\end{align}\]</span></p>
+<p>with thus <span class="math inline">\(\breve{z}_l = \sum_k \left[\breve{w}_k \frac{\partial \bar{w}^k}{\partial \bar{z}^l} + \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}\right]\)</span>. The same result would have been obtained from inserting <span class="math inline">\(\dot{w}^k = \frac{\partial w^k}{\partial z^l}\dot{z}^l + \frac{\partial w^k}{\partial \bar{z}^l}\dot{\bar{z}}^l\)</span> in <span class="math inline">\(\dot{f} = 2\mathop{\mathrm{Re}}(\boldsymbol{\breve{w}}^\dagger \boldsymbol{\dot{w}})\)</span> as</p>
+<p><span class="math display">\[\begin{align}
+\dot{f} &amp;= 2\mathop{\mathrm{Re}}(\boldsymbol{\breve{w}}^\dagger \boldsymbol{\dot{w}}) = 2\mathop{\mathrm{Re}}\left(\sum_k \overline{\breve{w}_k} \dot{w}^k\right)\\
+&amp;= 2\mathop{\mathrm{Re}}\left(\sum_{k,l} \overline{\breve{w}_k} \frac{\partial w^k}{\partial z^l} \dot{z}^l\right) + 2\mathop{\mathrm{Re}}\left(\sum_{k,l} \overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l} \overline{\dot{z}^l}\right)\\
+&amp;= 2\mathop{\mathrm{Re}}\left(\sum_{k,l} \overline{\breve{w}_k \overline{\frac{\partial w^k}{\partial z^l}}} \dot{z}^l\right) + 2\mathop{\mathrm{Re}}\left(\sum_{k,l} \overline{\overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}} \dot{z}^l\right)
+\end{align}\]</span> where in the second term we have used that we can conjugate the whole argument of the <span class="math inline">\(\mathop{\mathrm{Re}}\)</span> function. Hence, we again obtain</p>
+<p><span class="math display">\[\begin{align}
+\dot{f} = 2\mathop{\mathrm{Re}}\left(\sum_{k,l} \overline{\left[\breve{w}_k \overline{\frac{\partial w^k}{\partial z^l}}+\overline{\breve{w}_k} \frac{\partial w^k}{\partial \bar{z}^l}\right]} \dot{z}^l\right)
+\end{align}\]</span></p>
+<p>which (not unexpectedly) yields the same result for <span class="math inline">\(\breve{z}_l\)</span>, upon substituing <span class="math inline">\(\overline{\frac{\partial w^k}{\partial z^l}} = \frac{\partial \bar{w}^k}{\partial \bar{z}^l}\)</span>. The reverse rules required by automatic differentation are exactly of the form that relate <span class="math inline">\(\breve{z}_l\)</span> to <span class="math inline">\(\breve{w}_k\)</span> (and possibly its conjugate). The way we derive them in practice is by starting from <span class="math inline">\(\mathop{\mathrm{Re}}\left(\sum_k \overline{\breve{w}_k} \dot{w}^k\right)\)</span> and inserting the (easier) forward rule that expresses <span class="math inline">\(\dot{w}^k\)</span> in terms of <span class="math inline">\(\dot{z}^l\)</span> (and possibly its conjugate), and then using the fact that we can conjugate within the argument of <span class="math inline">\(\mathop{\mathrm{Re}}\)</span> or <span class="math inline">\(\mathop{\mathrm{RTr}}\)</span> in order to isolate the contribution that is contracted with <span class="math inline">\(\dot{z}^l\)</span>.</p>
+</section>
+<section id="matrices-and-their-tangents-and-cotangents" class="level2">
+<h2 class="anchored" data-anchor-id="matrices-and-their-tangents-and-cotangents">Matrices and their tangents and cotangents</h2>
+<p>We will be working with complex matrices <span class="math inline">\(A \in {\mathbb{C}}^{m \times n}\)</span>. Sometimes these matrices satisfy additional constraints, which also constrains their tangents <span class="math inline">\(\dot{A}\)</span>. Given that the constraints on the tangent vectors are always linear (in contrast to those on the variables themselves), we can typically satisfy them explicitly by choosing a proper parameterisation.</p>
+<p>Constraints on the parameters do not directly impose constraints on the adjoint/dual variables <span class="math inline">\(\breve{A}\)</span> (cotangents). However, in the way they couple to the tangents, they will be automatically projected into the relevant subspace.</p>
+<p>Note that the coupling between tangents and cotangents takes the form <span class="math inline">\(\mathop{\mathrm{RTr}}(\breve{A}^\dagger \dot{A})\)</span>, which can be read as an inner product <span class="math inline">\({\left\langle A,B\right\rangle} = \mathop{\mathrm{RTr}}(A^\dagger B)\)</span>. However, because we are taking the real part, this corresponds to treating the vector spaces <span class="math inline">\({\mathbb{C}}^{m \times n}\)</span> of complex matrices as a real vector space. Indeed, the inner product can be rewritten as the standard (real) Euclidean inner product</p>
+<p><span class="math display">\[{\left\langle A,B,=\right\rangle} \sum_{i=1}^m\sum_{j=1}^n \mathop{\mathrm{Re}}(A_{ij}) \mathop{\mathrm{Re}}(B_ij) + \mathop{\mathrm{Im}}(A_ij)\mathop{\mathrm{Im}}(B_ij).\]</span></p>
+<p>This has a number of interesting implications.</p>
+<section id="diagonal-and-triangular-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="diagonal-and-triangular-matrices">Diagonal and triangular matrices</h3>
+<p>The easiest classes of special matrices are those where some of the entries are zero, such as diagonal or upper triangular matrices. Because of the structure of the inner product, only the corresponding entries of the dual variables will contribute. In fact, because of the structure of the real-valued inner product that we work with, we can even impose the real or imaginary component of an entry to be zero separately, and this information will also propagate onto the dual variables.</p>
+<p>We can make this explicit by introducing specific projection (super)operators <span class="math inline">\({\mathbb{C}}^{m\times n} \to {\mathbb{C}}^{m\times n}\)</span> onto the relevant subspaces that we need below, namely <span class="math display">\[\begin{align}
+\mathcal{P}_L(A)_{k,l} &amp;= \begin{cases} A_{k,l},&amp; k &gt; l\\ 0,&amp; k\leq l\end{cases}\\
+\mathcal{P}_U(A)_{k,l} &amp;= \begin{cases} A_{k,l},&amp; k &lt; l\\ 0,&amp; k\geq l\end{cases}\\
+\mathcal{P}_{rD}(A)_{k,l} &amp;= \begin{cases} \mathop{\mathrm{Re}}(A_{k,k}),&amp; k = l\\ 0,&amp; k\neq l\end{cases}\\
+\mathcal{P}_{iD}(A)_{k,l} &amp;= \begin{cases} {\mathrm{i}}\mathop{\mathrm{Im}}(A_{k,k}),&amp; k = l\\ 0,&amp; k\neq l\end{cases}\\
+\mathcal{P}_{D}(A)_{k,l} &amp;= (\mathcal{P}_{rD}+\mathcal{P}_{iD})(A)_{k,l} \\
+&amp;= \begin{cases} A_{k,k},&amp; k = l\\ 0,&amp; k\neq l\end{cases}
+\end{align}\]</span> All of those operators are self-adjoint with respect to the (real) inner product, i.e.</p>
+<p><span class="math display">\[\mathop{\mathrm{RTr}}\left[A^\dagger \mathcal{P}(B)\right] = \mathop{\mathrm{RTr}}\left[\mathcal{P}(A)^\dagger B\right]\]</span></p>
+<p>This will be important to derive the reverse rules, and it shows that the cotangents will be automatically projected onto the subspace where the tangents are defined.</p>
+<p>Closely related to this is the remark that we made above about the dagger. We can define a dagger superoperator <span class="math inline">\(\mathcal{D}:{\mathbb{C}}^{m \times n} \to {\mathbb{C}}^{n\times m}: A\mapsto \mathcal{D}({\hat{A}})=A^\dagger\)</span>. Note that this is not a single (super)operator, but one for every matrix size, and in case of rectangular matrices, it maps to matrices of opposite size. It is a complex antilinear operator, but with respect to the real vector space structure, it is real linear and we can write, for all <span class="math inline">\(A\in {\mathbb{C}}^{m \times n}\)</span> and <span class="math inline">\(B\in {\mathbb{C}}^{n \times m}\)</span>,</p>
+<p><span class="math display">\[\mathop{\mathrm{RTr}}(B^\dagger \mathcal{D}(A))= \mathop{\mathrm{RTr}}(B^\dagger A^\dagger) = \mathop{\mathrm{RTr}}(BA) = \mathop{\mathrm{RTr}}(\mathcal{D}(B)^\dagger A).\]</span></p>
+<p>We can then define two more projection superoperators on the spaces of square matrices <span class="math inline">\(A\in {\mathbb{C}}^{n\times n}\)</span>, namely those that project onto the hermitian and antihermitian part as <span class="math display">\[\begin{align}
+\mathcal{P}_{H}(A) &amp;= \frac{\mathcal{I}+\mathcal{D}}{2}(A) = \frac{A+A^\dagger}{2}\\
+\mathcal{P}_{A}(A) &amp;= \frac{\mathcal{I}-\mathcal{D}}{2}(A) = \frac{A-A^\dagger}{2}
+\end{align}\]</span> which also satisfy</p>
+<p><span class="math display">\[\mathop{\mathrm{RTr}}(B^\dagger \mathcal{P}_{H/A}(A)) = \mathop{\mathrm{RTr}}(\mathcal{P}_{H/A}(B)^\dagger A)\]</span></p>
+</section>
+<section id="unitary-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="unitary-matrices">Unitary matrices</h3>
+<p>We now turn to matrix constraints which are nonlinear, and give rise to known manifolds of special matrices. The first relevant case is a unitarity constraint, which requires <span class="math inline">\(m=n\)</span>: <span class="math display">\[U^\dagger U = I_n = U^\dagger U\]</span></p>
+<p>For the tangent directions, we find in this case that <span class="math display">\[U^\dagger \dot{U} + \dot{U}^\dagger U=O.\]</span></p>
+<p>For the tangent directions, the constraint has thus become linear and can easily be satisfied by parameterising <span class="math inline">\(\dot{U} = U\dot{K}\)</span> where <span class="math inline">\(\dot{K}=-\dot{K}^\dagger\)</span>, i.e.&nbsp;<span class="math inline">\(\dot{K}\)</span> is an antihermitian matrix, parameterised by <span class="math inline">\(n(n-1)/2\)</span> complex parameters below the diagonal (and their conjugates above the diagonal) and <span class="math inline">\(n\)</span> purely imaginary parameters on the diagonal.</p>
+</section>
+<section id="isometric-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="isometric-matrices">Isometric matrices</h3>
+<p>Isometric matrices are rectangular matrices with <span class="math inline">\(m \geq n\)</span> that satisfy</p>
+<p><span class="math display">\[Q^\dagger Q = I_n\]</span></p>
+<p>In this case, <span class="math inline">\(P=QQ^\dagger\)</span> is not the identity, but an orthogonal projector (<span class="math inline">\(P^2 =P=P^\dagger\)</span>)</p>
+<p>We can think of <span class="math inline">\(Q\)</span> as the first <span class="math inline">\(n\)</span> column of a unitary <span class="math inline">\((m \times m)\)</span> matrix</p>
+<p><span class="math display">\[U = \begin{bmatrix} Q &amp; Q_\perp \end{bmatrix}\]</span></p>
+<p>where <span class="math inline">\(Q_\perp\)</span> are an additional <span class="math inline">\((m-n)\)</span> orthonormal columns that complete the unitary matrix, and thus satisfy <span class="math inline">\(Q^\dagger Q_\perp = O\)</span> and <span class="math inline">\(Q_\perp^\dagger Q_\perp = I_{m-n}\)</span>. It furthermore holds that <span class="math inline">\(Q_\perp Q_\perp = I_m - QQ^\dagger\)</span>.</p>
+<p>If we parameterise the tangent of <span class="math inline">\(U\)</span> as <span class="math display">\[\begin{align}
+\begin{bmatrix} \dot{Q} &amp; \dot{Q}_\perp\end{bmatrix} = \begin{bmatrix} Q &amp; Q_\perp\end{bmatrix}\begin{bmatrix} \dot{K} &amp; -\dot{K}_\perp^\dagger \\ \dot{K}_\perp &amp; \dot{K}_{\perp\perp}\end{bmatrix}
+\end{align}\]</span> with <span class="math inline">\(\dot{K}=-\dot{K}^\dagger\)</span> (and also <span class="math inline">\(\dot{K}_{\perp\perp}=-\dot{K}_{\perp\perp}^\dagger\)</span>), then we find <span class="math display">\[\begin{align}
+\dot{Q} = Q \dot{K} + Q_{\perp} \dot{K}_\perp = Q \dot{K} + \dot{L}
+\end{align}\]</span> where <span class="math inline">\(\dot{L}\)</span> only needs to satisfy <span class="math inline">\(Q^\dagger \dot{L}=O\)</span>. In practice, both representations of <span class="math inline">\(\dot{Q}\)</span> can be useful, depending on the situation:</p>
+<ul>
+<li><p>If we have <span class="math inline">\(n \approx m\)</span> (e.g.&nbsp;<span class="math inline">\(n=m/2\)</span>), it can be useful to explicitly determine a <span class="math inline">\(m \times (m-n)\)</span> matrix <span class="math inline">\(Q_\perp\)</span> that completes <span class="math inline">\(Q\)</span> to unitary matrix, and to use the parameterisation <span class="math inline">\(\dot{Q} = Q \dot{K} + Q_{\perp} \dot{K}_\perp\)</span> where the <span class="math inline">\((m-n) \times n\)</span> matrix <span class="math inline">\(\dot{K}_\perp\)</span> is completely unconstrained.</p></li>
+<li><p>On the other hand, if <span class="math inline">\(n \ll m\)</span>, then it might be that it is undesirable or even infeasible to compute and manipulate a matrix <span class="math inline">\(Q_\perp\)</span> of size <span class="math inline">\(m \times (m-n)\)</span>. In that case, it is more efficient to use the parameterisation <span class="math inline">\(Q \dot{K} + \dot{L}\)</span>, where <span class="math inline">\(\dot{L}\)</span> also only has size <span class="math inline">\((m\times n)\)</span> (like <span class="math inline">\(Q\)</span> and <span class="math inline">\(\dot{Q}\)</span>), but does need to satisfy the requirement that <span class="math inline">\(Q^\dagger \dot{L} = 0\)</span>. Even though we can exploit this condition on <span class="math inline">\(\dot{L}\)</span> in order to derive or simplify the equations that it needs to satisfy, we have to make sure that the final equation that determines <span class="math inline">\(\dot{L}\)</span> (which will always be a linear equation), is such that it either explicitly imposes the condition <span class="math inline">\(Q^\dagger \dot{L} = 0\)</span>, or is solved in such a way that the solution does satisfy this condition. Failure of doing so will typically result in the linear system for <span class="math inline">\(\dot{L}\)</span> having a nontrivial kernel and thus being singular.</p></li>
+</ul>
+</section>
+</section>
+<section id="linear-problems-with-matrices" class="level2">
+<h2 class="anchored" data-anchor-id="linear-problems-with-matrices">Linear problems with matrices</h2>
+<p>Another common operation with matrices that we encounter is that the matrix of interest, for example, the tangent <span class="math inline">\(\dot{A}\)</span> of some matrix, is only specified implicitly as the solution of a linear system. Indeed, the matrix factorisations are written down as equations for the final solution (rather than as the algorithm that gave rise to them). Differentating such defining equations gives rise to (sometimes coupled) linear equations that need to be solved.</p>
+<section id="sylvester-equation-and-hadamard-product" class="level3">
+<h3 class="anchored" data-anchor-id="sylvester-equation-and-hadamard-product">Sylvester equation and Hadamard product</h3>
+<p>The most common type of linear system for a matrix quantity <span class="math inline">\(X\)</span> that we encounter takes the form of a Sylvester equation</p>
+<p><span class="math display">\[ A X - X B = C\]</span></p>
+<p>where thus <span class="math inline">\(X\)</span> is the unknown. Let us denote the left hand side as the (Sylvester) superoperator <span class="math inline">\(\mathcal{S}_{A,B}(X) = AX - XB\)</span>. For <span class="math inline">\(X\in{\mathbb{C}}^{m \times n}\)</span>, it is assumed that <span class="math inline">\(A\in{\mathbb{C}}^{m\times m}\)</span> and <span class="math inline">\(B \in {\mathbb{C}}^{n \times n}\)</span>, so that <span class="math inline">\(\mathcal{S}_{A,B}\)</span> is indeed a linear (super)opeator <span class="math inline">\({\mathbb{C}}^{m\times n} \mapsto {\mathbb{C}}^{m\times n}\)</span>, i.e.&nbsp;it is mapping matrices to the same size.</p>
+<p>The solution of the linear system is then given by</p>
+<p><span class="math display">\[X = S_{A,B}^{-1}(C)\]</span></p>
+<p>provided the inverse of the Sylvester superoperator exists. The Sylvester superoperator has a nontrivial kernel (and is thus not invertible) whenever <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> have a common eigenvalue <span class="math inline">\(\lambda\)</span>. Indeed, with <span class="math inline">\(A\boldsymbol{v}=\lambda \boldsymbol{v}\)</span> and <span class="math inline">\(\boldsymbol{w}^\dagger B = \lambda \boldsymbol{w}^\dagger\)</span>, it is clear that <span class="math inline">\(\mathcal{S}_{A,B}(\boldsymbol{v}\boldsymbol{w}^\dagger) = O\)</span>.</p>
+<p>If both <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> can be diagonalised as <span class="math inline">\(A=V_AD_AV_{A}^{-1}\)</span> and <span class="math inline">\(B=V_BD_BV_{B}^{-1}\)</span>, a simple way to obtain the solution of the Sylvester equation is as <span class="math display">\[\begin{align}
+D_{A} \tilde{X} - \tilde{X}D_{B} = \tilde{C}
+\end{align}\]</span> with <span class="math inline">\(\tilde{X} = V_{A}^{-1}XV_{B}\)</span> and analoguously for <span class="math inline">\(\tilde{C}\)</span>. In this case, the <span class="math inline">\(i,j\)</span> component of this equation reads</p>
+<p><span class="math display">\[(\lambda_i - \mu_j) \tilde{X}_{ij} = \tilde{C}_{ij}\]</span></p>
+<p>with <span class="math inline">\((D_A)_{ii} = \lambda_i\)</span> and <span class="math inline">\((D_{B})_{jj}=\mu_j\)</span> the respective eigenvalues. Here too, the importance of not having coinciding eigenvalues of <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> is clear, unless then also <span class="math inline">\(\tilde{C}_{ij} = 0\)</span>. In the above form, we can solve the equation and find</p>
+<p><span class="math display">\[ \tilde{X}_{ij} = \frac{\tilde{C}_{ij}}{\lambda_i - \mu_j}\]</span></p>
+<p>We will typically denote this</p>
+<p><span class="math display">\[\tilde{X}=\tilde{C} \odot F\]</span></p>
+<p>where <span class="math inline">\(F_{ij} = \frac{1}{\lambda_i - \mu_j}\)</span> and <span class="math inline">\(\odot\)</span> is the pointwise or Hadamard product, satisfying</p>
+<p><span class="math display">\[(A\odot B)_{ij} = (B\odot A)_{ij} = A_{ij} B_{ij}\]</span>.</p>
+<p>Finally, we investigate how these operations behave with respect to the real inner product. Note that the Sylvester superoperator acts as</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(X^\dagger \mathcal{S}_{A,B}(Y)) &amp;= \mathop{\mathrm{RTr}}(X^\dagger (AY-YB)) \\
+&amp;= \mathop{\mathrm{RTr}}((A^\dagger X - XB^\dagger)^\dagger Y)\\
+&amp;= \mathop{\mathrm{RTr}}(\mathcal{S}_{A^\dagger,B^\dagger}(X)^\dagger Y)
+\end{align}\]</span></p>
+<p>As a consequence, when we have a variable <span class="math inline">\(\dot{X} = \mathcal{S}_{A,B}^{-1}(\dot{Y})\)</span>, it must hold that</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{X}^\dagger \dot{X})&amp;= \mathop{\mathrm{RTr}}(\breve{X}^\dagger \mathcal{S}_{A,B}^{-1}(\dot{Y}))\\
+&amp;= \mathop{\mathrm{RTr}}(\mathcal{S}_{A^\dagger,B^\dagger}^{-1}(\breve{X})^\dagger \dot{Y})
+\end{align}\]</span></p>
+<p>and thus <span class="math inline">\(\breve{Y} = \mathcal{S}_{A^\dagger,B^\dagger}^{-1}(\breve{X})\)</span>.</p>
+<p>Related to this is the behaviour of the Hadamard product with respect to this inner product, for which we obtain</p>
+<p><span class="math display">\[\mathop{\mathrm{RTr}}(A^\dagger (B \odot C)) = \mathop{\mathrm{RTr}}((A\odot \overline{B})^\dagger C).\]</span></p>
+<p>All of these results will prove useful below.</p>
+</section>
+</section>
+<section id="gauge-freedom" class="level2">
+<h2 class="anchored" data-anchor-id="gauge-freedom">Gauge freedom</h2>
+<p>A final issue that is in some sense “orthogonal” to constraints is that of gauge freedom. This arises when certain variables are not uniquely determined, such as the phase of eigenvectors or singular vectors. For example, it could happen that an output matrix <span class="math inline">\(A\)</span> of a certain step of the computation is only determined up to an overall multiplication with another matrix <span class="math inline">\(D\)</span> (for example diagonal, or unitary, …), so that we could also have obtained <span class="math inline">\(A' = AD\)</span>.</p>
+<p>If we now consider a one-parameter family of such equivalent matrices, this gives rise to tangent vectors <span class="math inline">\(\dot{A}=A\dot{D}\)</span>. However, for objective functions <span class="math inline">\(f\)</span> that are insensitive to such gauge changes, it should hold that the partial derivatives <span class="math inline">\(\breve{A} = \frac{\partial f}{\partial \overline{A}_{ij}}\)</span> should be such that</p>
+<p><span class="math display">\[\mathop{\mathrm{RTr}}(\breve{A}^\dagger A\dot{D}) = 0\]</span></p>
+<p>for all <span class="math inline">\(\dot{D}\)</span> that are allowed. Such a condition can easily be checked at the beginning of a reverse rule, and then warned about if it is not satisfied, as this would be indicative of an objective function that uses <span class="math inline">\(A\)</span> in a way that depends on implementation details, i.e.&nbsp;an objective function that is not “gauge invariant”.</p>
+</section>
+</section>
+<section id="qr-decomposition" class="level1">
+<h1>QR decomposition</h1>
+<section id="full-rank-case" class="level2">
+<h2 class="anchored" data-anchor-id="full-rank-case">Full rank case</h2>
+<p>Consider a rectangular matrix <span class="math inline">\(A\in {\mathbb{C}}^{m \times n}\)</span>. The typical scenario is when <span class="math inline">\(m \geq n\)</span> and <span class="math inline">\(\mathop{\mathrm{rank}}(A)=n\)</span>, i.e.&nbsp;<span class="math inline">\(A\)</span> has full rank. In this case, there exists a decomposition</p>
+<p><span class="math display">\[A  =Q R\]</span></p>
+<p>with <span class="math inline">\(Q\in {\mathbb{C}}^{m\times n}\)</span> an isometric matrix (<span class="math inline">\(Q^\dagger Q=I_n\)</span>) and <span class="math inline">\(R\in{\mathbb{C}}^{n \times n}\)</span> an upper-triangular matrix (<span class="math inline">\(R_{k,l}=0\)</span> for <span class="math inline">\(k &gt; l\)</span>). This decomposition can be made unique by choosing the diagonal elemenents <span class="math inline">\(R_{kk} &gt; 0\)</span>. For <span class="math inline">\(\mathop{\mathrm{rank}}(A)=\mathop{\mathrm{rank}}(R)=n\)</span>, none of those elements can be zero and <span class="math inline">\(R\)</span> is invertible, with its inverse <span class="math inline">\(R^{-1}\)</span> also being an upper triangular matrix</p>
+<p>For the forward rule, we find</p>
+<p><span class="math display">\[\dot{A} = \dot{Q} R + Q \dot{R}\]</span></p>
+<p>where we now insert <span class="math inline">\(\dot{Q} = Q\dot{K}+\dot{L}\)</span> as described above. Projecting those equations onto the column space of <span class="math inline">\(Q\)</span> and onto the orthogonal complement thereof, we obtain</p>
+<p><span class="math display">\[\begin{align}
+Q^\dagger \dot{A} R^{-1} &amp;= \dot{K}  + \dot{R}R^{-1}\\
+(I- QQ^\dagger)\dot{A}R^{-1} &amp;= \dot{L}
+\end{align}\]</span></p>
+<p>using <span class="math inline">\((I- QQ^\dagger)\dot{L} =\dot{L}\)</span> by definition. For the first equation, the second term in the right hand side is also upper triangular with a real diagonal, whereas the first term is antihermitian. The first term is thus determined by the part below the diagonal on the left hand side, as well as the imaginary part of its diagonal. We can then write the forward rule as</p>
+<p><span class="math display">\[\begin{align}
+\dot{K} &amp;= \mathcal{P}_L(Q^\dagger \dot{A} R^{-1}) + \mathcal{P}_{iD}(Q^\dagger \dot{A} R^{-1}) - \mathcal{P}_L(Q^\dagger \dot{A} R^{-1})^\dagger\\
+\dot{R} &amp;= \left[\mathcal{P}_{rD}(Q^\dagger \dot{A} R^{-1}) + \mathcal{P}_U(Q^\dagger \dot{A} R^{-1}) +  \mathcal{P}_L(Q^\dagger \dot{A} R^{-1})^\dagger \right]R\\
+\dot{L} &amp;= (I- QQ^\dagger)\dot{A}R^{-1}\\
+\Rightarrow \dot{Q} &amp;= Q \dot{K} + \dot{L} \\
+&amp;= \dot{A}R^{-1} + Q\left[-Q^\dagger \dot{A}R^{-1} + \mathcal{P}_L(Q^\dagger \dot{A} R^{-1})+ \mathcal{P}_{iD}(Q^\dagger \dot{A} R^{-1}) - \mathcal{P}_L(Q^\dagger \dot{A} R^{-1})^\dagger\right]\\
+&amp;= \dot{A}R^{-1} - Q\left[\mathcal{P}_U(Q^\dagger \dot{A} R^{-1}) + \mathcal{P}_{rD}(Q^\dagger \dot{A} R^{-1}) + \mathcal{P}_L(Q^\dagger \dot{A} R^{-1})^\dagger\right] = \dot{A}R^{-1} - Q\dot{R}R^{-1}
+\end{align}\]</span></p>
+<p>To derive the reverse rule, we then start from <span class="math inline">\(\mathop{\mathrm{RTr}}(\breve{Q}^\dagger\dot{Q}) + \mathop{\mathrm{RTr}}(\breve{R}^\dagger\dot{R})\)</span> and insert the expressions above, which we then simplify by making use of the cyclic invariance of the trace and the self-adjointness of the <span class="math inline">\(\mathcal{P}\)</span> operators with respect to the real <span class="math inline">\(\mathop{\mathrm{RTr}}\)</span> inner product. We find</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{Q}^\dagger\dot{Q}) &amp;+ \mathop{\mathrm{RTr}}(\breve{R}^\dagger\dot{R}) \\
+&amp;= \mathop{\mathrm{RTr}}(\breve{Q}^\dagger \dot{A}R^{-1}) + \mathop{\mathrm{RTr}}([\breve{R}^\dagger - R^{-1} \breve{Q}^\dagger Q]\dot{R})\\
+&amp;= \mathop{\mathrm{RTr}}([\breve{Q}R^{-\dagger}]^\dagger \dot{A}) + \mathop{\mathrm{RTr}}([\breve{R} -  Q^\dagger\breve{Q}R^{-\dagger}]^\dagger\dot{R})\\
+&amp;= \mathop{\mathrm{RTr}}([\breve{Q}R^{-\dagger}]^\dagger \dot{A}) + \mathop{\mathrm{RTr}}([\breve{R} -  Q^\dagger\breve{Q}R^{-\dagger}]^\dagger [\mathcal{P}_{rD}(Q^\dagger \dot{A} R^{-1}) + \mathcal{P}_U(Q^\dagger \dot{A} R^{-1}) +  \mathcal{P}_L(Q^\dagger \dot{A} R^{-1})^\dagger ]R)\\
+&amp;= \mathop{\mathrm{RTr}}([\breve{Q}R^{-\dagger}]^\dagger \dot{A}) + \mathop{\mathrm{RTr}}([\breve{R}R^\dagger -  Q^\dagger\breve{Q}]^\dagger [\mathcal{P}_{rD}(Q^\dagger \dot{A} R^{-1}) + \mathcal{P}_U(Q^\dagger \dot{A} R^{-1}) +  \mathcal{P}_L(Q^\dagger \dot{A} R^{-1})^\dagger ])\\
+&amp;= \mathop{\mathrm{RTr}}([\breve{Q}R^{-\dagger}]^\dagger \dot{A}) + \\
+&amp;\qquad \mathop{\mathrm{RTr}}([ \mathcal{P}_{rD}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{L}((\breve{R}R^\dagger -  Q^\dagger\breve{Q})^\dagger)]^\dagger Q^\dagger \dot{A} R^{-1})
+\end{align}\]</span></p>
+<p>Note that, for the last term in the square brackets, we first had to use <span class="math inline">\(\mathop{\mathrm{RTr}}(A^\dagger B^\dagger) = \mathop{\mathrm{RTr}}(AB) = \mathop{\mathrm{RTr}}((A^\dagger)^\dagger B)\)</span>, before we could use the self-adjointness property of <span class="math inline">\(\mathcal{P}_L\)</span>. Halfway in the computation, we have also introduced the short-hand notation <span class="math inline">\(R^{-\dagger} = (R^{-1})^\dagger = (R^\dagger)^{-1}\)</span>. If we furthermore use that <span class="math inline">\(\mathcal{P}_L(A^\dagger) = \mathcal{P}_U(A)^\dagger\)</span>, we can further rewrite this result as</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{Q}^\dagger\dot{Q}) &amp;+ \mathop{\mathrm{RTr}}(\breve{R}^\dagger\dot{R}) \\
+&amp;= \mathop{\mathrm{RTr}}([\breve{Q}R^{-\dagger}]^\dagger \dot{A}) + \\
+&amp;\qquad \mathop{\mathrm{RTr}}([ \mathcal{P}_{rD}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})^\dagger]^\dagger Q^\dagger \dot{A} R^{-1})\\
+&amp;=  \mathop{\mathrm{RTr}}([\breve{Q}R^{-\dagger} + Q(\mathcal{P}_{rD}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})^\dagger)R^{-\dagger}]^\dagger \dot{A})
+\end{align}\]</span></p>
+<p>from which we obtain the final result for the reverse rule</p>
+<p><span class="math display">\[\begin{align}
+\breve{A} = \breve{Q}R^{-\dagger} + Q(\mathcal{P}_{rD}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}R^\dagger -  Q^\dagger\breve{Q})^\dagger)R^{-\dagger}
+\end{align}\]</span></p>
+</section>
+<section id="general-result" class="level2">
+<h2 class="anchored" data-anchor-id="general-result">General result</h2>
+<p>Now suppose that we have a matrix <span class="math inline">\(A\in{\mathbb{C}}^{m \times n}\)</span>, where we do not require that <span class="math inline">\(m \geq n\)</span>, and furthermore can have <span class="math inline">\(\mathop{\mathrm{rank}}(A) = r \leq \min(m,n)\)</span>. Let us split <span class="math inline">\(m=m_1 + m_2 + m_3\)</span> and <span class="math inline">\(n=n_1 + n_2 =\)</span> with <span class="math inline">\(n_1 = m_1 = r\)</span>, <span class="math inline">\(m_2 = \min(m,n)-r\)</span>, <span class="math inline">\(n_2 = n-r\)</span> and <span class="math inline">\(m_3=m-\min(m,n)\)</span>. We still have to make one assumption, which is that <span class="math inline">\(A\)</span> is such that its first <span class="math inline">\(n_1=r\)</span> columns already span its image (column space), so that a full rank QR decomposition of size <span class="math inline">\(m \times r\)</span> could be obtained from these columns.</p>
+<p>We now write the QR decomposition using a square (and thus unitary) matrix <span class="math inline">\(Q\)</span>, in the form</p>
+<p><span class="math display">\[\begin{bmatrix} A_1 &amp; A_2\end{bmatrix} = \begin{bmatrix} Q_1 &amp; Q_2 &amp;  Q_3\end{bmatrix} \begin{bmatrix} R_{11} &amp; R_{12} \\ O&amp; O\\  O&amp; O\end{bmatrix}\]</span></p>
+<p>Here, <span class="math inline">\(A_j \in {\mathbb{C}}^{m \times n_j}\)</span>, <span class="math inline">\(Q_j \in {\mathbb{C}}^{m \times m_i}\)</span> and <span class="math inline">\(R_{ij} \in {\mathbb{C}}^{m_i \times n_j}\)</span> for <span class="math inline">\(i=1,2,3\)</span> and <span class="math inline">\(j=1,2\)</span>. Note that <span class="math inline">\(R_{21}\)</span>, <span class="math inline">\(R_{31}\)</span> and <span class="math inline">\(R_{32}\)</span> are always zero because of the upper triangularity of <span class="math inline">\(R\)</span>. A compact QR decomposition would not return <span class="math inline">\(Q_3\)</span> and the bottom row of <span class="math inline">\(R\)</span>, since already <span class="math inline">\(m_1 + m_2 = \min(m,n)\)</span>. We include it here for completeness.</p>
+<p>Note that the partitioning of <span class="math inline">\(m\)</span> and <span class="math inline">\(n\)</span> is dependent on the current matrix <span class="math inline">\(A\)</span>, and we only have <span class="math inline">\(m_2&gt;0\)</span> and <span class="math inline">\(n_2&gt;0\)</span> when both <span class="math inline">\(m\)</span> and <span class="math inline">\(n\)</span> exceed the rank <span class="math inline">\(r\)</span> of the current matrix. That the block <span class="math inline">\(R_{22}\)</span> is zero expresses precisely this rank deficiency, but it will become nonzero as soon as we perturb away from it. A consequence of this is that <span class="math inline">\(\dot{R}_{22}\)</span> will be nonzero. To assess the effect of <span class="math inline">\(R_{22}=0\)</span>, we will actually replace it with <span class="math inline">\(R_{22} = \epsilon S_{22}\)</span> and study the limit <span class="math inline">\(\epsilon \to 0\)</span>.</p>
+<p>Note that <span class="math inline">\(Q_3\)</span> (present for <span class="math inline">\(m &gt; n\)</span>) can never be uniquely defined, whereas <span class="math inline">\(Q_2\)</span> becomes ambiguous in the limit <span class="math inline">\(\epsilon \to 0\)</span> and will change abruptly under small variations. Hence, we can expect that <span class="math inline">\(\dot{Q}_{22}\)</span> will scale as <span class="math inline">\(\frac{1}{\epsilon}\)</span>. We first try to derive a forward rule by writing</p>
+<p><span class="math display">\[\begin{bmatrix} \dot{A}_1 &amp; \dot{A}_2\end{bmatrix} = \begin{bmatrix} \dot{Q}_1 &amp; \dot{Q}_2 &amp; \dot{Q}_3 \end{bmatrix} \begin{bmatrix} R_{11} &amp; R_{12} \\ O&amp; \epsilon S_{22}\\ O&amp; O\end{bmatrix} + \begin{bmatrix} Q_1 &amp; Q_2 &amp; Q_3\end{bmatrix} \begin{bmatrix} \dot{R}_{11} &amp; \dot{R}_{12} \\ O&amp; \dot{R}_{22} \\ O&amp; O\end{bmatrix}\]</span></p>
+<p>which gives rise to</p>
+<p><span class="math display">\[\begin{align}
+\dot{A}_1 &amp;= \dot{Q}_1 R_{11} + Q_1 \dot{R}_{11}\\
+\dot{A}_2 &amp;= \dot{Q}_1 R_{12} + \epsilon \dot{Q}_2 S_{22} + Q_1 \dot{R}_{12} + Q_2 \dot{R}_{22}
+\end{align}\]</span></p>
+<p>The first equation fixes <span class="math inline">\(\dot{Q}_1\)</span> and <span class="math inline">\(\dot{R}_{11}\)</span> completely, using the forward rule of the full rank QR derived above. Suppose that the resulting <span class="math inline">\(\dot{Q}_1\)</span> takes the form <span class="math inline">\(\dot{Q}_1 = Q_1 \dot{K}_{11} + \dot{L}_1\)</span>. From the structure of <span class="math inline">\(\dot{Q}\)</span>, we know that <span class="math inline">\(\dot{L}_1 = Q_2 \dot{K}_{21} + Q_3 \dot{K}_{31}\)</span>, and then <span class="math inline">\(\dot{Q}_2 = -Q_1 \dot{K}_{21}^\dagger + Q_2 \dot{K}_{22}+Q_3 \dot{K}_{32}\)</span>, where thus <span class="math inline">\(\dot{K}_{21} = Q_2^\dagger \dot{L}_1 =  Q_2^\dagger \dot{Q}_1\)</span> and <span class="math inline">\(\dot{K}_{22}\)</span> and <span class="math inline">\(\dot{K}_{32}\)</span> are new variables (with <span class="math inline">\(\dot{K}_{22}\)</span> antihermitian). Inserting this expression for <span class="math inline">\(\dot{Q}_2\)</span> into the second equation and projection onto <span class="math inline">\(Q_1\)</span>, <span class="math inline">\(Q_2\)</span> and <span class="math inline">\(Q_3\)</span> separately, we obtain</p>
+<p><span class="math display">\[\begin{align}
+Q_1^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon Q_1^\dagger\dot{Q}_2 S_{22} + \dot{R}_{12} = -\epsilon \dot{Q}_1^\dagger Q_2 S_{22} + \dot{R}_{12}\\
+Q_2^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{22} S_{22} + \dot{R}_{22} \\
+Q_3^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}) &amp;= \epsilon \dot{K}_{32} S_{22}
+\end{align}\]</span></p>
+<p>We see that the divergent contribution in <span class="math inline">\(\dot{Q}_2\)</span> disappears along the component <span class="math inline">\(Q_1^\dagger\dot{Q}_2\)</span>, because this equals <span class="math inline">\(-Q_2^\dagger\dot{Q}_1\)</span>. Here, we can safely take the limit <span class="math inline">\(\epsilon \to 0\)</span>, which yields</p>
+<p><span class="math display">\[\begin{align}
+\dot{R}_{12} = Q_1^\dagger (\dot{A}_2-\dot{Q}_1 R_{12}).
+\end{align}\]</span></p>
+<p>The divergent contributions will thus appear in <span class="math inline">\(\dot{K}_{22}=Q_2 \dot{Q}_2\)</span> and <span class="math inline">\(\dot{K}_{32}=Q_3 \dot{Q}_2\)</span>. As the original matrix <span class="math inline">\(A\)</span> only fixes <span class="math inline">\(Q_1\)</span>, but not <span class="math inline">\(Q_2\)</span> and <span class="math inline">\(Q_3\)</span> (except for the fact that together they span the orthogonal complement of <span class="math inline">\(Q_1\)</span>), it follows naturally that the objective function is such that <span class="math inline">\(Q_2^\dagger \breve{Q}_2\)</span> and <span class="math inline">\(Q_3^\dagger \breve{Q}_3\)</span> are approximately zero. The fact that we know that <span class="math inline">\(Q_2\)</span> needs to be orthogonal to <span class="math inline">\(Q_1\)</span> does give meaning tot the projection <span class="math inline">\(Q_1^\dagger \breve{Q}_2\)</span>, which thus does not need to be zero. As <span class="math inline">\(Q_3\)</span> is typically not part of the return result, we do not consider its tangent and cotangent at all.</p>
+<p>PS: In practice, this doesn’t work. For any small update <span class="math inline">\(A \to A +\epsilon \dot{A}\)</span>, we know that the change to <span class="math inline">\(Q_2\)</span> will be of order 1, i.e.&nbsp;writing this is <span class="math inline">\(Q_2 + \epsilon \dot{Q}_2\)</span>, this implies that <span class="math inline">\(\dot{Q}_2\)</span> is <span class="math inline">\(\mathop{\mathrm{\mathscr{O}}}(\epsilon^{-1})\)</span>. While it is true that it is only <span class="math inline">\(Q_2^\dagger \dot{Q}_2\)</span> that order <span class="math inline">\(\epsilon^{-1}\)</span>, and <span class="math inline">\(Q_1^\dagger \dot{Q}_2\)</span> is indeed of order 1, it does not correspond to <span class="math inline">\(-(Q_2^\dagger \dot{Q}_1)^\dagger\)</span> up to order <span class="math inline">\(\epsilon\)</span>, because there are order <span class="math inline">\(\epsilon * \epsilon^{-1} = 1\)</span> corrections. As a consequence, the physically meaningfull contribution to <span class="math inline">\(Q_1^\dagger \breve{Q}_2\)</span> is polluted and it only makes sense to check for <span class="math inline">\(\breve{Q}_2\)</span> as a whole to be zero as a condition for a gauge-invariant cost function.</p>
+<p>What remains to be discussed is the faith of <span class="math inline">\(\dot{R}_{22}\)</span>, and thus, whether there can be a meaningfull cotangent <span class="math inline">\(\breve{R}_{22}\)</span> associated to it. As it seems from these equations, it couples to <span class="math inline">\(Q_2\)</span>, which is not well defined, which seems to imply that also <span class="math inline">\(\dot{R}_{22}\)</span> can impossibly defined unambiguously and would potentially also be divergent. It turns out that the truth is more subtle. Consider thereto</p>
+<p><span class="math display">\[\begin{align}
+(I-Q_1Q_1^\dagger)(\dot{A}_2 - \dot{Q}_1 R_{12})=\dot{A}_2 - \dot{Q}_1 R_{12} - Q_1\dot{R}_{12} = \epsilon \dot{Q}_2 S_22 + Q_2 \dot{R}_{22}.
+\end{align}\]</span></p>
+<p>The left hand side is by construction orthogonal to <span class="math inline">\(Q_1\)</span>, and thus supported in its orthogonal complement. If it would happen that the QR decomposition of the left hand side is exactly <span class="math inline">\(Q_2 \dot{R}_{22}\)</span>, there would be no need for divergent contributions in <span class="math inline">\(\dot{Q}_{22}\)</span>, i.e.&nbsp;we would have <span class="math inline">\(\dot{K}_{22} =O\)</span> and <span class="math inline">\(\dot{K}_{33}=O\)</span>. Note also that, as <span class="math inline">\(\dot{R}_{22}\)</span> is a tangent to <span class="math inline">\(R_{22}=O\)</span>, we want to diagonal elements of <span class="math inline">\(\dot{R}_{22}\)</span> to be positive instead of just real, if the whole decomposition is to represent a QR decomposition with positive diagonal elements. Any deviation between the value of <span class="math inline">\(Q_2\)</span> that happens to be chosen in the QR decomposition of <span class="math inline">\(A\)</span>, and the Q-factor in the QR decomposition of <span class="math inline">\(\dot{A}_2 - \dot{Q}_1 R_{12} - Q_1\dot{R}_{12}\)</span> gives rise to divergent contributions in <span class="math inline">\(\dot{Q}_2\)</span>, but does not affect <span class="math inline">\(\dot{R}_{22}\)</span>. Hence, <span class="math inline">\(\dot{R}_{22}\)</span> is well defined and nondiverging as the R-factor in the (positive) QR decomposition of <span class="math inline">\(\dot{A}_2 - \dot{Q}_1 R_{12} - Q_1\dot{R}_{12}\)</span>. However, while the R-factor in a QR decomposition is homogeneous (rescaling the matrix rescales the R-factor) it is not additive (the R-factor of the sum of two matrices is not the sum). Hence, <span class="math inline">\(\dot{R}_{22}\)</span>, while being non-diverging, does not satisfy the linearity properties associated with a well defined tangent. Hence, we must also assume (or verify) that the associated cotangent <span class="math inline">\(\breve{R}_{22}\)</span> approximates zero for a gauge invariant cost function.</p>
+<p>For the reverse rule, we now start from <span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{Q}_1^\dagger\dot{Q}_1) &amp;+ \mathop{\mathrm{RTr}}(\breve{Q}_2^\dagger\dot{Q}_2)+ \mathop{\mathrm{RTr}}(\breve{R}_{11}^\dagger\dot{R}_{11})+ \mathop{\mathrm{RTr}}(\breve{R}_{12}^\dagger\dot{R}_{12})+ \mathop{\mathrm{RTr}}(\breve{R}_{22}^\dagger\dot{R}_{22})\end{align}\]</span></p>
+<p>and use our assumptions that <span class="math inline">\(\breve{R}_{22}=0\)</span> and <span class="math inline">\(\breve{Q}_2 = (Q_1Q_1^\dagger + Q_2Q_2^\dagger + Q_3Q_3^\dagger)\breve{Q}_2 = Q_1Q_1^\dagger\breve{Q}_2\)</span> together with <span class="math inline">\(Q_1^\dagger\dot{Q}_2 = -\dot{Q}_1^\dagger Q_2\)</span> to write</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{Q}_1^\dagger\dot{Q}_1) &amp;- \mathop{\mathrm{RTr}}((Q_1^\dagger \breve{Q}_2]^\dagger\dot{Q}_1^\dagger Q_2)+ \mathop{\mathrm{RTr}}(\breve{R}_{11}^\dagger\dot{R}_{11})+ \mathop{\mathrm{RTr}}(\breve{R}_{12}^\dagger\dot{R}_{12}) \\
+&amp;= \mathop{\mathrm{RTr}}([\breve{Q}_1-Q_2\breve{Q}_2^\dagger Q_1]^\dagger\dot{Q}_1) + \mathop{\mathrm{RTr}}(\breve{R}_{11}^\dagger\dot{R}_{11})+ \mathop{\mathrm{RTr}}(\breve{R}_{12}^\dagger Q_1^\dagger(\dot{A}_2 - \dot{Q}_1R_{12}))\\
+&amp;= \mathop{\mathrm{RTr}}([\breve{Q}_1-Q_2\breve{Q}_2^\dagger Q_1 - Q_1\breve{R}_{12}R_{12}^\dagger]^\dagger\dot{Q}_1) + \mathop{\mathrm{RTr}}(\breve{R}_{11}^\dagger\dot{R}_{11})+ \mathop{\mathrm{RTr}}([Q_1\breve{R}_{12}]^\dagger \dot{A}_2)
+\end{align}\]</span></p>
+<p>From this point on, we can follow the derivation of the full rank case to reduce <span class="math inline">\(\dot{Q}_1\)</span> and <span class="math inline">\(\dot{R}_11\)</span> to <span class="math inline">\(\dot{A}_1\)</span>, which then defines the cotangent <span class="math inline">\(\breve{A}_1\)</span>, while we can immediately read of <span class="math inline">\(\breve{A}_2\)</span>. We thus find</p>
+<p><span class="math display">\[\begin{align}
+\breve{A}_1 &amp;= \breve{Q}R_{11}^{-\dagger} + Q_1(\mathcal{P}_{rD}(\breve{R}_{11}R_{11}^\dagger -  Q_1^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}_{11}R_{11}^\dagger -  Q_1^\dagger\breve{Q})+\mathcal{P}_{U}(\breve{R}_{11}R_{11}^\dagger -  Q_1^\dagger\breve{Q})^\dagger)R_{11}^{-\dagger}\\
+\breve{A}_2 &amp;= Q_1\breve{R}_{12}
+\end{align}\]</span> where the value <span class="math display">\[\begin{align}
+\breve{Q} = \breve{Q}_1-Q_2\breve{Q}_2^\dagger Q_1 - Q_1\breve{R}_{12}R_{12}^\dagger
+\end{align}\]</span> should be inserted.</p>
+</section>
+</section>
+<section id="eigenvalue-decomposition" class="level1">
+<h1>Eigenvalue decomposition</h1>
+<section id="hermitian-eigenvalue-decomposition" class="level2">
+<h2 class="anchored" data-anchor-id="hermitian-eigenvalue-decomposition">Hermitian eigenvalue decomposition</h2>
+<p>Given a Hermitian matrix <span class="math inline">\(A=A^\dagger\)</span> with <span class="math inline">\(A\in{\mathbb{C}}^{n\times n}\)</span>, it admits an eigenvalue decomposition of the form</p>
+<p><span class="math display">\[A = U D U^{\dagger}\]</span></p>
+<p>with <span class="math inline">\(U\in{\mathbb{C}}^{n\times n}\)</span> unitary and <span class="math inline">\(D\)</span> a real diagonal matrix containing the eigenvalues. This decomposition is not unique, as we can multiply <span class="math inline">\(U\)</span> with another unitary matrix <span class="math inline">\(V\)</span> that commutes with <span class="math inline">\(D\)</span>. If all eigenvalues in <span class="math inline">\(D\)</span> are mutually distinct, this amounts to <span class="math inline">\(V\)</span> being diagonal and unitary, or thus, a matrix with pure complex phases. If some eigenvalues are repeated, <span class="math inline">\(V\)</span> can take a block diagonal form.</p>
+<p>Let us first derive the forward rule from writing the decomposition as <span class="math inline">\(AU =UD\)</span></p>
+<p><span class="math display">\[\dot{A} U + A \dot{U} = \dot{U} D + U\dot{D}\]</span></p>
+<p>and inserting <span class="math inline">\(\dot{U}=U\dot{K}\)</span> with <span class="math inline">\(K=-K^\dagger\)</span>, we obtain</p>
+<p><span class="math display">\[U^\dagger \dot{A}U= \dot{K}D - D\dot{K} + \dot{D}\]</span></p>
+<p>or, in components, where we denote the <span class="math inline">\(i\)</span>th column of <span class="math inline">\(U\)</span> as <span class="math inline">\(\boldsymbol{u}_i\)</span>, the <span class="math inline">\(i\)</span>th eigenvector, and the <span class="math inline">\(i\)</span>th diagonal element of <span class="math inline">\(D\)</span> as <span class="math inline">\(\lambda_i\)</span>, the corresponding eigenvalue:</p>
+<p><span class="math display">\[\boldsymbol{u}_i^\dagger \dot{A} \boldsymbol{u}_j = \dot{K}_{ij} (\lambda_j - \lambda_i) + \dot{\lambda}_i \delta_{ij}\]</span></p>
+<p>Note that <span class="math inline">\(\dot{K}_{ij}\)</span> cannot be determined if <span class="math inline">\(\lambda_j = \lambda_i\)</span>, which includes in particular the diagonal elements <span class="math inline">\(i=j\)</span>. This corresponds exactly to the indeterminedness of <span class="math inline">\(U\)</span> itself in these cases. Any adjoint variables originating from a “gauge-invariant” objective function should thus satisfy</p>
+<p><span class="math display">\[\mathop{\mathrm{RTr}}(\breve{U}^\dagger U K) = 0\]</span></p>
+<p>for any antihermitian <span class="math inline">\(K\)</span> that contains nonzero entries <span class="math inline">\((i,j)\)</span> only where <span class="math inline">\(\lambda_i = \lambda_j\)</span>. This leads to</p>
+<p><span class="math display">\[(U^\dagger \breve{U})_{ij} - \overline{(U^\dagger \breve{U})_{ji}} = 0,\quad \text{for all $1\leq i\leq j\leq n$ for which $\lambda_i = \lambda_j$}\]</span></p>
+<p>We can then solve the forward rule as</p>
+<p><span class="math display">\[\begin{align}
+\dot{K}_{ij} &amp;= \begin{cases} 0,&amp; i = j\text{ or } \lambda_i=\lambda_j \\ \frac{\boldsymbol{u}_i^\dagger \dot{A}\boldsymbol{u}_j}{\lambda_i-\lambda_j},&amp;\text{otherwise}\end{cases}\\
+\dot{\lambda}_i &amp;= \boldsymbol{u}_i^\dagger \dot{A}\boldsymbol{u}_i
+\end{align}\]</span></p>
+<p>The rule for <span class="math inline">\(\dot{K}\)</span> is often written as <span class="math inline">\(\dot{K} = F \odot (U^\dagger \dot{A}U)\)</span> with <span class="math inline">\(\odot\)</span> the Hadamard product (see above) and <span class="math inline">\(F_{ij} = \begin{cases} 0, &amp;\lambda_i = \lambda_j\\ \frac{1}{\lambda_j-\lambda_i},&amp;\text{otherwise}\end{cases}\)</span>.</p>
+<p>It is furthermore important whether we consider <span class="math inline">\(D\)</span>, and thus also its adjoint <span class="math inline">\(\breve{D}\)</span>, to be a matrix, or only a vector of its diagonal elements. Here, we make the former choice. Indeed, we can write the forward rules as</p>
+<p><span class="math display">\[\begin{align}
+\dot{K} &amp;= F \odot (U^\dagger \dot{A}U)\\
+\dot{D} &amp;= \mathcal{P}_{rD}(U^\dagger \dot{A}U)
+\end{align}\]</span> with <span class="math inline">\(\mathcal{P}_{rD}\)</span> the superoperator from before, that projects away everything but the real part of the diagonal. Note that the diagonal elements are anyway real in this case. If the adjoint <span class="math inline">\(\breve{D}\)</span> would be a full matrix, all its non-diagonal elements as well as possible imaginary contributions on the diagonal are projected away, because of the self-adjointness property of this superoperator. Indeed, we can now obtain the backward rule as</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{U}^\dagger \dot{U})+ \mathop{\mathrm{RTr}}(\breve{D}^\dagger \dot{D}) &amp;= \mathop{\mathrm{RTr}}(\breve{U}^\dagger U\dot{K})+ \mathop{\mathrm{RTr}}(\breve{D}^\dagger \dot{D})\\
+&amp;= \mathop{\mathrm{RTr}}\left[(U^\dagger \breve{U})^\dagger (F \odot (U^\dagger\dot{A}U))\right] + \mathop{\mathrm{RTr}}\left[\breve{D}^\dagger \mathcal{P}_{rD}(U^\dagger \dot{A}U)\right]\\
+&amp;= \mathop{\mathrm{RTr}}\left[(F\odot(U^\dagger \breve{U}))^\dagger (U^\dagger\dot{A}U)\right] + \mathop{\mathrm{RTr}}\left[\mathcal{P}_{rD}(\breve{D})^\dagger (U^\dagger \dot{A}U)\right]\\
+&amp;=\mathop{\mathrm{RTr}}\left[(U(F\odot (U^\dagger \breve{U}) + \mathcal{P}_{rD}(\breve{D}))U^\dagger)^\dagger \dot{A}\right]
+\end{align}\]</span></p>
+<p>and thus obtain</p>
+<p><span class="math display">\[\breve{A} = U(F\odot (U^\dagger \breve{U}) + \mathcal{P}_{rD}(\breve{D}))U^\dagger\]</span></p>
+<p>with thus <span class="math inline">\(F_{ij} = \begin{cases} 0, &amp;\lambda_i = \lambda_j\\ \frac{1}{\lambda_j-\lambda_i},&amp;\text{otherwise}\end{cases}\)</span>. As <span class="math inline">\(F\)</span> is real, no complex conjugations are introduced when it <span class="math inline">\(F\)</span> moved from the tangent to the cotangent variables.</p>
+</section>
+<section id="nonhermitian-eigenvalue-decomposition" class="level2">
+<h2 class="anchored" data-anchor-id="nonhermitian-eigenvalue-decomposition">Nonhermitian eigenvalue decomposition</h2>
+<p>Most of this analysis can be repeated for the nonhermitian case, where the eigenvalue decomposition reads</p>
+<p><span class="math display">\[A =VDV^{-1} \iff AV=VD\]</span></p>
+<p>with <span class="math inline">\(D\)</span> still diagonal, but <span class="math inline">\(V\)</span> no longer unitary. Still parameterising <span class="math inline">\(\dot{V}=V\dot{K}\)</span>, where <span class="math inline">\(\dot{K}\)</span> can now be a general matrix, we find</p>
+<p><span class="math display">\[\begin{align}
+\dot{K}&amp;= F \odot (V^{-1}\dot{A}V)\\
+\dot{D}&amp;= \mathcal{P}_D (V^{-1}\dot{A}V)
+\end{align}\]</span></p>
+<p>with <span class="math inline">\(\mathcal{P}_{D} = \mathcal{P}_{rD}+\mathcal{P}_{iD}\)</span> the superoperator that selects the diagonal entries (real + imaginary part) and removes all non-diagonal entries. The matrix <span class="math inline">\(F\)</span> is still given by</p>
+<p><span class="math display">\[F_{ij} = \begin{cases} 0, &amp;\lambda_i = \lambda_j\\ \frac{1}{\lambda_j-\lambda_i},&amp;\text{otherwise}\end{cases}\]</span></p>
+<p>and still uses the fact that <span class="math inline">\(\dot{K}_{ij}\)</span> cannot be determined if <span class="math inline">\(\lambda_i = \lambda_j\)</span>, and that we just put these components equal to zero. The major difference with the Hermitian case is that now the eigenvalues <span class="math inline">\(\lambda_i = D_{ii}\)</span> can no longer assumed to be real.</p>
+<p>From this result, we obtain the reverse rule</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{V}^\dagger \dot{V})+ \mathop{\mathrm{RTr}}(\breve{D}^\dagger \dot{D})&amp;=  \mathop{\mathrm{RTr}}(\breve{V}^\dagger V\dot{K})+ \mathop{\mathrm{RTr}}(\breve{D}^\dagger \dot{D})\\
+&amp;= \mathop{\mathrm{RTr}}\left[(V^\dagger\breve{V})^\dagger (F \odot (V^{-1}\dot{A}V))\right] + \mathop{\mathrm{RTr}}\left[\breve{D}^\dagger \mathcal{P}_{D}(V^{-1} \dot{A}V)\right]\\
+&amp;= \mathop{\mathrm{RTr}}\left[(\overline{F}\odot (V^\dagger\breve{V}))^\dagger (V^{-1}\dot{A}V)\right] + \mathop{\mathrm{RTr}}\left[\mathcal{P}_{D}(\breve{D})^\dagger (V^{-1} \dot{A}V)\right]\\
+&amp;=\mathop{\mathrm{RTr}}\left[(V^{-\dagger}(\overline{F}\odot (V^\dagger\breve{V}) + \mathcal{P}_{D}(\breve{D}))V^{\dagger})^\dagger \dot{A}\right]
+\end{align}\]</span></p>
+<p>and thus obtain</p>
+<p><span class="math display">\[\breve{A} = V^{-\dagger}(\overline{F}\odot (V^\dagger \breve{V}) + \mathcal{P}_{D}(\breve{D}))V^{\dagger}\]</span></p>
+</section>
+<section id="schur-decomposition" class="level2">
+<h2 class="anchored" data-anchor-id="schur-decomposition">Schur decomposition</h2>
+<p>Another decomposition that is closely related to the eigenvalue decomposition of general matrices <span class="math inline">\(A\in{\mathbb{C}}^{n \times n}\)</span> is the Schur decomposition, namely</p>
+<p><span class="math display">\[A = UTU^\dagger\]</span></p>
+<p>where now <span class="math inline">\(U\in {\mathbb{C}}^{n\times n}\)</span> is unitary, and <span class="math inline">\(T\in{\mathbb{C}}^{n\times n}\)</span> is upper triangular. In the case of a hermitian matrix <span class="math inline">\(A\)</span>, the hermiticity of <span class="math inline">\(T\)</span> requires that also its entries above the diagonal vanish, so that the Schur decomposition then coincides with the eigenvalue decomposition. As in the hermitian eigenvalue decomposition, the phase of the columns of <span class="math inline">\(U\)</span> is not fixed by this equation. However, in this case, a phase change in the columns of <span class="math inline">\(U\)</span> also affects the off-diagonal (=above diagonal) elements of <span class="math inline">\(T\)</span>.</p>
+<p>For the forward rule, we again parameterise <span class="math inline">\(\dot{U}=U\dot{K}\)</span> with <span class="math inline">\(\dot{K}=-\dot{K}^\dagger\)</span> in order to find</p>
+<p><span class="math display">\[\dot{A}U + A\dot{U} = \dot{U}T+ U\dot{T}\]</span></p>
+<p>or thus</p>
+<p><span class="math display">\[U^\dagger \dot{A}U = \dot{K}T-T\dot{K} + \dot{T}\]</span></p>
+<p>From the gauge freedom, it follows that the diagonal elements of <span class="math inline">\(\dot{K}\)</span> do not appear in this equations, and can be put to zero (but we should have that the imaginary diagonal components of <span class="math inline">\(U^\dagger \breve{U}\)</span> should be zero for the adjoint variables associated with a gauge invariant objective function). We can interpret the equation above as a black-box linear system for the below-diagonal entries of <span class="math inline">\(\dot{K}\)</span> (which also fix the above-diagonal entries via antihermiticity) and the entries of <span class="math inline">\(\dot{T}\)</span> and feed it into a linear solver. Note that we should then actually separate everything into real and imaginary components.</p>
+<p>Let us instead try to find some more structure in these equations. We first focus on the entries <span class="math inline">\(1 \leq j &lt; i \leq n\)</span>, for which <span class="math inline">\(\dot{T}_{ij} = 0\)</span>. We then find</p>
+<p><span class="math display">\[(U^\dagger\dot{A}U)_{ij} = \sum_{k=1}^j \dot{K}_{ik} T_{kj} - \sum_{k=i}^n T_{ik} \dot{K}_{kj}\]</span></p>
+<p>… to be continued …</p>
+</section>
+</section>
+<section id="partial-eigenvalue-and-schur-factorisation" class="level1">
+<h1>Partial eigenvalue and Schur factorisation</h1>
+<section id="invariant-subspaces" class="level2">
+<h2 class="anchored" data-anchor-id="invariant-subspaces">Invariant subspaces</h2>
+<p>Consider a matrix <span class="math inline">\(A\in{\mathbb{C}}^{n \times n}\)</span>, and a matrix <span class="math inline">\(V \in {\mathbb{C}}^{n \times r}\)</span> of which the columns span an invariant subspace of <span class="math inline">\(A\)</span>. This means that it is such that there exists a matrix <span class="math inline">\(B \in {\mathbb{C}}^{r \times r}\)</span> such that we have an exact equality</p>
+<p><span class="math display">\[AV = VB\]</span></p>
+<p>The matrix <span class="math inline">\(V\)</span> could be composed out of a number of eigenvectors of <span class="math inline">\(A\)</span>, in which case <span class="math inline">\(B\)</span> would be diagonal and contain the corresponding eigenvalues. Alternatively, we can choose the columns of <span class="math inline">\(V\)</span> to be orthonormal, i.e.&nbsp;<span class="math inline">\(V\)</span> isometric, and at the same time <span class="math inline">\(B\)</span> upper triangular. We then have a partial Schur factorisation. As always, both choices coincide in the case where <span class="math inline">\(A\)</span> is hermitian.</p>
+</section>
+<section id="single-eigenvector" class="level2">
+<h2 class="anchored" data-anchor-id="single-eigenvector">Single eigenvector</h2>
+<p>We start with the case where <span class="math inline">\(r=1\)</span>. A one-dimensional invariant subspace needs to be an eigenvector. A single eigenvector <span class="math inline">\(\boldsymbol{u}\)</span> and associated eigenvalue <span class="math inline">\(\lambda\)</span> satisfy</p>
+<p><span class="math display">\[A\boldsymbol{u} = \lambda \boldsymbol{u}\]</span></p>
+<p>from which we obtain</p>
+<p><span class="math display">\[\dot{A}\boldsymbol{u} + A\boldsymbol{\dot{u}} = \dot{\lambda} \boldsymbol{u} + \lambda \boldsymbol{\dot{u}}\]</span></p>
+<p>Since a single eigenvector can always be chosen normalised, we now set <span class="math inline">\(\boldsymbol{\dot{u}} = \boldsymbol{u} k + \boldsymbol{\dot{l}}\)</span> where <span class="math inline">\(k\)</span> is purely imaginary and <span class="math inline">\(\boldsymbol{\dot{l}}\)</span> is orthogonal to <span class="math inline">\(\boldsymbol{u}\)</span>. The scalar <span class="math inline">\(k\)</span> corresponds to changes in the phase of the eigenvector, and will disappear from the equations. It cannot be uniquely determined and so it should also be annihilated by the adjoint associated with any gauge-invariant objective function, i.e.&nbsp;it should hold for any purely imaginary <span class="math inline">\(k\)</span> that</p>
+<p><span class="math display">\[\mathop{\mathrm{Re}}(\boldsymbol{\breve{u}}^\dagger \boldsymbol{u} k) = 0\quad \Rightarrow\quad \mathop{\mathrm{Im}}(\boldsymbol{\breve{u}}^\dagger \boldsymbol{u}) = 0\]</span></p>
+<p>If we thus choose <span class="math inline">\(\dot{k}=0\)</span>, we find that <span class="math inline">\(\boldsymbol{\dot{u}}=\boldsymbol{\dot{l}}\)</span> lives in the orthogonal complement of <span class="math inline">\(\boldsymbol{u}\)</span>, i.e.&nbsp;<span class="math inline">\(\boldsymbol{u}^\dagger \boldsymbol{\dot{u}}=0\)</span>. By projecting the equation above onto <span class="math inline">\(\boldsymbol{u}\)</span> and its orthogonal complement, we then find <span class="math display">\[\begin{align}
+\dot{\lambda} &amp;= \boldsymbol{u}^\dagger \dot{A}\boldsymbol{u} + \boldsymbol{u}^\dagger A\boldsymbol{\dot{u}} \\
+\lambda \boldsymbol{\dot{u}} - (I- \boldsymbol{u}\boldsymbol{u}^\dagger)A\boldsymbol{\dot{u}} &amp;= (\lambda I- A)\boldsymbol{\dot{u}} + \boldsymbol{u}\boldsymbol{u}^\dagger A\boldsymbol{\dot{u}}= (I- \boldsymbol{u}\boldsymbol{u}^\dagger) \dot{A} \boldsymbol{u}\\
+\end{align}\]</span> When <span class="math inline">\(A\)</span> is hermitian, <span class="math inline">\(\boldsymbol{u}^\dagger\)</span> is also a left eigenvector and we can omit the terms containing <span class="math inline">\(\boldsymbol{u}^\dagger A\boldsymbol{\dot{u}}\)</span> in the first and second equation. In particular, we recover the well-known result <span class="math inline">\(\dot{\lambda}=\boldsymbol{u}^\dagger \dot{A}\boldsymbol{u}\)</span>. However, we here deal with the more general case.</p>
+<p>Another way to write this linear system is as <span class="math display">\[\begin{align}
+\begin{bmatrix}
+\lambda I- A  &amp; \boldsymbol{u}\\
+\boldsymbol{u}^\dagger &amp; 0
+\end{bmatrix}\begin{bmatrix} \boldsymbol{\dot{u}} \\ \dot{\lambda}\end{bmatrix}
+= \begin{bmatrix} \dot{A}\boldsymbol{u}\\ 0 \end{bmatrix}
+\end{align}\]</span></p>
+<p>Despite the appearance of <span class="math inline">\((\lambda I-A)\)</span>, which has an eigenvalue zero, the coefficient matrix in this system can be inverted (provided the multiplicity of eigenvalue <span class="math inline">\(\lambda\)</span> of <span class="math inline">\(A\)</span> is one). This follows from writing it as</p>
+<p><span class="math display">\[\begin{align}
+\begin{bmatrix}
+\lambda I- A  &amp; \boldsymbol{u}\\
+\boldsymbol{u}^\dagger &amp; 0
+\end{bmatrix}=\begin{bmatrix}
+\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger  &amp; \boldsymbol{o}\\
+\boldsymbol{o}^\dagger &amp; -a
+\end{bmatrix} + \frac{1}{a} \begin{bmatrix} \boldsymbol{u} \\ a\end{bmatrix}\begin{bmatrix} \boldsymbol{u}^\dagger &amp; a \end{bmatrix}
+\end{align}\]</span> where <span class="math inline">\(a\)</span> is an arbitrary nonzero number. When <span class="math inline">\(A\)</span> is hermitian, it is useful to also restrict <span class="math inline">\(a\)</span> to be real, so that both terms in this sum are hermitian.</p>
+<p>Assuming that the eigenvalue <span class="math inline">\(\lambda\)</span> has multiplicity one, the matrix <span class="math inline">\(\lambda I- A-\frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger\)</span> is invertible for any <span class="math inline">\(a \neq \infty\)</span>, since the spectrum of <span class="math inline">\(A+\frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger\)</span> is given by the spectrum of <span class="math inline">\(A\)</span> with eigenvalue <span class="math inline">\(\lambda\)</span> replaced by <span class="math inline">\(\lambda+\frac{1}{a}\)</span>. Indeed, we find that <span class="math inline">\(\boldsymbol{u}\)</span> is still a right eigenvector as</p>
+<p><span class="math display">\[ (A+\frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)\boldsymbol{u} = \lambda \boldsymbol{u} + \frac{1}{a} \boldsymbol{u}(\boldsymbol{u}^\dagger \boldsymbol{u})\]</span></p>
+<p>and <span class="math inline">\(\boldsymbol{u}\)</span> was assumed normalised to one. Note that this does not require that <span class="math inline">\(A\)</span> is hermitian. That the other eigenvalues <span class="math inline">\(\tilde{\lambda}\neq \lambda\)</span> are not affected by this extra term, follows from applying the left eigenvector <span class="math inline">\(\boldsymbol{\tilde{v}}^\dagger\)</span> associated with those eigenvalues, which satisfy <span class="math inline">\(\boldsymbol{\tilde{v}}^\dagger\boldsymbol{u}=0\)</span>. However, in the general non-Hermitian case, both the left eigenvector for eigenvalue <span class="math inline">\(\lambda\)</span> and the right eigenvectors associated with eigenvalues <span class="math inline">\(\tilde{\lambda}\neq \lambda\)</span> are affected by this extra term.</p>
+<p>We can then compute the inverse of this matrix using the Sherman-Morisson formula, as the second term is a rank-1 update. We find</p>
+<p><span class="math display">\[\begin{align}
+&amp;\begin{bmatrix}
+\lambda I- A  &amp; \boldsymbol{u}\\
+\boldsymbol{u}^\dagger &amp; 0
+\end{bmatrix}^{-1} \\
+&amp;=\begin{bmatrix}
+(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}  &amp; \boldsymbol{o}\\
+\boldsymbol{o}^\dagger &amp; -\frac{1}{a} \end{bmatrix} - \frac{1}{a} \frac{\begin{bmatrix}
+(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}  &amp; \boldsymbol{o}\\
+\boldsymbol{o}^\dagger &amp; -\frac{1}{a} \end{bmatrix}  \begin{bmatrix} \boldsymbol{u} \\ a\end{bmatrix}\begin{bmatrix} \boldsymbol{u}^\dagger &amp; a \end{bmatrix}  \begin{bmatrix}
+(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}  &amp; \boldsymbol{o}\\
+\boldsymbol{o}^\dagger &amp; -\frac{1}{a} \end{bmatrix}}{1+ \frac{1}{a} \begin{bmatrix} \boldsymbol{u}^\dagger &amp; a \end{bmatrix} \begin{bmatrix}
+(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}  &amp; \boldsymbol{o}\\
+\boldsymbol{o}^\dagger &amp; -\frac{1}{a} \end{bmatrix}   \begin{bmatrix} \boldsymbol{u} \\ a\end{bmatrix}}\\
+
+&amp;=\begin{bmatrix}
+(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}  &amp; \boldsymbol{o}\\
+\boldsymbol{o}^\dagger &amp; -\frac{1}{a} \end{bmatrix} - \frac{1}{a} \frac{ \begin{bmatrix} -a\boldsymbol{u} \\ -1\end{bmatrix}\begin{bmatrix}  \boldsymbol{u}^\dagger(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1} &amp; -1 \end{bmatrix}}{1+ \frac{1}{a} \begin{bmatrix} \boldsymbol{u}^\dagger &amp; a \end{bmatrix} \begin{bmatrix} -a\boldsymbol{u} \\ -1\end{bmatrix}}\\
+
+&amp;=\begin{bmatrix}
+(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}  &amp; \boldsymbol{o}\\
+\boldsymbol{o}^\dagger &amp; -\frac{1}{a} \end{bmatrix} -  \begin{bmatrix} \boldsymbol{u} \\ \frac{1}{a}\end{bmatrix}\begin{bmatrix}  \boldsymbol{u}^\dagger(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1} &amp; -1 \end{bmatrix}\\
+
+&amp;=\begin{bmatrix}
+(I-\boldsymbol{u}\boldsymbol{u}^\dagger)(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}  &amp; \boldsymbol{u}\\
+-\frac{1}{a}\boldsymbol{u}^\dagger(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1} &amp; 0 \end{bmatrix}
+\end{align}\]</span></p>
+<p>Here, we have used that <span class="math inline">\((\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}\boldsymbol{u} = -a \boldsymbol{u}\)</span>, but we have not assumed that <span class="math inline">\(A\)</span> is hermitian. If that is the case, then also the entry in the bottom left corner simplifies down to <span class="math inline">\(\boldsymbol{u}^\dagger\)</span>.</p>
+<p>Inserting this inverse in the linear system, we now find</p>
+<p><span class="math display">\[\begin{align}
+\begin{bmatrix}
+\boldsymbol{\dot{u}}\\
+\dot{\lambda}
+\end{bmatrix} = \begin{bmatrix} (I-\boldsymbol{u}\boldsymbol{u}^\dagger)(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1} \dot{A}\boldsymbol{u}\\
+-\frac{1}{a}\boldsymbol{u}^\dagger(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}\dot{A}\boldsymbol{u}
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>Note that the equation</p>
+<p><span class="math display">\[\dot{\lambda} = -\frac{1}{a}\boldsymbol{u}^\dagger(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}\dot{A}\boldsymbol{u}\]</span></p>
+<p>reduced to its well known form <span class="math inline">\(\dot{\lambda}=\boldsymbol{u}^\dagger \dot{A}\boldsymbol{u}\)</span> in the case where <span class="math inline">\(A\)</span> is Hermitian. One might have expected the nonhermitian generalisation <span class="math inline">\(\dot{\lambda}=\boldsymbol{v}^\dagger \dot{A}\boldsymbol{u}\)</span> where <span class="math inline">\(\boldsymbol{v}^\dagger\)</span> is the left eigenvector of <span class="math inline">\(A\)</span> corresponding to eigenvalue <span class="math inline">\(\lambda\)</span>. In fact, it turns out that it holds indeed that</p>
+<p><span class="math display">\[\boldsymbol{v}^\dagger = -\frac{1}{a}\boldsymbol{u}^\dagger(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}\]</span></p>
+<p>as can be verified by writing it as</p>
+<p><span class="math display">\[\boldsymbol{v}^\dagger(\lambda I- A) - \frac{1}{a} (\boldsymbol{v}^\dagger \boldsymbol{u})\boldsymbol{u^\dagger} = -\frac{1}{a}\boldsymbol{u}^\dagger\]</span></p>
+<p>Indeed, it is exactly the left eigenvector <span class="math inline">\(\boldsymbol{v}\)</span>, normalised such that <span class="math inline">\(\boldsymbol{v}^\dagger \boldsymbol{u}=1\)</span>, that satisfies this equation. However, instead of explicitly needing to know this left eigenvector, either by separately solving the eigenvalue equation for the left eigenvector, or by solving the linear system above, we only need to solve one linear system, namely</p>
+<p><span class="math display">\[(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}\dot{A}\boldsymbol{u}\]</span></p>
+<p>in order to determine both <span class="math inline">\(\boldsymbol{\dot{u}}\)</span> and <span class="math inline">\(\dot{\lambda}\)</span>. Note, finally, that while the precise choice of <span class="math inline">\(a\)</span> was irrelevant in all of the above, in practice it might affect the condition number of the matrix that needs to be inverted, and it can be beneficial to make a careful choice, based on what properties of <span class="math inline">\(A\)</span> are known.</p>
+<p>Finally, we derive the backward rule, via</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{Re}}(\boldsymbol{\breve{u}}^\dagger \boldsymbol{\dot{u}})+\mathop{\mathrm{Re}}(\breve{\lambda}^\dagger \dot{\lambda}) &amp;=\mathop{\mathrm{Re}}([(I-\boldsymbol{u}\boldsymbol{u}^\dagger)\boldsymbol{\breve{u}} - \frac{1}{\overline{a}}\breve{\lambda}\boldsymbol{u}]^\dagger(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}\dot{A}\boldsymbol{u})\\
+&amp;=\mathop{\mathrm{RTr}}(((\overline{\lambda}I-A^\dagger -\frac{1}{\overline{a}}\boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}[(I-\boldsymbol{u}\boldsymbol{u}^\dagger)\boldsymbol{\breve{u}} - \frac{1}{\overline{a}}\breve{\lambda}\boldsymbol{u}]\boldsymbol{u}^\dagger)^\dagger \dot{A})
+\end{align}\]</span></p>
+<p>from which we obtain</p>
+<p><span class="math display">\[\breve{A} = (\overline{\lambda}I-A^\dagger -\frac{1}{\overline{a}}\boldsymbol{u}\boldsymbol{u}^\dagger)^{-1}[(I-\boldsymbol{u}\boldsymbol{u}^\dagger)\boldsymbol{\breve{u}} - \frac{1}{\overline{a}}\breve{\lambda}\boldsymbol{u}]\boldsymbol{u}^\dagger\]</span></p>
+</section>
+<section id="single-eigenvector-alternative" class="level2">
+<h2 class="anchored" data-anchor-id="single-eigenvector-alternative">Single eigenvector (alternative)</h2>
+<p>The previous scheme of course hints towards an alternative scheme, that is probably better known or more expected, for the case of a nonhermitian matrix <span class="math inline">\(A\)</span> for which both the left eigenvector <span class="math inline">\(\boldsymbol{u}\)</span> and the right eigenvector <span class="math inline">\(\boldsymbol{v}^\dagger\)</span> associated with an eigenvalue <span class="math inline">\(\lambda\)</span> are known. It is furthermore assumed that <span class="math inline">\(\lambda\)</span> has (algebraic and geometric) multiplicity one, so that there are no Jordan blocks and <span class="math inline">\(\boldsymbol{v}^\dagger \boldsymbol{u}\neq 0\)</span>. We then normalise <span class="math inline">\(\boldsymbol{v}^\dagger\)</span> such that <span class="math inline">\(\boldsymbol{v}^\dagger \boldsymbol{u}=1\)</span>. If we are only interested in the chain rule with respect to <span class="math inline">\(\boldsymbol{u}\)</span>, we can now gauge the tangent direction so that <span class="math inline">\(\boldsymbol{v}^\dagger \boldsymbol{\dot{u}} =0\)</span>, giving rise to the linear system</p>
+<p><span class="math display">\[\begin{align}
+\begin{bmatrix}
+\lambda I- A  &amp; \boldsymbol{u}\\
+\boldsymbol{v}^\dagger &amp; 0
+\end{bmatrix}\begin{bmatrix} \boldsymbol{\dot{u}} \\ \dot{\lambda}\end{bmatrix}
+= \begin{bmatrix} \dot{A}\boldsymbol{u}\\ 0 \end{bmatrix}
+\end{align}\]</span></p>
+<p>Most of the analysis from the previous subsection can easily be generalised by substituting <span class="math inline">\(\boldsymbol{u}^\dagger\)</span> with <span class="math inline">\(\boldsymbol{v}^\dagger\)</span>. But since now <span class="math inline">\(\boldsymbol{v}^\dagger\)</span> is a left eigenvector of <span class="math inline">\(A\)</span>, and also of <span class="math inline">\(A + \frac{1}{a} \boldsymbol{u}\boldsymbol{v}^\dagger\)</span>, some simplification occurs. In this case, the spectral (or Jordan) decomposition of <span class="math inline">\(A + \frac{1}{a} \boldsymbol{u}\boldsymbol{v}^\dagger\)</span> coincides completely with that of <span class="math inline">\(A\)</span> (both eigenvalues and left and right eigenvectors), except for eigenvalue <span class="math inline">\(\lambda\)</span> being shifted to <span class="math inline">\(\lambda + \frac{1}{a}\)</span>. We obtain as final result</p>
+<p><span class="math display">\[\begin{align}
+\begin{bmatrix}
+\boldsymbol{\dot{u}}\\
+\dot{\lambda}
+\end{bmatrix} = \begin{bmatrix} (I-\boldsymbol{u}\boldsymbol{v}^\dagger)(\lambda I- A - \frac{1}{a} \boldsymbol{u}\boldsymbol{v}^\dagger)^{-1} \dot{A}\boldsymbol{u}\\
+\boldsymbol{v}^\dagger\dot{A}\boldsymbol{u}
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>For the reverse rule, we now obtain</p>
+<p><span class="math display">\[\breve{A} = (\overline{\lambda}I-A^\dagger -\frac{1}{\overline{a}}\boldsymbol{v}\boldsymbol{u}^\dagger)^{-1}(I-\boldsymbol{u}\boldsymbol{v}^\dagger)\boldsymbol{\breve{u}}  + \breve{\lambda}\boldsymbol{v}\boldsymbol{u}^\dagger\]</span></p>
+<p>Note that this alternative method is useful if the left eigenvector is already known. If however it still needs to be computed, the previous approach is expected to be computationally cheaper, as it only requires solving one linear system. In the case where <span class="math inline">\(A\)</span> is hermitian and thus <span class="math inline">\(v=u\)</span>, these two approaches coincides.</p>
+</section>
+<section id="higher-dimensional-invariant-subspace" class="level2">
+<h2 class="anchored" data-anchor-id="higher-dimensional-invariant-subspace">Higher-dimensional invariant subspace</h2>
+<p>Now let us consider the case where <span class="math inline">\(V\in{\mathbb{C}}^{n \times p}\)</span> and contains <span class="math inline">\(p\)</span> eigenvectors <span class="math inline">\({v}_i\)</span> and associated eigenvectors <span class="math inline">\(\lambda_i\)</span> for <span class="math inline">\(i=1,\ldots,p\)</span>. Of course, we can just reuse the result from the previous subsection for each pair <span class="math inline">\((\lambda_i,{v}_i)\)</span> separately. For the reverse rule, because of linearity, we can then simply add the results, i.e.</p>
+<p><span class="math display">\[\begin{align}
+\breve{A} = \sum_{i=1}^{p}(\overline{\lambda}_iI-A^\dagger -\frac{1}{\overline{a}}\boldsymbol{v}_i\boldsymbol{v}_i^\dagger)^{-1}[(I-\boldsymbol{v}_i\boldsymbol{v}_i^\dagger)\boldsymbol{\breve{v}_i} - \frac{1}{\overline{a}}\breve{\lambda}_i\boldsymbol{v}_i]\boldsymbol{v}_i^\dagger
+\end{align}\]</span></p>
+<p>However, it might be that there are alternative approaches.</p>
+<section id="hermitian-case" class="level3">
+<h3 class="anchored" data-anchor-id="hermitian-case">Hermitian case</h3>
+<p>Let us first focus on the case where <span class="math inline">\(A\)</span> is hermitian, as in this case the matrix <span class="math inline">\(V\)</span> satisfies the additional constraint that it is isometric, so that it columns are not independent.</p>
+<p>We can then parameterise <span class="math inline">\(\dot{V}=V\dot{K}+\dot{L}\)</span> where <span class="math inline">\(\dot{K}\)</span> is antihermitian and <span class="math inline">\(V^\dagger \dot{L} = O\)</span>. We insert this decomposition in</p>
+<p><span class="math display">\[\dot{A}V + A\dot{V}=\dot{V}D+V\dot{D}\]</span></p>
+<p>and project the resulting equation onto <span class="math inline">\(V\)</span> and its orthogonal complement, in order to obtain</p>
+<p><span class="math display">\[\begin{align}
+V^\dagger \dot{A}V &amp;= \dot{K}D-D\dot{K} + \dot{D}\\
+(I- VV^\dagger)\dot{A}V &amp;=  \dot{L}D -(I- VV^\dagger)A\dot{L}=-\mathcal{S}_{(I- VV^\dagger)A,D}(\dot{L})
+\end{align}\]</span></p>
+<p>The first equation is identical to that of a full eigenvalue decomposition, so that we can recycle the results from that section. For the Sylvester equation on the second line, one might be inclined to omit the projection <span class="math inline">\((I- VV^\dagger)\)</span> in front of <span class="math inline">\(A\dot{L}\)</span>, as <span class="math inline">\(V^\dagger A\dot{L}=DV^\dagger\dot{L}\)</span>, and <span class="math inline">\(V^\dagger\dot{L}\)</span> is supposed to be zero. However, it is exactly the presence of this factor that will enforce that <span class="math inline">\(\dot{L}\)</span> will satisfy this constraint. A different perspective is that the projection is necessary to ensure <span class="math inline">\((I-VV^\dagger)A\)</span> and <span class="math inline">\(D\)</span> do not have common eigenvalues, which makes that the Sylvester equation will have a unique solution. In fact, this requires that all eigenvalues with higher multiplicity are either completely contained in the subspace <span class="math inline">\(V\)</span> or in its orthogonal complement. Furthermore, it is also important that none of the eigenvalues in <span class="math inline">\(V\)</span>, or thus of the diagonal elements in <span class="math inline">\(D\)</span>, are zero. If this is the case, it can help to regularise the second equation as</p>
+<p><span class="math display">\[\begin{align}
+(I- VV^\dagger)\dot{A}V &amp;=  \dot{L}D -A\dot{L} - VD'V^\dagger \dot{L}
+\end{align}\]</span></p>
+<p>where <span class="math inline">\(D'\)</span> is a diagonal matrix that is chosen such that <span class="math inline">\(D\)</span> and <span class="math inline">\(D+D'\)</span> do not have any eigenvalues (diagonal elements) in common. If <span class="math inline">\(D\)</span> does not contain eigenvalues zero, then the choice <span class="math inline">\(D'=-D\)</span> reduces this equation to its original form.</p>
+<p>We now find the solution</p>
+<p><span class="math display">\[\begin{align}
+\dot{K} &amp;= F \odot (V^\dagger \dot{A}V)\\
+\dot{D} &amp;= \mathcal{P}_{rD}(V^\dagger \dot{A}V)\\
+\dot{L} &amp;= - \mathcal{S}_{A+VD'V^\dagger , D}^{-1}((I- VV^\dagger)\dot{A}V)
+\end{align}\]</span> with <span class="math inline">\(F_{ij}=\begin{cases} \frac{1}{\lambda_j-\lambda_i},&amp; i\neq j\\ 0,&amp;i=j\end{cases}\)</span> and <span class="math inline">\(\lambda_i = D_{ii} \in {\mathbb{R}}\)</span>.</p>
+<p>For the reverse rule, we insert <span class="math inline">\(\dot{V}=V\dot{K} + (I- VV^\dagger)\dot{L}\)</span>, where the explicit projector onto the orthogonal complement of <span class="math inline">\(V\)</span> in the second term does not affect <span class="math inline">\(\dot{L}\)</span>, but will help in projecting the corresponding component out of the adjoint variable <span class="math inline">\(\breve{V}\)</span>. We then find <span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{V}^\dagger \dot{V})&amp;+\mathop{\mathrm{RTr}}(\breve{D}^\dagger \dot{D})\\
+&amp;=\mathop{\mathrm{RTr}}([(V^\dagger\breve{V})\odot F + \mathcal{P}_{rD}(\breve{D})]^\dagger V^\dagger\dot{A}V) + \mathop{\mathrm{RTr}}([-\mathcal{S}_{A+VD'V^\dagger , D}^{-1}((I- VV^\dagger)\breve{V})]^\dagger (I- VV^\dagger)\dot{A}V)\\
+&amp;= \mathop{\mathrm{RTr}}([V\{(V^\dagger\breve{V})\odot F + \mathcal{P}_{rD}(\breve{D})\}V^\dagger - (I- VV^\dagger)\mathcal{S}_{A+VD'V^\dagger , D}^{-1}((I- VV^\dagger)\breve{V})V^\dagger]^\dagger\dot{A})
+\end{align}\]</span></p>
+<p>where we have used the hermiticity of <span class="math inline">\(A\)</span> (and <span class="math inline">\(D\)</span> and <span class="math inline">\(D'\)</span>) in order to bring the (inverse) Sylvester superoperator to the dual variables. We thus find</p>
+<p><span class="math display">\[\breve{A}=V[(V^\dagger\breve{V})\odot F + \mathcal{P}_{rD}(\breve{D})]V^\dagger - (I- VV^\dagger)\mathcal{S}_{A+VD'V^\dagger , D}^{-1}((I- VV^\dagger)\breve{V})V^\dagger\]</span></p>
+<p>where, as mentioned above, <span class="math inline">\(D'\)</span> is a an arbitrary (real) diagonal matrix that is chosen such that <span class="math inline">\(D\)</span> and <span class="math inline">\(D+D'\)</span> do not have any eigenvalues (diagonal elements) in common.</p>
+<p>Alternatively, if we can afford to explicitly compute a complement <span class="math inline">\(V_\perp\)</span> and parameterise <span class="math inline">\(\dot{L} = V_\perp \dot{K}_\perp\)</span> and thus <span class="math inline">\(\dot{V}=V\dot{K}+V_\perp \dot{K}_\perp\)</span>, we would find</p>
+<p><span class="math display">\[\begin{align}
+\dot{K} &amp;= F \odot (V^\dagger \dot{A}V)\\
+\dot{D} &amp;= \mathcal{P}_{rD}(V^\dagger \dot{A}V)\\
+\dot{K}_\perp &amp;= - \mathcal{S}_{V_\perp^\dagger AV_\perp, D}^{-1}(V_\perp^\dagger\dot{A}V)
+\end{align}\]</span></p>
+<p>where again we assume that <span class="math inline">\(A\)</span> does not have common eigenvalues in the subspace <span class="math inline">\(V\)</span> (diagonal elements of <span class="math inline">\(D\)</span>) and in the subspace <span class="math inline">\(V_\perp\)</span>. This description translates to a reverse rule</p>
+<p><span class="math display">\[\breve{A}=V[(V^\dagger\breve{V})\odot F + \mathcal{P}_{rD}(\breve{D})]V^\dagger - V_\perp\mathcal{S}_{V_\perp^\dagger AV_\perp , D}^{-1}(V_\perp^\dagger\breve{V})V^\dagger\]</span></p>
+</section>
+<section id="non-hermitian-case" class="level3">
+<h3 class="anchored" data-anchor-id="non-hermitian-case">Non-hermitian case</h3>
+<p>For a non-hermitian matrix <span class="math inline">\(A\)</span>, we can still have a subspace spanned by the columns of <span class="math inline">\(V\)</span>, where we assume these columns to be different eigenvectors, such that <span class="math inline">\(AV=VD\)</span></p>
+<p>As these columns are now not necessarily orthogonal, we first compute their Gram matrix <span class="math inline">\(G=V^\dagger V\)</span>, in order to build an orthogonal projector</p>
+<p><span class="math display">\[P_{V} = V G^{-1} V^\dagger\]</span></p>
+<p>Note that <span class="math inline">\(G^{-1}V^\dagger\)</span> is often referred to as the (Moore-Penrose) pseudoinverse of <span class="math inline">\(V\)</span> and is then denoted as <span class="math inline">\(V^+\)</span>. In the case where <span class="math inline">\(V = {\mathbb{F}}^{n \times n}\)</span>, it coincides with <span class="math inline">\(V^{-1}\)</span>. In the case where the columns of <span class="math inline">\(V\)</span> are orthogonal, <span class="math inline">\(G=I\)</span> and it coincides with <span class="math inline">\(V^\dagger\)</span>.</p>
+<p>We can now again parameterise <span class="math inline">\(\dot{V} = V \dot{K} + \dot{L}\)</span>, which is simply a way to decompose <span class="math inline">\(\dot{V}\)</span> into a component along <span class="math inline">\(V\)</span> and a component in the orthogonal complement. Put differently, we have <span class="math inline">\(V\dot{K} = P_{V}\dot{V}\)</span> and <span class="math inline">\(\dot{L} = (I- P_{V})\dot{V}\)</span>, which shows that <span class="math inline">\(V^\dagger \dot{L} =O\)</span>. In this case, however there is no contraint on <span class="math inline">\(\dot{K}\)</span>. However, as the individual columns of <span class="math inline">\(V\)</span> are only determined up to phases and normalisation, we can still impose a condition on the diagonal of <span class="math inline">\(\dot{K}\)</span>. This is exactly what was used in the full eigenvalue decomposition.</p>
+<p>Now inserting <span class="math inline">\(\dot{V} = V \dot{K} + \dot{L}\)</span> in</p>
+<p><span class="math display">\[\dot{A}V + A\dot{V} = \dot{V}D + V\dot{D}\]</span></p>
+<p>and projecting onto <span class="math inline">\(V\)</span> and its orthogonal complement, we find</p>
+<p><span class="math display">\[\begin{align}
+V^\dagger\dot{A}V + GD\dot{K} + V^\dagger A \dot{L} &amp;= G\dot{K} D + G \dot{D}\\
+(I- VG^{-1}V^\dagger)\dot{A}V + (I- VG^{-1}V^\dagger)A\dot{L} &amp;= \dot{L} D
+\end{align}\]</span></p>
+<p>or thus</p>
+<p><span class="math display">\[\begin{align}
+G^{-1}V^\dagger\left(\dot{A}V +A \dot{L}\right) &amp;= \dot{K} D - D\dot{K} + \dot{D}\\
+(I- VG^{-1}V^\dagger)\dot{A}V &amp;= \dot{L} D - (I- VG^{-1}V^\dagger)A\dot{L} = - \mathcal{S}_{(I- VG^{-1}V^\dagger)A,D}(\dot{L})
+\end{align}\]</span></p>
+<p>The first equation defines <span class="math inline">\(\dot{D}\)</span> and <span class="math inline">\(\dot{K}\)</span> in terms of the left hand side, which still includes <span class="math inline">\(\dot{L}\)</span>. The latter can be completely determined from the second equation. This second equation, as before, contains a Sylvester operator involving the matrices <span class="math inline">\(D\)</span>, the restriction of <span class="math inline">\(A\)</span> onto the subspace <span class="math inline">\(V\)</span>, and <span class="math inline">\((I-VG^{-1}V^\dagger)A\)</span>. The second matrix has the same spectrum of <span class="math inline">\(A\)</span>, except that all eigenvalues contained in <span class="math inline">\(V\)</span> have been mapped to zero. More generally, we could again regularise this Sylvester equation by replacing <span class="math inline">\((I-VG^{-1}V^\dagger)A\)</span> with <span class="math inline">\(A + VD'G^{-1}V^\dagger = A+V D'V^+\)</span>, where <span class="math inline">\(D'\)</span> is chosen such that <span class="math inline">\(D\)</span> and <span class="math inline">\(D+D'\)</span> have no eigenvalues in common. Note that now both choices <span class="math inline">\((I-VG^{-1}V^\dagger)A\)</span> and <span class="math inline">\(A + VD'G^{-1}V^\dagger = A+V D'V^+\)</span> do not become equal for the choice <span class="math inline">\(D'=-D\)</span>, even though the effect on the spectrum is the same (right eigenvectors in <span class="math inline">\(V\)</span> are preserved and have eigenvalue zero, complementary eigenvalues are preserved together with their left eigenvectors). To streamline the rest of the discussion, I will denote either of these choises as <span class="math inline">\(A'\)</span>.</p>
+<p>We now find the solution</p>
+<p><span class="math display">\[\begin{align}
+\dot{L} &amp;= - \mathcal{S}_{A', D}^{-1}((I- VV^+)\dot{A}V)=- \mathcal{S}_{A', D}^{-1}((I- P_V)\dot{A}V)\\
+\dot{K} &amp;= F \odot (V^+ \dot{A}V + V^+ A\dot{L}) = F \odot (V^+ \dot{A}V - V^+ A\mathcal{S}_{A', D}^{-1}((I- P_V)\dot{A}V))\\
+\dot{D} &amp;= \mathcal{P}_{D}(V^+ \dot{A}V + V^+ A\dot{L})=\mathcal{P}_{D}(V^+ \dot{A}V - V^+ A\mathcal{S}_{A', D}^{-1}((I- P_V)\dot{A}V))\\
+\end{align}\]</span></p>
+<p>with, as before, <span class="math inline">\(F_{ij}=\begin{cases} \frac{1}{\lambda_j-\lambda_i},&amp; i\neq j\\ 0,&amp;i=j\end{cases}\)</span> and <span class="math inline">\(\lambda_i = D_{ii}\)</span>.</p>
+<p>For the reverse rule, we then start from</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{V}^\dagger \dot{V}) &amp;+ \mathop{\mathrm{RTr}}(\breve{D}\dot{D}) \\
+&amp;= \mathop{\mathrm{RTr}}([(V^\dagger \breve{V}) \odot {\overline{F}} + \mathcal{P}_{D}(\breve{D})]^\dagger [ V^+ \dot{A}V + V^+ A\dot{L}]) + \mathop{\mathrm{RTr}}(((I- P_V)\breve{V})^\dagger\dot{L})
+\end{align}\]</span></p>
+<p>and using the shorthand <span class="math display">\[\begin{align}
+Z &amp;= (V^+)^\dagger[(V^\dagger \breve{V}) \odot {\overline{F}} + \mathcal{P}_{D}(\breve{D})] = V G^{-1} [(V^\dagger \breve{V}) \odot {\overline{F}} + \mathcal{P}_{D}(\breve{D})]
+\end{align}\]</span></p>
+<p>we find</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{V}^\dagger \dot{V}) &amp;+ \mathop{\mathrm{RTr}}(\breve{D}\dot{D}) \\
+&amp;= \mathop{\mathrm{RTr}}(Z^\dagger \dot{A}V) + \mathop{\mathrm{RTr}}([(I- P_V)\breve{V} + A^\dagger Z]^\dagger \dot{L})\\
+&amp;= \mathop{\mathrm{RTr}}(Z^\dagger \dot{A}V) - \mathop{\mathrm{RTr}}([(I- P_V)\breve{V} + A^\dagger Z]^\dagger\mathcal{S}_{A', D}^{-1}((I- P_V)\dot{A}V))\\
+&amp;= \mathop{\mathrm{RTr}}(Z^\dagger \dot{A}V) - \mathop{\mathrm{RTr}}((\mathcal{S}_{A'^\dagger,D^\dagger}^{-1}((I- P_V)\breve{V} + A^\dagger Z))^\dagger((I- P_V)\dot{A}V))\\
+&amp;= \mathop{\mathrm{RTr}}([Z V^\dagger - (I- P_V) \mathcal{S}^{-1}_{A'^\dagger,D^\dagger}((I-P_V)\breve{V}+A^\dagger Z)V^\dagger]^\dagger \dot{A})
+\end{align}\]</span></p>
+<p>in order to find</p>
+<p><span class="math display">\[\begin{align}
+\breve{A}=Z V^\dagger - (I- P_V) \mathcal{S}^{-1}_{A'^\dagger,D^\dagger}((I-P_V)\breve{V}+A^\dagger Z)V^\dagger
+\end{align}\]</span></p>
+</section>
+</section>
+</section>
+<section id="singular-value-decomposition" class="level1">
+<h1>Singular value decomposition</h1>
+<p>A matrix <span class="math inline">\(A\in {\mathbb{C}}^{m\times n}\)</span> can be decomposed as</p>
+<p><span class="math display">\[A=USV^\dagger\]</span></p>
+<p>where <span class="math inline">\(S \in {\mathbb{C}}^{k \times k}\)</span> is diagonal with real non-negative elements and are typically sorted such that <span class="math inline">\(S_{ii} = s_i \geq s_{i+1}\)</span>. Furthermore, <span class="math inline">\(U\in {\mathbb{C}}^{m \times k}\)</span> and <span class="math inline">\(V\in{\mathbb{C}}^{n \times k}\)</span> are isometric. Here, <span class="math inline">\(k=\min(m,n)\)</span>, but can be chosen equal to some smaller value <span class="math inline">\(r = \mathop{\mathrm{rank}}(A)\)</span> as <span class="math inline">\(s_{r+1}=s_{r+2}=\ldots=s_{\min(m,n)}=0\)</span>.</p>
+<p>Often, we are interested in a truncated singular value decomposition, where only the <span class="math inline">\(p\)</span> largest singular values are kept, but some smaller nonzero singular values are discarded. In this case, the decomposition is not exact. We however still have the exact equality</p>
+<p><span class="math display">\[\begin{align}
+A V &amp;= U S\\
+A^\dagger U &amp;= V S
+\end{align}\]</span></p>
+<p>Note that we always have the gauge freedom <span class="math inline">\(U\to UD\)</span> and <span class="math inline">\(V\to VD\)</span> with <span class="math inline">\(D\)</span> a unitary matrix that satisfies <span class="math inline">\(DS = SD\)</span>. When all the singular values are distinct, this amounts to a diagonal matrix with pure phases.</p>
+<section id="full-rank-decomposition" class="level2">
+<h2 class="anchored" data-anchor-id="full-rank-decomposition">Full rank decomposition</h2>
+<p>We start with the case of a square matrix (<span class="math inline">\(m=n\)</span>) that has full rank (<span class="math inline">\(r=m\)</span>), for which we consider the full singular value decomposition.</p>
+<p>To derive the forward rule, we write</p>
+<p><span class="math display">\[\dot{A} V + A\dot{V} = \dot{U}S + U\dot{S}\]</span></p>
+<p>and parameterise <span class="math inline">\(\dot{U}= U\dot{K}\)</span> and <span class="math inline">\(\dot{V}=V\dot{M}\)</span> with <span class="math inline">\(\dot{K}\)</span> and <span class="math inline">\(\dot{M}\)</span> are antihermitian. We then find</p>
+<p><span class="math display">\[U^\dagger \dot{A} V =  \dot{K} S - S\dot{M} + \dot{S}\]</span></p>
+<p>Writing the components of these equations for the diagonal and off-diagonal separately, we obtain</p>
+<p><span class="math display">\[\begin{align}
+(U^\dagger \dot{A} V)_{ii} &amp;= s_i(\dot{K}_{ii} -\dot{M}_{ii}) + \dot{S}_{ii}\\
+(U^\dagger \dot{A} V)_{ij} &amp;= \dot{K}_{ij} s_j -\dot{M}_{ij} s_i, \qquad i\neq j
+\end{align}\]</span></p>
+<p>Because the antihermitian matrices <span class="math inline">\(\dot{K}\)</span> and <span class="math inline">\(\dot{M}\)</span> only have imaginary diagonal entries, we immediately obtain <span class="math inline">\(\dot{S}=\mathcal{P}_{rD}(U^\dagger \dot{A} V)\)</span>. For the imaginary part of the diagaonal components, we cannot unambiguously distribute them over <span class="math inline">\(\dot{K}_{ii}\)</span> and <span class="math inline">\(\dot{M}_{ii}\)</span> because of the gauge invariance, which means that only there difference is fixed. This implies that any adjoint variables resulting from a gauge invariant objective function should satisfy <span class="math inline">\(\mathop{\mathrm{RTr}}(\breve{U}^\dagger \dot{U} + \breve{V}^\dagger \dot{V})=0\)</span> whenever <span class="math inline">\(\dot{U} = U\dot{D}\)</span> and <span class="math inline">\(\dot{V}=V\dot{D}\)</span> for the same purely imaginary and diagonal matrix <span class="math inline">\(\dot{D}\)</span>, which we could express as the condition</p>
+<p><span class="math display">\[\mathcal{P}_{iD}(U^\dagger \breve{U} + V^\dagger\breve{V})=0\]</span></p>
+<p>for the adjoint variables associated with a gauge-invariant cost function. We can generalise this constraint to the case where some singular values coincide.</p>
+<p>We now make an arbitrary gauge choice that</p>
+<p><span class="math display">\[\dot{K}_{ii} = - \dot{M}_{ii}= \frac{{\mathrm{i}}}{2} \frac{\mathop{\mathrm{Im}}((U^\dagger \dot{A}V)_{ii})}{s_i} = \frac{(U^\dagger \dot{A}V)_{ii} - (V^\dagger \dot{A}^\dagger U)_{ii}}{4 s_i}\]</span></p>
+<p>For the off-diagonal components of <span class="math inline">\(\dot{K}\)</span> and <span class="math inline">\(\dot{M}\)</span>, we parameterise the components above the diagonal in terms of those below the diagonal, in order to find</p>
+<p><span class="math display">\[\begin{align}
+(U^\dagger \dot{A} V)_{ij} &amp;= \dot{K}_{ij} s_j -\dot{M}_{ij} s_i, \qquad i &gt; j\\
+(U^\dagger \dot{A} V)_{ij} &amp;= -\overline{\dot{K}_{ji}} s_j +\overline{\dot{M}_{ji}} s_i, \qquad i&lt; j
+\end{align}\]</span></p>
+<p>or thus, for all <span class="math inline">\(i &gt; j\)</span>: <span class="math display">\[\begin{align}
+(U^\dagger \dot{A} V)_{ij} &amp;= \dot{K}_{ij} s_j -\dot{M}_{ij} s_i\\
+-(V^\dagger \dot{A}^\dagger U)_{ij} &amp;= \dot{K}_{ij} s_i -\dot{M}_{ij} s_j
+\end{align}\]</span> from which we can solve <span class="math display">\[\begin{align}
+\dot{K}_{ij} &amp;= \frac{s_j (U^\dagger \dot{A} V)_{ij} + s_i (V^\dagger \dot{A}^\dagger U)_{ij}}{s_j^2 - s_i^2} = \frac{1}{2} \frac{(U^\dagger \dot{A} V)_{ij} + (V^\dagger \dot{A}^\dagger U)_{ij}}{s_j - s_i} + \frac{1}{2} \frac{(U^\dagger \dot{A} V)_{ij} - (V^\dagger \dot{A}^\dagger U)_{ij}}{s_j + s_i} \\
+\dot{M}_{ij} &amp;= \frac{s_j (V^\dagger \dot{A}^\dagger U)_{ij} + s_i (U^\dagger \dot{A} V)_{ij}}{s_j^2 - s_i^2}=\frac{1}{2} \frac{(U^\dagger \dot{A} V)_{ij} + (V^\dagger \dot{A}^\dagger U)_{ij}}{s_j - s_i} - \frac{1}{2} \frac{(U^\dagger \dot{A} V)_{ij} - (V^\dagger \dot{A}^\dagger U)_{ij}}{s_j + s_i}
+\end{align}\]</span> While these equations were derived for the entries of <span class="math inline">\(\dot{K}\)</span> and <span class="math inline">\(\dot{M}\)</span> with <span class="math inline">\(i &gt; j\)</span>, it can easily be verified that the same equations hold for <span class="math inline">\(i &lt; j\)</span>. Indeed, the first term on the last right hand side of both equations can be recognised as the Hermitian part <span class="math inline">\(\mathcal{P}_{H}(U^\dagger \dot{A}V)\)</span>, which is then made antihermitian by the Hadamard product with <span class="math inline">\(F\)</span>, where <span class="math inline">\(F_{ij}=\begin{cases}\frac{1}{s_j - s_i},&amp; i\neq j\\0,&amp;\text{otherwise}\end{cases}\)</span>. The second term of both right hand sides corresponds to the antihermitian part <span class="math inline">\(\mathcal{P}_{A}(U^\dagger \dot{A}V)\)</span>, which keeps remains antihermitian upon taking the Hadamard product with <span class="math inline">\(G\)</span>, where <span class="math inline">\(G_{ij} = \frac{1}{s_i+s_j}\)</span>. In fact, this last term is even compatible with the specific gauge we have chosen for the diagonal entries of <span class="math inline">\(\dot{K}\)</span> and <span class="math inline">\(\dot{M}\)</span>, and can thus be taken to hold for all <span class="math inline">\(i,j=1,\ldots,n\)</span>. We then obtain the final result for the forward rules</p>
+<p><span class="math display">\[\begin{align}
+\dot{S} &amp;= \mathcal{P}_{rD}(U^\dagger \dot{A}V) = \mathcal{P}_{D}(\mathcal{P}_{H}(U^\dagger \dot{A}V))\\
+\dot{U} &amp;= U (F\odot \mathcal{P}_{H}(U^\dagger \dot{A}V) + G\odot \mathcal{P}_{A}(U^\dagger \dot{A}V))\\
+\dot{V} &amp;= V (F\odot \mathcal{P}_{H}(U^\dagger \dot{A}V) - G\odot \mathcal{P}_{A}(U^\dagger \dot{A}V))
+\end{align}\]</span></p>
+<p>We can now readily obtain the reverse rule using <span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{U}^\dagger \dot{U})&amp;+\mathop{\mathrm{RTr}}(\breve{V}^\dagger \dot{V})+\mathop{\mathrm{RTr}}(\breve{S}^\dagger \dot{S})\\
+&amp;= \mathop{\mathrm{RTr}}(((U^\dagger\breve{U} + V^\dagger\breve{V})\odot F)^\dagger \mathcal{P}_H(U^\dagger \dot{A}V)) \\
+&amp;\qquad + \mathop{\mathrm{RTr}}(((U^\dagger\breve{U} - V^\dagger\breve{V})\odot G)^\dagger \mathcal{P}_A(U^\dagger \dot{A}V))\\
+&amp;\qquad+ \mathop{\mathrm{RTr}}(\mathcal{P}_{rD}(\breve{S})^\dagger (U^\dagger\dot{A}V))\\
+&amp;= \mathop{\mathrm{RTr}}((U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_H((U^\dagger\breve{U} + V^\dagger\breve{V})\odot F) + \mathcal{P}_A((U^\dagger\breve{U} - V^\dagger\breve{V})\odot G)]V^\dagger)^\dagger\dot{A})
+\end{align}\]</span> from which we conclude that</p>
+<p><span class="math display">\[\begin{align}
+\breve{A} &amp;= U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_H((U^\dagger\breve{U} + V^\dagger\breve{V})\odot F) + \mathcal{P}_A((U^\dagger\breve{U} - V^\dagger\breve{V})\odot G)]V^\dagger\\
+&amp;= U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_A(U^\dagger\breve{U} + V^\dagger\breve{V})\odot F + \mathcal{P}_A(U^\dagger\breve{U} - V^\dagger\breve{V})\odot G]V^\dagger\\
+\end{align}\]</span></p>
+<p>where thus</p>
+<p><span class="math display">\[\begin{align}
+F_{ij}&amp;=\begin{cases}\frac{1}{s_j - s_i},&amp; i\neq j\\0,&amp;\text{otherwise}\end{cases},\\
+G_{ij} &amp;= \frac{1}{s_i+s_j}.
+\end{align}\]</span></p>
+<p>Using <span class="math display">\[\begin{align}
+(F\odot G)_{ij}=\begin{cases}\frac{1}{s_j^2 - s_i^2},&amp; i\neq j\\0,&amp;\text{otherwise}\end{cases}
+\end{align}\]</span> we could rewrite this as <span class="math display">\[\begin{align}
+\breve{A} &amp;= U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_A(U^\dagger\breve{U} + V^\dagger\breve{V})\odot F + \mathcal{P}_A(U^\dagger\breve{U} - V^\dagger\breve{V})\odot G]V^\dagger\\
+&amp;= U [ \mathcal{P}_{rD}(\breve{S}) + (\{\mathcal{P}_A(U^\dagger\breve{U} + V^\dagger\breve{V}), S\} + [\mathcal{P}_A(U^\dagger\breve{U} - V^\dagger\breve{V}),S])\odot (F \odot G) + \mathcal{P}_{iD}(U^\dagger\breve{U} - V^\dagger\breve{V})\odot G]V^\dagger\\
+&amp;= U [ \mathcal{P}_{rD}(\breve{S}) + (2\mathcal{P}_A(U^\dagger\breve{U})\cdot S + 2 S \cdot \mathcal{P}_A(V^\dagger\breve{V}))\odot (F \odot G)+ \mathcal{P}_{iD}(U^\dagger\breve{U} - V^\dagger\breve{V})\odot G]V^\dagger\\
+&amp;= U [ \mathcal{P}_{rD}(\breve{S}) + 2\mathcal{P}_H(U^\dagger\breve{U}\odot (F \odot G))\cdot S +  S \cdot 2\mathcal{P}_H(V^\dagger\breve{V}\odot (F \odot G))+ \mathcal{P}_{iD}(U^\dagger\breve{U} - V^\dagger\breve{V})\odot G]V^\dagger\\
+\end{align}\]</span></p>
+<p>It is this last form that appears for example in <a href="https://arxiv.org/1909.02659">https://arxiv.org/1909.02659</a>, except that a different gauge for the diagonal elements was chosen in the forward rule, which also alters the final term of the reverse rule. Indeed, in that reference, the gauge for the diagonal elements was chosen such that</p>
+<p><span class="math display">\[\dot{K}_{ii} =0, \qquad  \dot{M}_{ii}= \frac{(U^\dagger \dot{A}V)_{ii} - (V^\dagger \dot{A}^\dagger U)_{ii}}{2 s_i}\]</span></p>
+<p>While it might seem suspicious that this affects the reverse rule, note that dual variables associated with gauge invariant objective functions should satisfy</p>
+<p><span class="math display">\[\mathcal{P}_{iD}(U^\dagger \breve{U} + V^\dagger\breve{V})=0\]</span></p>
+<p>as mentioned above, so that we could then reexpress</p>
+<p><span class="math display">\[\mathcal{P}_{iD}(U^\dagger\breve{U} - V^\dagger\breve{V}) = -2 \mathcal{P}_{iD}(V^\dagger\breve{V})\]</span></p>
+<p>Using this substitution, our reverse rule equals Equation 1 in <a href="https://arxiv.org/1909.02659">https://arxiv.org/1909.02659</a>.</p>
+</section>
+<section id="general-result-1" class="level2">
+<h2 class="anchored" data-anchor-id="general-result-1">General result</h2>
+<p>We now discuss the general result for the singular value decomposition of a rectangular matrix <span class="math inline">\(A \in {\mathbb{C}}^{m\times n}\)</span>, which potentially has a rank <span class="math inline">\(r \leq \min(m,n)\)</span>, and which is possibly truncated, i.e.&nbsp;for which we only compute <span class="math inline">\(p\leq r\)</span> (typically the largest) singular values and corresponding vectors. We start from the exact relations</p>
+<p><span class="math display">\[\begin{align}
+AV &amp;= US,&amp;A^\dagger U &amp;= VS
+\end{align}\]</span></p>
+<p>with thus <span class="math inline">\(U \in {\mathbb{C}}^{m \times p}\)</span>, <span class="math inline">\(V \in {\mathbb{C}}^{n \times p}\)</span> and <span class="math inline">\(S \in {\mathbb{R}}_{\geq 0}^{p \times p}\)</span>. For the forward derivatives, we obtain</p>
+<p><span class="math display">\[\begin{align}
+\dot{A}V &amp;= \dot{U}S - A\dot{V} + U\dot{S}\\
+\dot{A}^\dagger U &amp;= \dot{V}S - A^\dagger\dot{U} + V\dot{S}
+\end{align}\]</span> where we now insert <span class="math display">\[\begin{align}
+\dot{U}=U\dot{K}+\dot{L},\qquad\dot{K}=-\dot{K}^\dagger,\qquad U^\dagger \dot{L}=O\\
+\dot{V}=U\dot{M}+\dot{N},\qquad\dot{L}=-\dot{L}^\dagger,\qquad V^\dagger \dot{N}=O
+\end{align}\]</span></p>
+<p>Projecting the first equation onto <span class="math inline">\(U^\dagger\)</span> and the second onto <span class="math inline">\(V^\dagger\)</span>, we obtain</p>
+<p><span class="math display">\[\begin{align}
+U^\dagger \dot{A}V &amp;= \dot{K}S - S\dot{M} + \dot{S}\\
+V^\dagger \dot{A}^\dagger U &amp;= \dot{M}S - S\dot{K} + \dot{S}
+\end{align}\]</span> which are the equations we had solved in the full rank case in the previous subsection.</p>
+<p>Instead, we now project the first equation onto <span class="math inline">\((I- UU^\dagger)\)</span> and the second on <span class="math inline">\((I- VV^\dagger)\)</span> in order to find</p>
+<p><span class="math display">\[\begin{align}
+(I- UU^\dagger)\dot{A}V &amp;= \dot{L}S - (I- UU^\dagger)A\dot{N}\\
+(I- VV^\dagger)\dot{A}^\dagger U &amp;= \dot{N}S - (I- VV^\dagger)A^\dagger\dot{L}
+\end{align}\]</span> The best way to solve these equations is to treat them as a single Sylvester equation by rewriting it in block matrix form as</p>
+<p><span class="math display">\[\begin{align}
+\begin{bmatrix}
+(I- UU^\dagger)\dot{A}V\\
+(I- VV^\dagger)\dot{A}^\dagger U
+\end{bmatrix} = \begin{bmatrix} \dot{L} \\ \dot{N} \end{bmatrix} S - \begin{bmatrix} O&amp; (I- UU^\dagger)A \\
+(I- VV^\dagger)A^\dagger &amp; O\end{bmatrix} \begin{bmatrix} \dot{L} \\ \dot{N} \end{bmatrix} = -\mathcal{S}_{\begin{bmatrix} O&amp; (I- UU^\dagger)A \\
+(I- VV^\dagger)A^\dagger &amp; O\end{bmatrix}, S}\left(\begin{bmatrix} \dot{L} \\ \dot{N} \end{bmatrix}\right)
+\end{align}\]</span></p>
+<p>As in the case of the partial Hermitian eigenvalue factorisation, the terms <span class="math inline">\((I- UU^\dagger)A\dot{N}\)</span> and <span class="math inline">\((I- VV^\dagger)A^\dagger\dot{L}\)</span> could be simplified to <span class="math inline">\(A\dot{N}\)</span> and <span class="math inline">\(A^\dagger\dot{L}\)</span> by exploiting that <span class="math inline">\(V^\dagger \dot{N}=O\)</span> and <span class="math inline">\(U^\dagger \dot{L}=O\)</span>. However, it is exactly the presence of these extra projectors that will enforce this condition, and make that the Sylvester operator has a trivial null space and thus becomes invertible. While we could consider more general types of regularisation as in the eigenvalue case, we now asssume that <span class="math inline">\(S\)</span> does not contain zeros on the diagonal, as we are considering a truncated SVD, which is used in cases where zero singular values are probably meant to be truncated away. Furthermore note that <span class="math inline">\((I- UU^\dagger)A=A(I- VV^\dagger) = A-USV^\dagger\)</span> so that the first matrix appearing in the Sylvester operator is also Hermitian, and let us introduce the notation</p>
+<p><span class="math display">\[A_\perp = (I- UU^\dagger)A=A(I- VV^\dagger) = A-USV^\dagger = (I- UU^\dagger)A(I- VV^\dagger)\]</span></p>
+<p>We thus obtain</p>
+<p><span class="math display">\[\begin{align}
+\dot{S} &amp;= \mathcal{P}_{rD}(U^\dagger \dot{A}V) = \mathcal{P}_{D}(\mathcal{P}_{H}(U^\dagger \dot{A}V))\\
+\dot{U} &amp;= U \dot{K} + \dot{L}\\
+\dot{V} &amp;= U \dot{M} + \dot{N}\\
+\dot{K} &amp;= F\odot \mathcal{P}_{H}(U^\dagger \dot{A}V) + G\odot \mathcal{P}_{A}(U^\dagger \dot{A}V)\\
+\dot{M} &amp;= F\odot \mathcal{P}_{H}(U^\dagger \dot{A}V) - G\odot \mathcal{P}_{A}(U^\dagger \dot{A}V)\\
+\begin{bmatrix} \dot{L} \\ \dot{N} \end{bmatrix} &amp;= -\mathcal{S}^{-1}_{\begin{bmatrix} O&amp; A_\perp \\
+A_\perp^\dagger &amp; O\end{bmatrix},S}\left(\begin{bmatrix}
+(I- UU^\dagger)\dot{A}V\\
+(I- VV^\dagger)\dot{A}^\dagger U
+\end{bmatrix}\right)
+\end{align}\]</span></p>
+<p>with</p>
+<p><span class="math display">\[\begin{align}
+F_{ij}&amp;=\begin{cases}\frac{1}{s_j - s_i},&amp; i\neq j\\0,&amp;\text{otherwise}\end{cases},\\
+G_{ij} &amp;= \frac{1}{s_i+s_j}.
+\end{align}\]</span></p>
+<p>as before. To formulate the reverse rule, we will need the quantities</p>
+<p><span class="math display">\[\begin{align}
+\begin{bmatrix} \breve{X} \\ \breve{Y} \end{bmatrix} &amp;= -\mathcal{S}^{-1}_{\begin{bmatrix} O&amp; A_\perp \\
+A_\perp^\dagger &amp; O\end{bmatrix},S}\left(\begin{bmatrix}
+(I- UU^\dagger)\breve{U}\\
+(I- VV^\dagger)\breve{V}
+\end{bmatrix}\right)
+\end{align}\]</span></p>
+<p>so that we can now write</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{U}^\dagger \dot{U})&amp;+\mathop{\mathrm{RTr}}(\breve{V}^\dagger \dot{V})+\mathop{\mathrm{RTr}}(\breve{S}^\dagger \dot{S})\\
+&amp;= \mathop{\mathrm{RTr}}(((U^\dagger\breve{U} + V^\dagger\breve{V})\odot F)^\dagger \mathcal{P}_H(U^\dagger \dot{A}V)) \\
+&amp;\qquad + \mathop{\mathrm{RTr}}(((U^\dagger\breve{U} - V^\dagger\breve{V})\odot G)^\dagger \mathcal{P}_A(U^\dagger \dot{A}V))\\
+&amp;\qquad+ \mathop{\mathrm{RTr}}(\mathcal{P}_{rD}(\breve{S})^\dagger (U^\dagger\dot{A}V))\\
+&amp;\qquad +\mathop{\mathrm{RTr}}(\breve{X}^\dagger (I-UU^\dagger) \dot{A}V)\\
+&amp;\qquad +\mathop{\mathrm{RTr}}(\breve{Y}^\dagger (I-VV^\dagger) \dot{A}^\dagger U)\\
+&amp;= \mathop{\mathrm{RTr}}((U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_H((U^\dagger\breve{U} + V^\dagger\breve{V})\odot F) + \mathcal{P}_A((U^\dagger\breve{U} - V^\dagger\breve{V})\odot G)]V^\dagger)^\dagger\dot{A})\\
+&amp;\qquad+\mathop{\mathrm{RTr}}([(I- UU^\dagger)\breve{X}V^\dagger]^\dagger \dot{A}) + \mathop{\mathrm{RTr}}([(I- VV^\dagger)\breve{Y}U^\dagger]^\dagger \dot{A}^\dagger)
+\end{align}\]</span> from which we conclude that</p>
+<p><span class="math display">\[\begin{align}
+\breve{A} &amp;= U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_H((U^\dagger\breve{U} + V^\dagger\breve{V})\odot F) + \mathcal{P}_A((U^\dagger\breve{U} - V^\dagger\breve{V})\odot G)]V^\dagger\\
+&amp;\qquad + (I- UU^\dagger)\breve{X}V^\dagger  + U\breve{Y}^\dagger (I- VV^\dagger)\\
+&amp;= U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_A(U^\dagger\breve{U} + V^\dagger\breve{V})\odot F + \mathcal{P}_A(U^\dagger\breve{U} - V^\dagger\breve{V})\odot G]V^\dagger\\
+&amp;\qquad + (I- UU^\dagger)\breve{X}V^\dagger  + U\breve{Y}^\dagger (I- VV^\dagger).
+\end{align}\]</span></p>
+<p>Note that <span class="math inline">\(U^\dagger \breve{X}=O\)</span> and <span class="math inline">\(V^\dagger\breve{Y}=O\)</span> should automatically be satisfied by the solutions <span class="math inline">\((\breve{X},\breve{Y}\)</span> of the Sylvester equation, and the inclusion of the extra projectors onto the orthogonal complement of <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span> in the terms containing <span class="math inline">\(\breve{X}\)</span> and <span class="math inline">\(\breve{Y}\)</span> is therefore redundant.</p>
+<p>If we obtained the truncated SVD from first performing a full SVD, and thus have the orthogonal complements <span class="math inline">\(U_\perp\)</span> and <span class="math inline">\(V_\perp\)</span> available, we can rewrite this</p>
+<p><span class="math display">\[\begin{align}
+\dot{S} &amp;= \mathcal{P}_{rD}(U^\dagger \dot{A}V) = \mathcal{P}_{D}(\mathcal{P}_{H}(U^\dagger \dot{A}V))\\
+\dot{U} &amp;= U \dot{K} + U_\perp \dot{K}_\perp\\
+\dot{V} &amp;= U \dot{M} + V_\perp \dot{M}_\perp\\
+\dot{K} &amp;= F\odot \mathcal{P}_{H}(U^\dagger \dot{A}V) + G\odot \mathcal{P}_{A}(U^\dagger \dot{A}V)\\
+\dot{M} &amp;= F\odot \mathcal{P}_{H}(U^\dagger \dot{A}V) - G\odot \mathcal{P}_{A}(U^\dagger \dot{A}V)\\
+\begin{bmatrix} \dot{K}_\perp \\ \dot{M}_\perp \end{bmatrix} &amp;= -\mathcal{S}^{-1}_{\begin{bmatrix} O&amp; U_\perp^\dagger AV_\perp \\
+V_\perp^\dagger \dot{A}^\dagger U_\perp &amp; O\end{bmatrix},S}\left(\begin{bmatrix}
+U_\perp^\dagger\dot{A}V\\
+V_\perp^\dagger\dot{A}^\dagger U
+\end{bmatrix}\right)
+\end{align}\]</span></p>
+<p>and thus for the reverse rule</p>
+<p><span class="math display">\[\begin{align}
+\breve{A} &amp;= U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_H((U^\dagger\breve{U} + V^\dagger\breve{V})\odot F) + \mathcal{P}_A((U^\dagger\breve{U} - V^\dagger\breve{V})\odot G)]V^\dagger\\
+&amp;\qquad + U_\perp \breve{X}'V^\dagger  + U\breve{Y}'^\dagger V_\perp^\dagger\\
+&amp;= U [ \mathcal{P}_{rD}(\breve{S}) + \mathcal{P}_A(U^\dagger\breve{U} + V^\dagger\breve{V})\odot F + \mathcal{P}_A(U^\dagger\breve{U} - V^\dagger\breve{V})\odot G]V^\dagger\\
+&amp;\qquad + U_\perp \breve{X}'V^\dagger  + U\breve{Y}'^\dagger V_\perp^\dagger\\
+\end{align}\]</span></p>
+<p>where now <span class="math inline">\(\breve{X}'=U_\perp^\dagger \breve{X}\)</span> and <span class="math inline">\(\breve{Y}' =V_\perp^\dagger \breve{Y}\)</span> (running out of letters) can directly be obtained from</p>
+<p><span class="math display">\[\begin{align}
+\begin{bmatrix} \breve{X}' \\ \breve{Y}' \end{bmatrix} &amp;= -\mathcal{S}^{-1}_{\begin{bmatrix} O&amp; U_\perp^\dagger AV_\perp \\
+V_\perp^\dagger \dot{A}^\dagger U_\perp &amp; O\end{bmatrix},S}\left(\begin{bmatrix}
+U_\perp^\dagger\breve{U}\\
+V_\perp^\dagger\breve{V}
+\end{bmatrix}\right)
+\end{align}\]</span></p>
+<p>or thus, writing out the sylvester equation explicitly,</p>
+<p><span class="math display">\[\begin{align}
+\breve{X}' S - U_\perp^\dagger AV_\perp \breve{Y}' &amp;= U_\perp^\dagger\breve{U}\\
+\breve{Y}'S - V_\perp^\dagger \dot{A}^\dagger U_\perp \breve{X}' &amp;= V_\perp^\dagger\breve{V}
+\end{align}\]</span></p>
+<p>If <span class="math inline">\(U_\perp\)</span> and <span class="math inline">\(V_\perp\)</span> are not just any orthogonal complement of <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span>, but truly come from a full SVD computation, it furthermore holds that <span class="math inline">\(U_\perp^\dagger AV_\perp\)</span> will also be diagonalised. Note that <span class="math inline">\(U_\perp \in {\mathbb{C}}^{m \times (m-p)}\)</span> and <span class="math inline">\(V \in {\mathbb{C}}^{n \times (n-p)}\)</span>, whereas <span class="math inline">\(\breve{X}' \in {\mathbb{C}}^{(m-p) \times p}\)</span> en <span class="math inline">\(\breve{V}' \in {\mathbb{C}}^{(n-p)\times p}\)</span>. The matrix <span class="math inline">\(U_\perp^\dagger AV_\perp\)</span> is thus a <span class="math inline">\((m-p) \times (n-p)\)</span> matrix with nonzero elements only on the diagonal, namely <span class="math inline">\((U_\perp^\dagger AV_\perp)_{ij} = s_{i+p} \delta_{ij}\)</span> with <span class="math inline">\(\{s_i, i=1,\ldots,\min(m,n)
+\}\)</span> the list of all singular values of <span class="math inline">\(A\)</span>, and <span class="math inline">\(\{s_i,i=1,\ldots,p\}\)</span> the singular values contained in <span class="math inline">\(S\)</span>.</p>
+<p>We now find the componentwise equations</p>
+<p><span class="math display">\[\begin{align}
+\breve{X}'_{ik} s_k - s_{i+p} \breve{Y}'_{ik} &amp;= (U_\perp^\dagger \breve{U})_{ik}\\
+\breve{Y}'_{jk} s_k - s_{j+p} \breve{X}'_{ik} &amp;= (V_\perp^\dagger \breve{V})_{jk}
+\end{align}\]</span> with <span class="math inline">\(i = 1,\ldots, m-p\)</span>, <span class="math inline">\(j=1,\ldots,n-p\)</span> and <span class="math inline">\(k=1,\ldots,p\)</span>. Note that if <span class="math inline">\(m \neq n\)</span>, we are already stretching the notation here, since the index of <span class="math inline">\(s\)</span> might be going out of bounds in the second term (which we interpret as the corresponding <span class="math inline">\(s\)</span> being zero). To solve this in way similar to the full SVD case for the square matrix, we first have to define a common square region for <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. Now, if there are only <span class="math inline">\(r \leq \min(m,n)\)</span> nonzero singular values (<span class="math inline">\(r\)</span> being the rank of <span class="math inline">\(A\)</span>) we can separate these equations into</p>
+<p><span class="math display">\[\begin{align}
+\breve{X}'_{ik} s_k - s_{i+p} \breve{Y}'_{ik} &amp;= (U_\perp^\dagger \breve{U})_{ik}\\
+\breve{Y}'_{jk} s_k - s_{j+p} \breve{X}'_{jk} &amp;= (V_\perp^\dagger \breve{V})_{jk}
+\end{align}\]</span></p>
+<p>for the square region <span class="math inline">\(i,j = 1,\ldots, r-p\)</span> and <span class="math inline">\(k=1,\ldots,p\)</span>, whereas</p>
+<p><span class="math display">\[\begin{align}
+\breve{X}'_{ik} s_k &amp;= (U_\perp^\dagger \breve{U})_{ik}\\
+\breve{Y}'_{jk} s_k &amp;= (V_\perp^\dagger \breve{V})_{jk}
+\end{align}\]</span></p>
+<p>for the remaining values <span class="math inline">\(i=r-p+1,\ldots,m-p\)</span> and <span class="math inline">\(j=r-p+1,\ldots,n-p\)</span>, again for all <span class="math inline">\(k=1,\ldots,p\)</span>.</p>
+<p>This can now easily be solved to</p>
+<p><span class="math display">\[\begin{align}
+\breve{X}'_{ik} &amp;= \frac{(U_\perp^\dagger \breve{U})_{ik} s_k + s_{i+p} (V_\perp^\dagger \breve{V})_{ik}}{s_k^2 - s_{i+p}^2}= \frac{1}{2} \frac{(U_\perp^\dagger \breve{U})_{ik} + (V_\perp^\dagger \breve{V})_{ik}}{s_k - s_{i+p}} + \frac{1}{2}\frac{(U_\perp^\dagger \breve{U})_{ik} - (V_\perp^\dagger \breve{V})_{ik}}{s_k + s_{i+p}}\\
+\breve{Y}'_{ik} &amp;= \frac{(V_\perp^\dagger \breve{V})_{ik} s_k + s_{i+p} (U_\perp^\dagger \breve{U})_{ik}}{s_k^2 - s_{i+p}^2}=\frac{1}{2} \frac{(U_\perp^\dagger \breve{U})_{ik} + (V_\perp^\dagger \breve{V})_{ik}}{s_k - s_{i+p}} - \frac{1}{2}\frac{(U_\perp^\dagger \breve{U})_{ik} - (V_\perp^\dagger \breve{V})_{ik}}{s_k + s_{i+p}}\\
+\end{align}\]</span> for <span class="math inline">\(i = 1,\ldots, r-p\)</span> and <span class="math inline">\(k=1,\ldots,p\)</span>, and <span class="math display">\[\begin{align}
+\breve{X}'_{ik} &amp;= \frac{(U_\perp^\dagger \breve{U})_{ik}}{s_k}\\
+\breve{Y}'_{jk} &amp;= \frac{(V_\perp^\dagger \breve{V})_{jk}}{s_k}
+\end{align}\]</span></p>
+<p>for the remaining values <span class="math inline">\(i=r-p+1,\ldots,m-p\)</span> and <span class="math inline">\(j=r-p+1,\ldots,n-p\)</span>, again for all <span class="math inline">\(k=1,\ldots,p\)</span>.</p>
+</section>
+</section>
+<section id="polar-decomposition" class="level1">
+<h1>Polar decomposition</h1>
+<p>We consider the case of a matrix <span class="math inline">\(A\in{\mathbb{C}}^{m \times n}\)</span> with <span class="math inline">\(m \geq n\)</span>, and write the “left” polar decomposition as <span class="math inline">\(A = W P\)</span> where <span class="math inline">\(W \in {\mathbb{C}}^{m\times n}\)</span> with <span class="math inline">\(W^\dagger W = I\)</span> and <span class="math inline">\(P \in {\mathbb{C}}^{n \times n}\)</span> with <span class="math inline">\(P = P^\dagger\)</span> and <span class="math inline">\(P &gt; 0\)</span> (positive definite). Here, we also assume that <span class="math inline">\(A\)</span> is not rank-deficient, i.e.&nbsp;<span class="math inline">\(A\)</span> and <span class="math inline">\({\hat{P}}\)</span> have rank <span class="math inline">\(n\)</span>. The case with <span class="math inline">\(m \leq n\)</span> where we want t owrite <span class="math inline">\(A = P W^\dagger\)</span> can be obtained by simply taking appropriate hermitian conjugates in all the equations.</p>
+<p>For the tangent directions, we find <span class="math display">\[\begin{align}
+\dot{A} = \dot{W} P + W \dot{P}
+\end{align}\]</span> where we again parameterise <span class="math inline">\(\dot{W} = W \dot{K} + \dot{L}\)</span> with <span class="math inline">\(\dot{K}\)</span> antihermitian and <span class="math inline">\(W^\dagger \dot{L} = O\)</span>.</p>
+<p>We thus find <span class="math display">\[\begin{align}
+W^\dagger \dot{A} = \dot{K} P + \dot{P}\\
+(I- WW^\dagger)\dot{A} &amp;= \dot{L}P
+\end{align}\]</span> and by also considering the Hermitian conjugate of the first equation and using the antihermiticity of <span class="math inline">\(\dot{K}\)</span> and the hermiticity of <span class="math inline">\(P\)</span> and <span class="math inline">\(\dot{P}\)</span>: <span class="math display">\[\begin{align}
+W^\dagger \dot{A} &amp;= \dot{K} P + \dot{P}\\
+\dot{A}^\dagger W &amp;= -P \dot{K} + \dot{P}
+\end{align}\]</span> We then find <span class="math display">\[\begin{align}
+W^\dagger \dot{A} - \dot{A}^\dagger W  &amp;= \dot{K} P + P \dot{K}
+\end{align}\]</span> and thus <span class="math display">\[\begin{align}
+\dot{K} = 2 \mathcal{S}_{P,-P}^{-1}(\mathcal{P}_A(W^\dagger \dot{A}))\\
+\dot{L} = (I- WW^\dagger) \dot{A} P^{-1}
+\end{align}\]</span> We can then compute <span class="math display">\[\begin{align}
+\dot{P} = W^\dagger \dot{A} - \dot{K} P
+\end{align}\]</span> or more explicitly as <span class="math display">\[\begin{align}
+\dot{P} = \mathcal{S}_{P^{-1},-P^{-1}}^{-1} (\mathcal{P}_H(W^\dagger \dot{A})).
+\end{align}\]</span></p>
+<p>To obtain the reverse rule, we start from <span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}(\breve{W}^\dagger \dot{W}) + \mathop{\mathrm{RTr}}(\breve{P}^\dagger \dot{P})
+\end{align}\]</span> where we should remember tath <span class="math inline">\(\dot{P}\)</span> is hermitian, and we can thus add a hermitian projector around <span class="math inline">\(\breve{P}\)</span>, to further find</p>
+<p><span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}&amp;((W^\dagger \breve{W})^\dagger \dot{K}) + \mathop{\mathrm{RTr}}(\breve{W}^\dagger \dot{L}) + \mathop{\mathrm{RTr}}(\mathcal{P}_H(\breve{P})^\dagger (W^\dagger \dot{A}-\dot{K}P))=\\
+&amp;\mathop{\mathrm{RTr}}((W^\dagger \breve{W} - \mathcal{P}_H(\breve{P}) P)^\dagger \dot{K}) +  \mathop{\mathrm{RTr}}(\breve{W}^\dagger (I- WW^\dagger)\dot{A}P^{-1}) + \mathop{\mathrm{RTr}}((W\mathcal{P}_H(\breve{P}))^\dagger \dot{A})
+\end{align}\]</span> We can now further expand the first term, thereby remembering that <span class="math inline">\(\dot{K}\)</span> is antihermitian, and so we only want to antihermitian part of <span class="math inline">\(W^\dagger \breve{W} - \mathcal{P}_H(\breve{P})\)</span>. Alternatively, we can say that <span class="math display">\[\begin{align}
+\mathcal{S}_{P,-P}^{-1}\circ \mathcal{P}_A = \mathcal{P}_A \circ \mathcal{S}_{P,-P}^{-1}
+\end{align}\]</span> i.e.&nbsp;solutions of this specific Sylvester equation nicely separates into hermitian and antihermitian part (due to <span class="math inline">\(P\)</span> being hermitian).</p>
+<p>We thus find for the first term <span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}&amp;((W^\dagger \breve{W} - \mathcal{P}_H(\breve{P}) P)^\dagger \dot{K}) =\\
+&amp;\mathop{\mathrm{RTr}}(\mathcal{S}_{P,-P}^{-1}(2 \mathcal{P}_A(W^\dagger \breve{W} - \mathcal{P}_H(\breve{P})P))^\dagger (W^\dagger \dot{A}))
+\end{align}\]</span> such that, collecting everything together as <span class="math inline">\(\mathop{\mathrm{RTr}}(\breve{A}^\dagger \dot{A})\)</span>, we obtain the final result</p>
+<p><span class="math display">\[\begin{align}
+\breve{A} = W \left[\mathcal{S}_{P,-P}^{-1}(2 \mathcal{P}_A(W^\dagger \breve{W} - \mathcal{P}_H(\breve{P})P)) + \mathcal{P}_H(\breve{P})\right] + (I- WW^\dagger) \breve{W}P^{-1}.
+\end{align}\]</span></p>
+<section id="alternative-from-svd" class="level2">
+<h2 class="anchored" data-anchor-id="alternative-from-svd">Alternative from SVD</h2>
+<p>Given that the polar decomposition is often computed from the SVD as <span class="math display">\[\begin{align}
+W &amp;= U V^\dagger &amp; P &amp;= V S V^\dagger
+\end{align}\]</span> we also find <span class="math display">\[\begin{align}
+\dot{W} &amp;= \dot{U} V^\dagger + U \dot{V}^\dagger\\
+P &amp;= \dot{V} S V^\dagger + V \dot{S} V^\dagger + V S \dot{V}^\dagger
+\end{align}\]</span></p>
+<p>We can then write <span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}&amp;(\breve{W}^\dagger \dot{W}) + \mathop{\mathrm{RTr}}(\mathcal{P}_H(\breve{P})^\dagger \dot{P}) =\\
+&amp;\mathop{\mathrm{RTr}}((\breve{W}V)^\dagger \dot{U}) + \mathop{\mathrm{RTr}}((U^\dagger \breve{W})^\dagger \dot{V}^\dagger) +\\
+&amp; \mathop{\mathrm{RTr}}((\mathcal{P}_H(\breve{P})V S)^\dagger \dot{V}) + \mathop{\mathrm{RTr}}((V^\dagger \mathcal{P}_H(\breve{P})V )^\dagger \dot{S}) + \mathop{\mathrm{RTr}}((SV^\dagger \mathcal{P}_H(\breve{P}) )^\dagger\dot{V}^\dagger)
+\end{align}\]</span> which can be rewritten as <span class="math display">\[\begin{align}
+\mathop{\mathrm{RTr}}&amp;((\breve{W}V)^\dagger \dot{U}) + \mathop{\mathrm{RTr}}(\mathcal{P}_D(V^\dagger \mathcal{P}_H(\breve{P})V )^\dagger \dot{S}) + \mathop{\mathrm{RTr}}((2\mathcal{P}_H(\breve{P})VS+ \breve{W}^\dagger U)^\dagger \dot{V}).
+\end{align}\]</span> Indeed, this is exactly what AD would do to pull back the polar cotangents <span class="math inline">\((\breve{W},\breve{P})\)</span> to SVD cotangents <span class="math display">\[\begin{align}
+\breve{U} &amp;= \breve{W} V\\
+\breve{S} &amp;= \mathcal{P}_D(V^\dagger \mathcal{P}_H(\breve{P})V )\\
+\breve{V} &amp;= 2\mathcal{P}_H(\breve{P})VS+ \breve{W}^\dagger U
+\end{align}\]</span></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
